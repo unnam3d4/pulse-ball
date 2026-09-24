@@ -226,6 +226,96 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
 .menu-quick .menu-help-link{grid-area:auto;justify-self:auto}
 .menu-quick-btn{padding:5px 0;border:0;background:transparent;color:#6e8090;font-size:11px;font-weight:700}
 .menu-quick-btn:hover{color:#5545be}
+
+/* ===== Fullscreen game shell: no top/bottom chrome ===== */
+.level-bar,.game-bottom{display:none!important}
+.game-shell{display:block;background:#dff4df}
+.stage{position:absolute;inset:0;width:100%;height:100%}
+.hud{top:calc(14px + var(--safe-top));left:calc(14px + var(--safe-left));right:calc(14px + var(--safe-right))}
+.hud-level-chip{height:38px;max-width:230px;display:flex;align-items:center;gap:9px;padding:0 12px 0 7px;border:1px solid #ffffffd9;border-radius:13px;background:#ffffffdf;box-shadow:0 5px 18px #21425d1d;backdrop-filter:blur(10px);color:#425c75}
+.hud-level-chip>span{display:grid;place-items:center;width:25px;height:25px;flex:none;border-radius:8px;background:linear-gradient(145deg,#7562ed,#917cf6);color:#fff;font-size:9px;font-weight:900}
+.hud-level-chip>strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:800}
+.ready-hint{bottom:calc(22px + var(--safe-bottom))}
+
+/* ===== Juicy main menu ===== */
+.menu-screen{position:absolute;z-index:20;inset:0;display:grid;place-items:center;padding:max(18px,var(--safe-top)) max(22px,var(--safe-right)) max(18px,var(--safe-bottom)) max(22px,var(--safe-left));overflow:hidden;background:linear-gradient(180deg,#57d5ef 0%,#9cebdc 42%,#eaf18a 100%);backdrop-filter:none}
+.menu-screen[hidden],.menu-level-picker[hidden]{display:none!important}
+.menu-sky-art{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.menu-sky-art::before{content:"";position:absolute;left:9%;top:7%;width:20vmin;height:20vmin;border-radius:50%;background:#fff4a4;box-shadow:0 0 80px 25px #fff0a788}
+.menu-cloud{position:absolute;width:170px;height:42px;border-radius:999px;background:#ffffff9e;filter:blur(.2px)}
+.menu-cloud::before,.menu-cloud::after{content:"";position:absolute;bottom:8px;border-radius:50%;background:inherit}
+.menu-cloud::before{left:26px;width:58px;height:58px}.menu-cloud::after{right:28px;width:74px;height:74px}
+.menu-cloud.c1{left:4%;top:25%;transform:scale(.72)}
+.menu-cloud.c2{right:7%;top:14%;transform:scale(.54);opacity:.72}
+.menu-cloud.c3{right:23%;top:44%;transform:scale(.4);opacity:.48}
+.menu-hill{position:absolute;bottom:-22%;border-radius:50% 50% 0 0/70% 70% 0 0;filter:saturate(1.05)}
+.menu-hill.h1{left:-12%;width:62%;height:48%;background:#52ba7b}
+.menu-hill.h2{right:-13%;width:68%;height:53%;background:#34a77f}
+.menu-ground{position:absolute;left:0;right:0;bottom:0;height:13%;background:linear-gradient(180deg,#a4d94a,#7fbc42)}
+.menu-ground::after{content:"";position:absolute;left:0;right:0;top:0;height:7px;background:#d6f56a}
+.menu-spark{position:absolute;color:#fff7a7;font-style:normal;text-shadow:0 3px 0 #e9b84766;font-size:18px}
+.menu-spark.s1{left:34%;top:15%;transform:rotate(14deg)}.menu-spark.s2{right:29%;top:27%;font-size:12px}.menu-spark.s3{left:24%;top:56%;font-size:10px}.menu-spark.s4{right:12%;top:54%;font-size:15px}
+
+.menu-home{position:relative;z-index:2;width:min(1120px,94vw);min-height:min(610px,78vh);display:grid;grid-template-columns:minmax(0,1.35fr) minmax(330px,.72fr);gap:clamp(28px,5vw,72px);align-items:center;padding:clamp(18px,3vw,40px);border:0;border-radius:0;background:transparent;box-shadow:none}
+.menu-hero-zone{display:flex;align-items:center;gap:clamp(22px,4vw,48px);min-width:0}
+.menu-orb-stage{position:relative;display:grid;place-items:center;width:clamp(230px,24vw,330px);height:clamp(230px,24vw,330px);flex:none}
+.menu-logo-orb{position:relative;width:68%;height:68%;border:8px solid #071936;border-radius:50%;background:radial-gradient(circle at 30% 24%,#6da9e1 0 8%,#2b5e96 25%,#123867 56%,#07182f 100%);box-shadow:0 28px 48px #17395a4d,inset -18px -22px 27px #020a1d8c,inset 11px 11px 17px #a9f6ff2f;animation:menuFloat 3.1s ease-in-out infinite}
+.menu-logo-orb::before{content:"";position:absolute;inset:11%;border:3px solid #56e9ff;border-left-color:transparent;border-bottom-color:#73caff80;border-radius:50%;transform:rotate(28deg)}
+.menu-logo-orb::after{content:"";position:absolute;right:-11%;top:41%;width:23%;height:18%;border-radius:60% 20% 20% 60%;background:linear-gradient(90deg,#315d91,#83f3ff);box-shadow:0 0 18px #67efff77}
+.menu-eye{position:absolute;top:34%;width:22%;height:29%;border-radius:50%;background:#f6ffff;box-shadow:inset 0 -12px #70e5ff}
+.menu-eye::after{content:"";position:absolute;right:18%;top:32%;width:34%;height:44%;border-radius:50%;background:#061b3b}
+.menu-eye.left{left:24%}.menu-eye.right{right:24%}
+.menu-smile{position:absolute;left:35%;top:68%;width:30%;height:15%;border-bottom:4px solid #9cecff;border-radius:0 0 50% 50%}
+.menu-orbit{position:absolute;inset:8%;border:2px solid #ffffff99;border-radius:50%}.orbit-a{transform:rotate(18deg) scaleX(1.28);opacity:.58}.orbit-b{transform:rotate(-34deg) scaleY(.72);opacity:.33}
+.menu-energy{position:absolute;width:12px;height:12px;border-radius:50%;background:#fff8a6;box-shadow:0 0 18px #fff7a8}.e1{left:10%;top:29%}.e2{right:8%;bottom:26%;width:8px;height:8px}.e3{left:25%;bottom:6%;width:7px;height:7px}
+@keyframes menuFloat{50%{transform:translateY(-10px) rotate(2deg)}}
+.menu-copy{min-width:0;text-shadow:0 2px 0 #ffffff66}
+.menu-kicker{margin:0 0 8px;color:#236e83;font-size:12px;font-weight:950;letter-spacing:4px}
+.menu-title{margin:0;color:#102d55;font-size:clamp(64px,7.2vw,108px);line-height:.82;letter-spacing:-5px}
+.menu-tagline{max-width:420px;margin:19px 0 0;color:#285c6e;font-size:clamp(15px,1.45vw,22px);font-weight:800;line-height:1.3}
+.menu-feature-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.menu-feature-row span{padding:7px 10px;border:2px solid #ffffff7d;border-radius:999px;background:#ffffff42;color:#285f6d;font-size:9px;font-weight:900;letter-spacing:.8px;box-shadow:0 3px 10px #315e6510}
+
+.menu-command{position:relative;padding:26px;border:2px solid #ffffffb5;border-radius:30px;background:linear-gradient(155deg,#ffffffef,#f7fffbdc);box-shadow:0 24px 60px #13506135,0 4px 0 #ffffff88 inset}
+.menu-next-card{margin:0 2px 14px}.menu-next-kicker{display:block;margin-bottom:5px;color:#7b8f91;font-size:9px;font-weight:900;letter-spacing:1.6px}.menu-next-card strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#27475d;font-size:17px}
+.menu-play{min-height:78px;width:100%;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border:0;border-radius:22px;background:linear-gradient(135deg,#7258f0 0%,#8e6cf7 60%,#9f7cff 100%);box-shadow:0 7px 0 #5640ba,0 18px 35px #684fd34d;color:#fff;font-size:23px;font-weight:950;text-shadow:0 2px 0 #4935a5}
+.menu-play b{font-size:31px}.menu-play:hover{transform:translateY(-2px);filter:saturate(1.08) brightness(1.02)}.menu-play:active{transform:translateY(5px);box-shadow:0 2px 0 #5640ba}
+.menu-levels-button{min-height:58px;width:100%;display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding:0 17px;border:2px solid #d7eee8;border-radius:18px;background:#f6fffb;color:#315d6d;font-size:13px;font-weight:900;box-shadow:0 6px 16px #2d6b6412}
+.menu-levels-button strong{padding:7px 10px;border-radius:10px;background:#dff6e7;color:#31815e;font-size:10px}
+.menu-stats-strip{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.menu-stats-strip>div{padding:10px 12px;border-radius:14px;background:#eff9f6}
+.menu-stats-strip small{display:block;margin-bottom:3px;color:#7a9694;font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:1px}.menu-stats-strip strong{color:#355d69;font-size:12px}
+.menu-progress{height:8px;margin-top:9px;overflow:hidden;border-radius:999px;background:#dcebe7}.menu-progress i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#4bd7bb,#7666ee,#ffbf52);transition:width .25s}
+.menu-quick{display:flex;justify-content:center;gap:18px;margin-top:17px;flex-wrap:wrap}
+.menu-help-link,.menu-quick-btn{padding:5px 2px;border:0;background:transparent;color:#55727b;font-size:10px;font-weight:850}.menu-help-link:hover,.menu-quick-btn:hover{color:#5543c4}
+
+/* ===== Level picker: bright map-like grid ===== */
+.menu-level-picker{position:relative;z-index:2;width:min(1060px,94vw);max-height:min(700px,90vh);overflow:hidden;padding:24px;border:2px solid #ffffffb5;border-radius:30px;background:linear-gradient(160deg,#ffffffee,#f4fff8e8);box-shadow:0 24px 70px #174d6336}
+.picker-head{display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:14px;margin-bottom:18px}.picker-head p{margin:0 0 3px;color:#5a8a8f;font-size:9px;font-weight:950;letter-spacing:2px}.picker-head h2{margin:0;color:#173b59;font-size:27px}.picker-head>strong{padding:8px 11px;border-radius:11px;background:#e7f8ee;color:#34765e;font-size:11px}
+.picker-back{width:46px;height:46px;border:0;border-radius:14px;background:#eff7f5;color:#416c78;font-size:22px;font-weight:900}
+.menu-level-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.menu-level{position:relative;min-height:112px;padding:14px 12px 11px 15px;border:2px solid #ffffff;border-radius:18px;background:linear-gradient(155deg,#ffffff,#f0fbf7);color:#416171;text-align:left;box-shadow:0 8px 20px #285b6116;overflow:hidden}
+.menu-level::before{content:"";position:absolute;left:0;top:0;bottom:0;width:7px;background:#57cfad}.menu-level[data-chapter="1"]::before{background:#58bfee}.menu-level[data-chapter="2"]::before{background:#8d72ef}.menu-level[data-chapter="3"]::before{background:#f3b648}.menu-level[data-chapter="4"]::before{background:#ee7fa0}.menu-level[data-chapter="5"]::before{background:#36b8a0}
+.menu-level::after{content:"";position:absolute;right:-18px;bottom:-22px;width:70px;height:70px;border-radius:50%;background:#68d7bd16}
+.menu-level:hover:not(:disabled){transform:translateY(-3px) scale(1.015);border-color:#b9fff0;box-shadow:0 13px 25px #244f5c22}
+.menu-level:disabled{opacity:.47;filter:saturate(.5);background:#edf3f2;cursor:default}
+.menu-level-number{display:block;color:#705fe3;font-size:17px;font-weight:950;letter-spacing:.5px}.menu-level-name{display:block;min-height:32px;margin:7px 0;color:#274d61;font-size:11px;font-weight:900;line-height:1.25}.menu-level-meta{display:flex;justify-content:space-between;gap:5px;color:#789198;font-size:9px}.menu-level-stars{color:#e3a835;letter-spacing:.8px}
+.menu-level-lock{position:absolute;right:11px;top:11px;width:12px;height:12px;border:2px solid #82999d;border-radius:4px}.menu-level-lock::before{content:"";position:absolute;left:1px;right:1px;top:-8px;height:7px;border:2px solid #82999d;border-bottom:0;border-radius:7px 7px 0 0}
+
+@media(max-width:900px){
+  .menu-home{grid-template-columns:1fr minmax(290px,.75fr);gap:20px;padding:12px}.menu-orb-stage{width:210px;height:210px}.menu-title{font-size:62px}.menu-command{padding:19px}.menu-play{min-height:64px}
+  .menu-level-grid{grid-template-columns:repeat(3,minmax(0,1fr));overflow:auto;max-height:calc(90vh - 100px);padding-right:2px}
+}
+@media(max-width:680px){
+  .hud-level-chip>strong{display:none}.hud-level-chip{max-width:none;padding-right:7px}.hud{gap:4px}.hud-group{gap:5px}.hud-chip{padding-inline:7px}.pulse-meter{min-width:66px}
+  .menu-home{width:min(520px,96vw);min-height:0;grid-template-columns:1fr;gap:8px;padding:8px}.menu-hero-zone{justify-content:center;text-align:center}.menu-orb-stage{width:130px;height:130px}.menu-logo-orb{border-width:5px}.menu-copy{text-align:left}.menu-title{font-size:49px;letter-spacing:-2.5px}.menu-tagline{margin-top:9px;font-size:12px}.menu-feature-row{display:none}.menu-command{padding:16px;border-radius:22px}.menu-next-card{display:none}.menu-play{min-height:56px;font-size:17px}.menu-levels-button{min-height:49px;margin-top:10px}.menu-stats-strip{margin-top:11px}.menu-quick{margin-top:11px}
+  .menu-level-picker{width:96vw;padding:14px;border-radius:22px}.picker-head{margin-bottom:10px}.picker-head h2{font-size:20px}.menu-level-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.menu-level{min-height:88px;padding:9px 7px 8px 11px;border-radius:13px}.menu-level-number{font-size:13px}.menu-level-name{min-height:26px;margin:4px 0;font-size:9px}.menu-level-meta{font-size:8px}
+}
+@media(max-height:520px) and (orientation:landscape){
+  .menu-home{width:min(1040px,96vw);min-height:0;grid-template-columns:1.25fr .72fr;gap:25px;padding:8px}.menu-orb-stage{width:185px;height:185px}.menu-title{font-size:62px}.menu-tagline{font-size:13px;margin-top:9px}.menu-feature-row{margin-top:10px}.menu-command{padding:15px 17px;border-radius:22px}.menu-next-card{margin-bottom:8px}.menu-play{min-height:55px;font-size:18px}.menu-levels-button{min-height:44px;margin-top:9px}.menu-stats-strip{margin-top:10px}.menu-quick{margin-top:8px}.menu-progress{margin-top:6px}
+  .menu-level-picker{width:min(1120px,97vw);max-height:94vh;padding:12px 14px}.picker-head{margin-bottom:8px}.menu-level-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}.menu-level{min-height:74px;padding:7px 6px 6px 10px;border-radius:12px}.menu-level-number{font-size:11px}.menu-level-name{min-height:20px;margin:2px 0 4px;font-size:8px}.menu-level-meta{font-size:7px}
+}
+@media(prefers-reduced-motion:reduce){.menu-logo-orb{animation:none}}
 </style>
 </head>
 <body>
@@ -233,27 +323,39 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
   <main class="game-shell" id="game-shell" aria-label="Pulse Ball: Побег — игра">
     <div class="boot-screen" id="bootScreen"><div class="boot-mark"><span class="boot-orb"></span><span>PULSE BALL</span><span class="boot-dots"><i></i><i></i><i></i></span></div></div>
     <section class="menu-screen" id="menuScreen" aria-label="Главное меню">
+      <div class="menu-sky-art" aria-hidden="true">
+        <i class="menu-cloud c1"></i><i class="menu-cloud c2"></i><i class="menu-cloud c3"></i>
+        <i class="menu-spark s1">★</i><i class="menu-spark s2">★</i><i class="menu-spark s3">★</i><i class="menu-spark s4">★</i>
+        <i class="menu-hill h1"></i><i class="menu-hill h2"></i><i class="menu-ground"></i>
+      </div>
       <div class="menu-home" id="menuHome">
-        <div class="menu-brand">
-          <div class="menu-logo-orb" aria-hidden="true">
-            <span class="menu-eye left"></span><span class="menu-eye right"></span><span class="menu-smile"></span>
+        <div class="menu-hero-zone">
+          <div class="menu-orb-stage" aria-hidden="true">
+            <span class="menu-orbit orbit-a"></span><span class="menu-orbit orbit-b"></span>
+            <div class="menu-logo-orb"><span class="menu-eye left"></span><span class="menu-eye right"></span><span class="menu-smile"></span></div>
+            <span class="menu-energy e1"></span><span class="menu-energy e2"></span><span class="menu-energy e3"></span>
           </div>
           <div class="menu-copy">
             <p class="menu-kicker">PULSE BALL</p>
             <h1 class="menu-title" id="menuTitle">Побег!</h1>
             <p class="menu-tagline" id="menuTagline">Катись. Прыгай. Включай Pulse.</p>
+            <div class="menu-feature-row"><span>18 LEVELS</span><span>PULSE</span><span>★ STARS</span></div>
           </div>
         </div>
-        <div class="menu-primary-actions">
-          <button class="menu-play" id="continueButton"><span>Играть</span><b>→</b></button>
-          <button class="menu-levels-button" id="levelsButton"><span id="levelsButtonText">Уровни</span><strong id="menuCompleted">0 / 18</strong></button>
-        </div>
-        <div class="menu-progress-row">
-          <span id="menuProgressText">Прогресс</span>
+        <div class="menu-command">
+          <div class="menu-next-card">
+            <span class="menu-next-kicker" id="menuNextKicker">СЛЕДУЮЩИЙ УРОВЕНЬ</span>
+            <strong id="menuNextLevel">01 · Первый импульс</strong>
+          </div>
+          <button class="menu-play" id="continueButton"><span id="continueLabel">Играть</span><b>→</b></button>
+          <button class="menu-levels-button" id="levelsButton"><span id="levelsButtonText">Выбрать уровень</span><strong id="menuCompleted">0 / 18</strong></button>
+          <div class="menu-stats-strip">
+            <div><small id="menuProgressText">Прогресс</small><strong id="menuCompletionText">0%</strong></div>
+            <div><small>★</small><strong id="menuRating">0 / 54 ★</strong></div>
+          </div>
           <div class="menu-progress"><i id="menuProgressFill"></i></div>
-          <strong id="menuRating">0 / 36 ★</strong>
+          <div class="menu-quick"><button class="menu-help-link" id="menuHelpButton">? Как играть</button><button class="menu-quick-btn" id="menuSoundButton">♪ Звук</button><button class="menu-quick-btn" id="menuFullscreenButton">⛶ Экран</button></div>
         </div>
-        <div class="menu-quick"><button class="menu-help-link" id="menuHelpButton">? Как играть</button><button class="menu-quick-btn" id="menuSoundButton">♪ Звук</button><button class="menu-quick-btn" id="menuFullscreenButton">⛶ Экран</button></div>
       </div>
       <div class="menu-level-picker" id="levelPicker" hidden>
         <div class="picker-head">
@@ -285,7 +387,7 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
     <div class="stage" id="stage">
       <canvas id="game" tabindex="0" aria-label="Игра. Стрелки или A и D — движение, пробел — прыжок, E — импульс, P — пауза, R — заново."></canvas>
       <div class="hud">
-        <div class="hud-group"><div class="hud-chip hearts" id="hearts" aria-label="3 жизни">♥♥♥</div><div class="hud-chip" aria-label="Собранные звёзды"><span class="star-icon">★</span><span id="starCount">0</span><span class="star-divider">/</span><span id="starTotal">15</span></div><div class="hud-chip pulse-meter" id="pulseMeter" aria-label="Импульс готов"><span id="pulseText">PULSE</span><i id="pulseFill"></i></div><div class="hud-chip time" id="timer">00:00</div></div>
+        <div class="hud-group"><div class="hud-level-chip"><span id="hudCurrentNumber">01</span><strong id="hudCurrentName">Первый импульс</strong></div><div class="hud-chip hearts" id="hearts" aria-label="3 жизни">♥♥♥</div><div class="hud-chip" aria-label="Собранные звёзды"><span class="star-icon">★</span><span id="starCount">0</span><span class="star-divider">/</span><span id="starTotal">15</span></div><div class="hud-chip pulse-meter" id="pulseMeter" aria-label="Импульс готов"><span id="pulseText">PULSE</span><i id="pulseFill"></i></div><div class="hud-chip time" id="timer">00:00</div></div>
         <div class="hud-group"><button class="icon-btn" id="menuButton" title="Главное меню" aria-label="Главное меню"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="icon-btn help-control" id="helpButton" title="Как играть" aria-label="Как играть">?</button><button class="icon-btn" id="soundButton" aria-label="Включить звук" aria-pressed="false"><svg class="sound-icon" viewBox="0 0 24 24"><path d="M11 4 5 9H2v6h3l6 5V4Z"/><path id="soundWaves" d="m16 9 6 6m0-6-6 6"/></svg></button><button class="icon-btn" id="restartButton" title="Начать заново (R)" aria-label="Начать заново"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1.5 8M4 4v6h6"/></svg></button><button class="icon-btn" id="pauseButton" title="Пауза (P)" aria-label="Пауза"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button><button class="icon-btn fullscreen-btn" id="fullscreenButton" title="На весь экран" aria-label="На весь экран"><svg viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button></div>
       </div>
       <div class="ready-hint" id="readyHint"><p id="readyText">Двигайся, прыгай и используй Pulse!</p><button class="start-btn" id="startButton"><span id="startButtonText">Поехали</span> <span aria-hidden="true">→</span></button></div>
@@ -580,7 +682,7 @@ globalThis.PulseBallEngine = (() => {
   const LEVEL_NAMES_EN=['First Pulse','Echo Valley','Energy Rift','Pulse Ascent','Sky Terraces','Heart of the Rift','Resonance Canyon','Above the Clouds','Energy Cascade','Light Frontier','Sky Circuit','Radiant Core','Sunlit Gardens','Turquoise Flow','Pulse Garden','High Voltage','Rainbow Cascade','Energy Peak'];
   const I18N={
     ru:{
-      title:'Pulse Ball: Побег',menuTitle:'Побег!',menuTagline:'Катись. Прыгай. Включай Pulse.',levels:'Уровни',progress:'Прогресс',how:'? Как играть',pickerEyebrow:'ВЫБОР УРОВНЯ',pickerTitle:'Куда дальше?',ready:'Двигайся, прыгай и используй Pulse!',go:'Поехали',move:'двигаться',jump:'прыгать',restart:'заново',pause:'пауза',finish:'финиш ↗',space:'Пробел',
+      title:'Pulse Ball: Побег',menuTitle:'Побег!',menuTagline:'Катись. Прыгай. Включай Pulse.',levels:'Выбрать уровень',progress:'Прогресс',how:'? Как играть',pickerEyebrow:'ВЫБОР УРОВНЯ',pickerTitle:'Куда дальше?',ready:'Двигайся, прыгай и используй Pulse!',go:'Поехали',move:'двигаться',jump:'прыгать',restart:'заново',pause:'пауза',finish:'финиш ↗',space:'Пробел',
       play:'Играть',continue:'Продолжить',completed:'пройден',locked:'закрыт',levelLocked:'Сначала пройди предыдущий уровень',record:'РЕКОРД',adventure:'ТВОЁ ПРИКЛЮЧЕНИЕ',lives:'жизни',pulseReady:'Импульс готов',pulseCharging:'Импульс заряжается',
       tutorialMove:'ДВИЖЕНИЕ',tutorialJump:'ПРЫЖОК',tutorialObject:'ТОЛКНИ ЯЩИК',tutorialOrb:'СФЕРА → ПРИЁМНИК',tutorialRelay:'АКТИВИРУЙ RELAY',tutorialBoost:'АКТИВИРУЙ УСКОРИТЕЛЬ',
       orbLaunch:'Сфера летит к приёмнику — попади в кристалл!',orbHit:'Приёмник заряжен — мост включён!',hurtCheckpoint:'Ещё попытка — с контрольной точки!',hurtRetry:'Ничего, попробуем ещё раз!',checkpoint:'Контрольная точка! Здесь безопасно.',shatter:'Блок разрушен!',switchOn:'Переключатель включён. Направь ящик на плиту!',bridgeOn:'Мост активирован!',
@@ -593,7 +695,7 @@ globalThis.PulseBallEngine = (() => {
       helpMove:'Движение',helpJump:'Прыжок',helpPulse:'Импульс перед героем: ломает голубые блоки, двигает ящик и включает переключатель. На телефоне — кнопка PULSE',helpPlate:'Плита',helpPlateText:'Поставь на неё импульсный ящик, чтобы включить мост',helpOrb:'Энерго-сфера',helpOrbText:'Используй Pulse рядом со сферой: она летит по стрелке, сбивает врагов и включает приёмник',helpFlag:'Белый флаг',helpFlagText:'Контрольная точка',helpPR:'Пауза / начать заново'
     },
     en:{
-      title:'Pulse Ball: Escape',menuTitle:'Escape!',menuTagline:'Roll. Jump. Fire your Pulse.',levels:'Levels',progress:'Progress',how:'? How to play',pickerEyebrow:'LEVEL SELECT',pickerTitle:'Where next?',ready:'Move, jump and use Pulse!',go:'Go',move:'move',jump:'jump',restart:'restart',pause:'pause',finish:'finish ↗',space:'Space',
+      title:'Pulse Ball: Escape',menuTitle:'Escape!',menuTagline:'Roll. Jump. Fire your Pulse.',levels:'Choose level',progress:'Progress',how:'? How to play',pickerEyebrow:'LEVEL SELECT',pickerTitle:'Where next?',ready:'Move, jump and use Pulse!',go:'Go',move:'move',jump:'jump',restart:'restart',pause:'pause',finish:'finish ↗',space:'Space',
       play:'Play',continue:'Continue',completed:'cleared',locked:'locked',levelLocked:'Clear the previous level first',record:'BEST',adventure:'YOUR RUN',lives:'lives',pulseReady:'Pulse ready',pulseCharging:'Pulse charging',
       tutorialMove:'MOVE',tutorialJump:'JUMP',tutorialObject:'PUSH THE CRATE',tutorialOrb:'ORB → RECEIVER',tutorialRelay:'ACTIVATE RELAY',tutorialBoost:'HIT THE BOOST PAD',
       orbLaunch:'The orb is heading for the receiver — hit the crystal!',orbHit:'Receiver charged — bridge online!',hurtCheckpoint:'One more try — back to the checkpoint!',hurtRetry:'Almost. Try again!',checkpoint:'Checkpoint reached!',shatter:'Block shattered!',switchOn:'Switch on. Push the crate onto the plate!',bridgeOn:'Bridge activated!',
@@ -615,7 +717,7 @@ globalThis.PulseBallEngine = (() => {
     $('readyText').textContent=tr('ready');$('startButtonText').textContent=tr('go');$('guideMove').textContent=tr('move');$('guideJump').textContent=tr('jump');$('guideRestart').textContent=tr('restart');$('guidePause').textContent=tr('pause');$('finishGuide').textContent=tr('finish');$('jumpKeyLabel').textContent=tr('space');
     $('levelBrand').firstChild.nodeValue=tr('title')+' · ';
     $('menuButton').title=tr('levels');$('menuButton').setAttribute('aria-label',tr('levels'));$('helpButton').title=tr('helpTitle');$('helpButton').setAttribute('aria-label',tr('helpTitle'));$('restartButton').title=tr('restart');$('restartButton').setAttribute('aria-label',tr('restart'));$('pauseButton').title=tr('pause');$('pauseButton').setAttribute('aria-label',tr('pause'));
-    $('currentLevelName').textContent=levelDisplayName(g.index);updateSound();updateFullscreen();
+    $('currentLevelName').textContent=levelDisplayName(g.index);$('hudCurrentName').textContent=levelDisplayName(g.index);$('hudCurrentNumber').textContent=String(g.index+1).padStart(2,'0');updateSound();updateFullscreen();
   }
   function setLanguage(code){lang=String(code||'ru').toLowerCase().startsWith('ru')?'ru':'en';applyStaticLanguage();}
   function mergeExternalProgress(raw){
@@ -1028,8 +1130,8 @@ globalThis.PulseBallEngine = (() => {
       const index=Number(tab.dataset.level),locked=index>unlocked;tab.disabled=locked;tab.setAttribute('aria-label',locked?(tr('locked')+' '+(index+1)):levelDisplayName(index));
     });
     const done=completedCount(),rating=E.levels.reduce((sum,_,i)=>sum+ratingFor(i),0),next=continueLevel();
-    $('menuCompleted').textContent=done+' / '+E.levels.length;$('menuRating').textContent=rating+' / '+(E.levels.length*3)+' ★';$('menuProgressFill').style.width=Math.round(done/E.levels.length*100)+'%';$('pickerProgress').textContent=done+' / '+E.levels.length;
-    $('continueButton').querySelector('span').textContent=done?tr('continue')+' · '+String(next+1).padStart(2,'0'):tr('play');
+    $('menuCompleted').textContent=done+' / '+E.levels.length;$('menuRating').textContent=rating+' / '+(E.levels.length*3)+' ★';$('menuProgressFill').style.width=Math.round(done/E.levels.length*100)+'%';$('menuCompletionText').textContent=Math.round(done/E.levels.length*100)+'%';$('pickerProgress').textContent=done+' / '+E.levels.length;
+    $('continueLabel').textContent=done?tr('continue'):tr('play');$('menuNextLevel').textContent=String(next+1).padStart(2,'0')+' · '+levelDisplayName(next);
     $('levelGrid').innerHTML=E.levels.map((level,i)=>{
       const locked=i>unlocked,r=recordFor(i),rating=ratingFor(i),filled='★'.repeat(rating),empty='☆'.repeat(3-rating),chapter=Math.floor(i/3);
       const meta=r&&Number.isFinite(r.time)?formatTime(r.time):r?tr('completed'):locked?tr('locked'):tr('play').toLowerCase();
@@ -1057,7 +1159,7 @@ globalThis.PulseBallEngine = (() => {
     clearInput();globalThis.YandexPlatform?.hideBanner?.();g=E.createGame(index);mode=autostart?'playing':'ready';camera=0;particles=[];shake=0;accumulator=0;tutorialSeen=new Set();hideTutorial(true);
     $('menuScreen').hidden=true;$('overlay').hidden=true;$('readyHint').hidden=autostart;$('toast').classList.remove('visible');
     document.querySelectorAll('[data-level]').forEach(b=>{const active=Number(b.dataset.level)===index;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','true');else b.removeAttribute('aria-current');});
-    $('currentLevelNumber').textContent=String(index+1).padStart(2,'0');$('currentLevelName').textContent=levelDisplayName(index);
+    $('currentLevelNumber').textContent=String(index+1).padStart(2,'0');$('currentLevelName').textContent=levelDisplayName(index);$('hudCurrentNumber').textContent=String(index+1).padStart(2,'0');$('hudCurrentName').textContent=levelDisplayName(index);
     updateHud();updateRecord();if(autostart){unlockAudio();globalThis.YandexPlatform?.gameplayStart?.();canvas.focus({preventScroll:true});}
   }
   function openDialog(kind){
