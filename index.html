@@ -790,7 +790,7 @@ globalThis.PulseBallEngine = (() => {
       let cards='';
       for(let i=ch.from;i<=ch.to;i++){
         const locked=i>unlocked,r=recordFor(i),rating=ratingFor(i),filled='★'.repeat(rating),empty='☆'.repeat(3-rating);
-        cards+='<button class="menu-level" data-menu-level="'+i+'" '+(locked?'disabled':'')+'><span class="menu-level-number">'+String(i+1).padStart(2,'0')+'</span><span class="menu-level-name">'+E.levels[i].name+'</span><span class="menu-level-meta"><span class="menu-level-stars">'+(r?filled+empty:'☆☆☆')+'</span><span>'+(r?formatTime(r.time):locked?'закрыт':'играть')+'</span></span>'+(locked?'<span class="menu-level-lock">●</span>':'')+'</button>';
+        cards+='<button class="menu-level" data-menu-level="'+i+'" '+(locked?'disabled':'')+'><span class="menu-level-number">'+String(i+1).padStart(2,'0')+'</span><span class="menu-level-name">'+E.levels[i].name+'</span><span class="menu-level-meta"><span class="menu-level-stars">'+(r?filled+empty:'☆☆☆')+'</span><span>'+(r&&Number.isFinite(r.time)?formatTime(r.time):r?'пройден':locked?'закрыт':'играть')+'</span></span>'+(locked?'<span class="menu-level-lock">●</span>':'')+'</button>';
       }
       return '<section class="chapter-card"><h3>'+ch.title+'</h3><p>'+ch.subtitle+'</p><div class="chapter-levels">'+cards+'</div></section>';
     }).join('');
@@ -820,7 +820,7 @@ globalThis.PulseBallEngine = (() => {
     clearInput();hideTutorial(true);dialogKind=kind;mode=kind;$('menuScreen').hidden=true;$('readyHint').hidden=true;$('overlay').hidden=false;$('dialogExtra').innerHTML='';$('dialogSecondary').hidden=false;
     if(kind==='paused'){$('dialogSymbol').textContent='Ⅱ';$('dialogTitle').textContent='Маленькая передышка';$('dialogText').textContent='Импульс подождёт. Продолжим, когда будешь готов.';$('dialogPrimary').textContent='Продолжить →';$('dialogSecondary').textContent='С начала уровня';}
     if(kind==='help'){$('dialogSymbol').textContent='↟';$('dialogTitle').textContent='Как играть';$('dialogText').textContent='Используй Pulse, чтобы открыть путь к финишу.';$('dialogExtra').innerHTML='<div class="help-list"><strong>← → или A D</strong><span>Движение</span><strong>↑ W или пробел</strong><span>Прыжок</span><strong>E</strong><span>Импульс перед героем: ломает голубые блоки, двигает ящик и включает переключатель. На телефоне — кнопка PULSE</span><strong>Плита</strong><span>Поставь на неё импульсный ящик, чтобы включить мост</span><strong>Энерго-сфера</strong><span>Используй Pulse рядом со сферой: она летит по стрелке, сбивает врагов и включает приёмник</span><strong>Белый флаг</strong><span>Контрольная точка</span><strong>P / R</strong><span>Пауза / начать заново</span></div>';$('dialogPrimary').textContent='Всё понятно →';$('dialogSecondary').hidden=true;}
-    if(kind==='lost'){$('dialogSymbol').textContent='↻';$('dialogTitle').textContent='Ещё один разбег?';$('dialogText').textContent='Каждый прыжок — немного опыта. В этот раз точно получится.';$('dialogPrimary').textContent='Попробовать снова →';$('dialogSecondary').textContent='К началу приключения';}
+    if(kind==='lost'){$('dialogSymbol').textContent='↻';$('dialogTitle').textContent='Ещё один разбег?';$('dialogText').textContent='Каждый прыжок — немного опыта. В этот раз точно получится.';$('dialogPrimary').textContent='Попробовать снова →';$('dialogSecondary').textContent='К выбору уровней';}
     if(kind==='won'){
       const all=g.collected===g.stars.length,rating=all?3:g.collected>=Math.ceil(g.stars.length/2)?2:1;
       const wasUnlocked=unlocked;
