@@ -1,0 +1,62 @@
+name: Yandex Games Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate build
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f index.html
+          test "$(find . -maxdepth 1 -name 'index.html' | wc -l)" -eq 1
+          SIZE=$(wc -c < index.html)
+          test "$SIZE" -gt 1000
+          test "$SIZE" -lt 104857600
+          grep -q "YandexPlatform" index.html
+          grep -q "LoadingAPI" index.html
+          grep -q "GameplayAPI" index.html
+          grep -q "environment?.i18n" index.html
+          grep -q "pulseBallSave" index.html
+
+      - name: Validate JavaScript syntax
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import re, pathlib, subprocess, tempfile
+          html=pathlib.Path("index.html").read_text(encoding="utf-8")
+          scripts=re.findall(r"<script(?:[^>]*)>([\s\S]*?)</script>",html)
+          if not scripts:
+              raise SystemExit("No inline scripts found")
+          for i,src in enumerate(scripts):
+              path=f"/tmp/pulse-script-{i}.js"
+              pathlib.Path(path).write_text(src,encoding="utf-8")
+              subprocess.run(["node","--check",path],check=True)
+          print(f"Validated {len(scripts)} scripts")
+          PY
+
+      - name: Package Yandex archive
+        shell: bash
+        run: |
+          rm -f pulse-ball-yandex.zip
+          zip -9 -j pulse-ball-yandex.zip index.html
+          unzip -l pulse-ball-yandex.zip
+
+      - name: Upload release archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulse-ball-yandex
+          path: pulse-ball-yandex.zip
+          if-no-files-found: error
+          retention-days: 30
