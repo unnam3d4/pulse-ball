@@ -182,7 +182,7 @@ globalThis.PulseBallEngine = (() => {
   const overlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
   const relayVelocity={up:[0,-860],right:[325,-760],left:[-325,-760],east:[325,-100],west:[-325,-100]};
   function pulse(g){
-    const p=g.player,reach=145;g.pulseCooldown=.85;g.pulseEffect=.24;
+    const p=g.player,reach=145;g.pulseCooldown=.58;g.pulseEffect=.24;
     g.events.push({type:'pulse',x:p.x,y:p.y});
     for(const block of g.breakables)if(!block.broken&&Math.abs(block.x+block.w/2-p.x)<reach&&Math.abs(block.y+block.h/2-p.y)<105&&(block.x+block.w/2-p.x)*p.face>0){block.broken=true;g.events.push({type:'shatter',x:block.x+block.w/2,y:block.y+block.h/2});}
     for(const c of g.crates)if(c.pulse&&Math.abs(c.x+c.w/2-p.x)<reach&&Math.abs(c.y+c.h/2-p.y)<105&&(c.x+c.w/2-p.x)*p.face>0){
@@ -194,9 +194,9 @@ globalThis.PulseBallEngine = (() => {
     for(const enemy of g.enemies)if(!enemy.dead&&Math.abs(enemy.x-p.x)<reach&&Math.abs(enemy.y-p.y)<100&&(enemy.x-p.x)*p.face>0){const push=enemy.type==='heavy'?34:enemy.type==='charger'?78:65;enemy.x=Math.max(enemy.min,Math.min(enemy.max,enemy.x+p.face*push));enemy.dir=p.face;g.events.push({type:'push',x:enemy.x,y:enemy.y});}
     // Pad launch is a local Pulse response; ordinary jump parameters stay unchanged.
     const pad=g.boostPads.filter(b=>Math.abs(b.x-p.x)<=62&&Math.abs(b.y-(p.y+p.r))<=48).sort((a,b)=>Math.abs(a.x-p.x)-Math.abs(b.x-p.x))[0];
-    if(pad){p.vx=pad.dir*325;p.vy=-1040;p.grounded=false;p.coyote=0;p.jumpBuffer=0;p.boosted=true;p.boostGlow=.22;pad.flash=.24;pad.uses++;g.events.push({type:'boost',x:pad.x,y:pad.y-10,dir:pad.dir});}
+    if(pad){p.vx=pad.dir*325;p.vy=-1040;p.grounded=false;p.coyote=0;p.jumpBuffer=0;p.boosted=true;p.boostGlow=.22;pad.flash=.24;pad.uses++;g.pulseCooldown=Math.min(g.pulseCooldown,.22);g.events.push({type:'boost',x:pad.x,y:pad.y-10,dir:pad.dir});}
     // Airborne relay uses the same Pulse edge and cooldown, with a fixed launch vector.
-    const relay=!pad&&!p.grounded&&g.relays.filter(n=>n.cooldown<=0&&Math.hypot(n.x-p.x,n.y-p.y)<=118).sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y))[0];
+    const relay=!pad&&!p.grounded&&g.relays.filter(n=>n.cooldown<=0&&Math.hypot(n.x-p.x,n.y-p.y)<=138).sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y))[0];
     if(relay){const v=relayVelocity[relay.dir];p.vx=v[0];p.vy=v[1];p.coyote=0;p.jumpBuffer=0;p.boosted=true;p.boostGlow=.22;relay.cooldown=1.1;relay.flash=.22;relay.uses++;g.events.push({type:'relay',x:relay.x,y:relay.y,dir:relay.dir});}
   }
   function damage(g,fall=false) {
@@ -403,7 +403,7 @@ globalThis.PulseBallEngine = (() => {
   }
   function relayNode(n){
     const x=n.x-camera,y=n.y;if(x< -70||x>viewW+70)return;
-    const ready=n.cooldown<=0,near=!g.player.grounded&&Math.hypot(n.x-g.player.x,n.y-g.player.y)<=118;
+    const ready=n.cooldown<=0,near=!g.player.grounded&&Math.hypot(n.x-g.player.x,n.y-g.player.y)<=138;
     const beat=reduced?1:1+Math.sin(visualTime*3+n.x)*.035;
     ctx.save();ctx.translate(x,y);ctx.scale(beat,beat);ctx.globalAlpha=ready?1:.4;
     ellipse(0,0,31,31,'#5ae9f018');ctx.lineWidth=2;
