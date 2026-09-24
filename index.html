@@ -316,6 +316,20 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
   .menu-level-picker{width:min(1120px,97vw);max-height:94vh;padding:12px 14px}.picker-head{margin-bottom:8px}.menu-level-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}.menu-level{min-height:74px;padding:7px 6px 6px 10px;border-radius:12px}.menu-level-number{font-size:11px}.menu-level-name{min-height:20px;margin:2px 0 4px;font-size:8px}.menu-level-meta{font-size:7px}
 }
 @media(prefers-reduced-motion:reduce){.menu-logo-orb{animation:none}}
+
+/* ===== Settings: compact, universal, fully localized ===== */
+.settings-panel{position:relative;z-index:2;width:min(760px,94vw);padding:24px;border:2px solid #ffffffb8;border-radius:30px;background:linear-gradient(160deg,#ffffffef,#f3fff9e9);box-shadow:0 24px 70px #174d6336}
+.settings-panel[hidden]{display:none!important}
+.settings-head{margin-bottom:14px}.settings-gear{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#e9f8f0;color:#4d7a70;font-size:19px}
+.settings-list{display:grid;gap:9px}
+.settings-row{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:12px;min-height:72px;padding:11px 13px;border:1px solid #dceee8;border-radius:17px;background:#ffffffd9}
+.settings-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:linear-gradient(145deg,#e6f9f4,#edf0ff);color:#6557ca;font-size:18px;font-weight:900}
+.settings-copy{min-width:0}.settings-copy strong{display:block;color:#2c5264;font-size:12px}.settings-copy span{display:block;margin-top:4px;color:#82999c;font-size:9px;line-height:1.35}
+.settings-value{min-width:128px;min-height:40px;padding:0 13px;border:1px solid #d5e9e2;border-radius:13px;background:#eefaf5;color:#33765d;font-size:10px;font-weight:850}
+.language-switch{display:flex;padding:3px;border-radius:14px;background:#eaf4f1}.language-switch button{min-height:36px;padding:0 12px;border:0;border-radius:11px;background:transparent;color:#6c7e82;font-size:10px;font-weight:850}.language-switch button.active{background:#fff;color:#594bd0;box-shadow:0 3px 10px #36555d18}
+.settings-note{margin:13px 6px 0;color:#718b91;font-size:9px;line-height:1.5}
+.menu-settings-btn{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid #ffffff80;border-radius:999px;background:#ffffff45;color:#365f69;font-size:10px;font-weight:850}.menu-settings-btn span{font-size:14px}.menu-settings-btn:hover{background:#ffffff70;color:#5543c4}
+@media(max-width:680px){.settings-panel{width:96vw;padding:14px;border-radius:22px}.settings-row{grid-template-columns:38px 1fr;gap:8px;min-height:65px}.settings-icon{width:36px;height:36px}.settings-value,.language-switch{grid-column:1/-1;width:100%}.settings-value{min-height:38px}.language-switch button{flex:1}.settings-note{font-size:8px}}
 </style>
 </head>
 <body>
@@ -339,7 +353,7 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
             <p class="menu-kicker">PULSE BALL</p>
             <h1 class="menu-title" id="menuTitle">Побег!</h1>
             <p class="menu-tagline" id="menuTagline">Катись. Прыгай. Включай Pulse.</p>
-            <div class="menu-feature-row"><span>18 LEVELS</span><span>PULSE</span><span>★ STARS</span></div>
+            <div class="menu-feature-row"><span id="featureLevels">18 УРОВНЕЙ</span><span>PULSE</span><span id="featureStars">★ ЗВЁЗДЫ</span></div>
           </div>
         </div>
         <div class="menu-command">
@@ -354,7 +368,7 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
             <div><small>★</small><strong id="menuRating">0 / 54 ★</strong></div>
           </div>
           <div class="menu-progress"><i id="menuProgressFill"></i></div>
-          <div class="menu-quick"><button class="menu-help-link" id="menuHelpButton">? Как играть</button><button class="menu-quick-btn" id="menuSoundButton">♪ Звук</button><button class="menu-quick-btn" id="menuFullscreenButton">⛶ Экран</button></div>
+          <div class="menu-quick"><button class="menu-settings-btn" id="settingsButton" aria-label="Настройки"><span aria-hidden="true">⚙</span><strong id="settingsButtonText">Настройки</strong></button><button class="menu-help-link" id="menuHelpButton">? Как играть</button></div>
         </div>
       </div>
       <div class="menu-level-picker" id="levelPicker" hidden>
@@ -364,6 +378,36 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
           <strong id="pickerProgress">0 / 18</strong>
         </div>
         <div class="menu-level-grid" id="levelGrid"></div>
+      </div>
+      <div class="settings-panel" id="settingsPanel" hidden>
+        <div class="picker-head settings-head">
+          <button class="picker-back" id="backSettingsButton" aria-label="Назад">←</button>
+          <div><p id="settingsEyebrow">ИГРА</p><h2 id="settingsTitle">Настройки</h2></div>
+          <span class="settings-gear" aria-hidden="true">⚙</span>
+        </div>
+        <div class="settings-list">
+          <section class="settings-row">
+            <div class="settings-icon" aria-hidden="true">◎</div>
+            <div class="settings-copy"><strong id="languageTitle">Язык</strong><span id="languageHint">Определяется Яндекс Играми автоматически</span></div>
+            <div class="language-switch" aria-label="Язык"><button id="langRuButton">Русский</button><button id="langEnButton">English</button></div>
+          </section>
+          <section class="settings-row">
+            <div class="settings-icon" aria-hidden="true">♪</div>
+            <div class="settings-copy"><strong id="soundTitle">Звук</strong><span id="soundHint">Музыка и игровые эффекты</span></div>
+            <button class="settings-value" id="settingsSoundButton">Включён</button>
+          </section>
+          <section class="settings-row">
+            <div class="settings-icon" aria-hidden="true">⛶</div>
+            <div class="settings-copy"><strong id="fullscreenTitle">Экран</strong><span id="fullscreenHint">Использовать всё доступное пространство</span></div>
+            <button class="settings-value" id="settingsFullscreenButton">На весь экран</button>
+          </section>
+          <section class="settings-row">
+            <div class="settings-icon" aria-hidden="true">?</div>
+            <div class="settings-copy"><strong id="controlsTitle">Управление</strong><span id="controlsHint">Клавиатура и сенсорные кнопки</span></div>
+            <button class="settings-value" id="settingsHelpButton">Показать</button>
+          </section>
+        </div>
+        <p class="settings-note" id="settingsNote">Игра автоматически выбирает язык Яндекс Игр при первом запуске. Выбранный вручную язык сохраняется на этом устройстве.</p>
       </div>
     </section>
     <nav class="level-bar" aria-label="Текущий уровень">
@@ -388,7 +432,7 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
       <canvas id="game" tabindex="0" aria-label="Игра. Стрелки или A и D — движение, пробел — прыжок, E — импульс, P — пауза, R — заново."></canvas>
       <div class="hud">
         <div class="hud-group"><div class="hud-level-chip"><span id="hudCurrentNumber">01</span><strong id="hudCurrentName">Первый импульс</strong></div><div class="hud-chip hearts" id="hearts" aria-label="3 жизни">♥♥♥</div><div class="hud-chip" aria-label="Собранные звёзды"><span class="star-icon">★</span><span id="starCount">0</span><span class="star-divider">/</span><span id="starTotal">15</span></div><div class="hud-chip pulse-meter" id="pulseMeter" aria-label="Импульс готов"><span id="pulseText">PULSE</span><i id="pulseFill"></i></div><div class="hud-chip time" id="timer">00:00</div></div>
-        <div class="hud-group"><button class="icon-btn" id="menuButton" title="Главное меню" aria-label="Главное меню"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="icon-btn help-control" id="helpButton" title="Как играть" aria-label="Как играть">?</button><button class="icon-btn" id="soundButton" aria-label="Включить звук" aria-pressed="false"><svg class="sound-icon" viewBox="0 0 24 24"><path d="M11 4 5 9H2v6h3l6 5V4Z"/><path id="soundWaves" d="m16 9 6 6m0-6-6 6"/></svg></button><button class="icon-btn" id="restartButton" title="Начать заново (R)" aria-label="Начать заново"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1.5 8M4 4v6h6"/></svg></button><button class="icon-btn" id="pauseButton" title="Пауза (P)" aria-label="Пауза"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button><button class="icon-btn fullscreen-btn" id="fullscreenButton" title="На весь экран" aria-label="На весь экран"><svg viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button></div>
+        <div class="hud-group"><button class="icon-btn" id="menuButton" title="Главное меню" aria-label="Главное меню"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="icon-btn" id="restartButton" title="Начать заново (R)" aria-label="Начать заново"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1.5 8M4 4v6h6"/></svg></button><button class="icon-btn" id="pauseButton" title="Пауза (P)" aria-label="Пауза"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button></div>
       </div>
       <div class="ready-hint" id="readyHint"><p id="readyText">Двигайся, прыгай и используй Pulse!</p><button class="start-btn" id="startButton"><span id="startButtonText">Поехали</span> <span aria-hidden="true">→</span></button></div>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -656,7 +700,7 @@ globalThis.PulseBallEngine = (() => {
     {sky:'#8ebaf9',horizon:'#fff0bd',sun:'#fff1a0',far:'#c7b9ec',mid:'#a294d7',near:'#7968bb',tree:'#594e96',dark:'#3b3d73',grass:'#ead76d',edge:'#a99b53',dirt:'#bd856d',deep:'#7e5a67',stone:'#8e7fac',water:'#6b93ca'},
     {sky:'#71c7f5',horizon:'#fff3b0',sun:'#fff08e',far:'#aee5c0',mid:'#7ad0ab',near:'#4bb78f',tree:'#33876c',dark:'#235f58',grass:'#d8ef63',edge:'#79b64c',dirt:'#c69363',deep:'#875e54',stone:'#7e9b90',water:'#53bfc7'}
   ];
-  let g=E.createGame(0),mode='menu',input={left:false,right:false,jump:false,pulse:false},pulseQueued=false,heldCodes=new Set(),touchPointers=new Map(),camera=0,viewW=1200,viewH=600,last=0,accumulator=0,visualTime=0,particles=[],toastUntil=0,shake=0,audio=null,sound=false,dialogKind='',helpPrevious='menu',best=[],unlocked=0,lossesSinceAd=0,tutorialSeen=new Set(),tutorialActive='',tutorialUntil=0,tutorialActed=false,tutorialActionAt=0,tutorialHideTimer=0;
+  let g=E.createGame(0),mode='menu',input={left:false,right:false,jump:false,pulse:false},pulseQueued=false,heldCodes=new Set(),touchPointers=new Map(),camera=0,viewW=1200,viewH=600,last=0,accumulator=0,visualTime=0,particles=[],toastUntil=0,shake=0,audio=null,sound=localStorage.getItem('pulse-ball-sound')!=='off',dialogKind='',helpPrevious='menu',best=[],unlocked=0,lossesSinceAd=0,tutorialSeen=new Set(),tutorialActive='',tutorialUntil=0,tutorialActed=false,tutorialActionAt=0,tutorialHideTimer=0;
   const SAVE_KEY='pulse-ball-progress-v2';
   try{
     const modern=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
@@ -678,11 +722,11 @@ globalThis.PulseBallEngine = (() => {
   function completedCount(){return E.levels.reduce((n,_,i)=>n+(recordFor(i)?1:0),0);}
   function continueLevel(){for(let i=0;i<=unlocked;i++)if(!recordFor(i))return i;return Math.min(unlocked,E.levels.length-1);}
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let lang='ru';
+  let lang='ru',manualLang=localStorage.getItem('pulse-ball-lang')||'';
   const LEVEL_NAMES_EN=['First Pulse','Echo Valley','Energy Rift','Pulse Ascent','Sky Terraces','Heart of the Rift','Resonance Canyon','Above the Clouds','Energy Cascade','Light Frontier','Sky Circuit','Radiant Core','Sunlit Gardens','Turquoise Flow','Pulse Garden','High Voltage','Rainbow Cascade','Energy Peak'];
   const I18N={
     ru:{
-      title:'Pulse Ball: Побег',menuTitle:'Побег!',menuTagline:'Катись. Прыгай. Включай Pulse.',levels:'Выбрать уровень',progress:'Прогресс',how:'? Как играть',pickerEyebrow:'ВЫБОР УРОВНЯ',pickerTitle:'Куда дальше?',ready:'Двигайся, прыгай и используй Pulse!',go:'Поехали',move:'двигаться',jump:'прыгать',restart:'заново',pause:'пауза',finish:'финиш ↗',space:'Пробел',
+      title:'Pulse Ball: Побег',menuTitle:'Побег!',menuTagline:'Катись. Прыгай. Включай Pulse.',levels:'Выбрать уровень',progress:'Прогресс',how:'? Как играть',pickerEyebrow:'ВЫБОР УРОВНЯ',pickerTitle:'Куда дальше?',nextLevel:'СЛЕДУЮЩИЙ УРОВЕНЬ',featureLevels:'18 УРОВНЕЙ',featureStars:'★ ЗВЁЗДЫ',settings:'Настройки',settingsEyebrow:'ИГРА',language:'Язык',languageHint:'Определяется Яндекс Играми автоматически',soundTitle:'Звук',soundHint:'Музыка и игровые эффекты',soundEnabled:'Включён',soundDisabled:'Выключен',screenTitle:'Экран',screenHint:'Использовать всё доступное пространство',controlsTitle:'Управление',controlsHint:'Клавиатура и сенсорные кнопки',show:'Показать',settingsNote:'Игра автоматически выбирает язык Яндекс Игр при первом запуске. Выбранный вручную язык сохраняется на этом устройстве.',ready:'Двигайся, прыгай и используй Pulse!',go:'Поехали',move:'двигаться',jump:'прыгать',restart:'заново',pause:'пауза',finish:'финиш ↗',space:'Пробел',
       play:'Играть',continue:'Продолжить',completed:'пройден',locked:'закрыт',levelLocked:'Сначала пройди предыдущий уровень',record:'РЕКОРД',adventure:'ТВОЁ ПРИКЛЮЧЕНИЕ',lives:'жизни',pulseReady:'Импульс готов',pulseCharging:'Импульс заряжается',
       tutorialMove:'ДВИЖЕНИЕ',tutorialJump:'ПРЫЖОК',tutorialObject:'ТОЛКНИ ЯЩИК',tutorialOrb:'СФЕРА → ПРИЁМНИК',tutorialRelay:'АКТИВИРУЙ RELAY',tutorialBoost:'АКТИВИРУЙ УСКОРИТЕЛЬ',
       orbLaunch:'Сфера летит к приёмнику — попади в кристалл!',orbHit:'Приёмник заряжен — мост включён!',hurtCheckpoint:'Ещё попытка — с контрольной точки!',hurtRetry:'Ничего, попробуем ещё раз!',checkpoint:'Контрольная точка! Здесь безопасно.',shatter:'Блок разрушен!',switchOn:'Переключатель включён. Направь ящик на плиту!',bridgeOn:'Мост активирован!',
@@ -695,7 +739,7 @@ globalThis.PulseBallEngine = (() => {
       helpMove:'Движение',helpJump:'Прыжок',helpPulse:'Импульс перед героем: ломает голубые блоки, двигает ящик и включает переключатель. На телефоне — кнопка PULSE',helpPlate:'Плита',helpPlateText:'Поставь на неё импульсный ящик, чтобы включить мост',helpOrb:'Энерго-сфера',helpOrbText:'Используй Pulse рядом со сферой: она летит по стрелке, сбивает врагов и включает приёмник',helpFlag:'Белый флаг',helpFlagText:'Контрольная точка',helpPR:'Пауза / начать заново'
     },
     en:{
-      title:'Pulse Ball: Escape',menuTitle:'Escape!',menuTagline:'Roll. Jump. Fire your Pulse.',levels:'Choose level',progress:'Progress',how:'? How to play',pickerEyebrow:'LEVEL SELECT',pickerTitle:'Where next?',ready:'Move, jump and use Pulse!',go:'Go',move:'move',jump:'jump',restart:'restart',pause:'pause',finish:'finish ↗',space:'Space',
+      title:'Pulse Ball: Escape',menuTitle:'Escape!',menuTagline:'Roll. Jump. Fire your Pulse.',levels:'Choose level',progress:'Progress',how:'? How to play',pickerEyebrow:'LEVEL SELECT',pickerTitle:'Where next?',nextLevel:'NEXT LEVEL',featureLevels:'18 LEVELS',featureStars:'★ STARS',settings:'Settings',settingsEyebrow:'GAME',language:'Language',languageHint:'Detected automatically from Yandex Games',soundTitle:'Sound',soundHint:'Music and game effects',soundEnabled:'On',soundDisabled:'Off',screenTitle:'Screen',screenHint:'Use all available space',controlsTitle:'Controls',controlsHint:'Keyboard and touch buttons',show:'Show',settingsNote:'The game detects the Yandex Games language on first launch. A language selected manually is saved on this device.',ready:'Move, jump and use Pulse!',go:'Go',move:'move',jump:'jump',restart:'restart',pause:'pause',finish:'finish ↗',space:'Space',
       play:'Play',continue:'Continue',completed:'cleared',locked:'locked',levelLocked:'Clear the previous level first',record:'BEST',adventure:'YOUR RUN',lives:'lives',pulseReady:'Pulse ready',pulseCharging:'Pulse charging',
       tutorialMove:'MOVE',tutorialJump:'JUMP',tutorialObject:'PUSH THE CRATE',tutorialOrb:'ORB → RECEIVER',tutorialRelay:'ACTIVATE RELAY',tutorialBoost:'HIT THE BOOST PAD',
       orbLaunch:'The orb is heading for the receiver — hit the crystal!',orbHit:'Receiver charged — bridge online!',hurtCheckpoint:'One more try — back to the checkpoint!',hurtRetry:'Almost. Try again!',checkpoint:'Checkpoint reached!',shatter:'Block shattered!',switchOn:'Switch on. Push the crate onto the plate!',bridgeOn:'Bridge activated!',
@@ -713,13 +757,18 @@ globalThis.PulseBallEngine = (() => {
   function helpHtml(){return '<div class="help-list"><strong>← → / A D</strong><span>'+tr('helpMove')+'</span><strong>↑ W / '+tr('space')+'</strong><span>'+tr('helpJump')+'</span><strong>E</strong><span>'+tr('helpPulse')+'</span><strong>'+tr('helpPlate')+'</strong><span>'+tr('helpPlateText')+'</span><strong>'+tr('helpOrb')+'</strong><span>'+tr('helpOrbText')+'</span><strong>'+tr('helpFlag')+'</strong><span>'+tr('helpFlagText')+'</span><strong>P / R</strong><span>'+tr('helpPR')+'</span></div>';}
   function applyStaticLanguage(){
     document.documentElement.lang=lang;document.title=tr('title');
-    $('menuTitle').textContent=tr('menuTitle');$('menuTagline').textContent=tr('menuTagline');$('levelsButtonText').textContent=tr('levels');$('menuProgressText').textContent=tr('progress');$('menuHelpButton').textContent=tr('how');$('menuSoundButton').textContent=tr('soundMenu');$('menuFullscreenButton').textContent=tr('fullscreenMenu');$('pickerEyebrow').textContent=tr('pickerEyebrow');$('pickerTitle').textContent=tr('pickerTitle');
+    $('menuTitle').textContent=tr('menuTitle');$('menuTagline').textContent=tr('menuTagline');$('levelsButtonText').textContent=tr('levels');$('menuProgressText').textContent=tr('progress');$('menuHelpButton').textContent=tr('how');$('pickerEyebrow').textContent=tr('pickerEyebrow');$('pickerTitle').textContent=tr('pickerTitle');$('menuNextKicker').textContent=tr('nextLevel');$('featureLevels').textContent=tr('featureLevels');$('featureStars').textContent=tr('featureStars');$('settingsButtonText').textContent=tr('settings');$('settingsButton').setAttribute('aria-label',tr('settings'));$('settingsEyebrow').textContent=tr('settingsEyebrow');$('settingsTitle').textContent=tr('settings');$('languageTitle').textContent=tr('language');$('languageHint').textContent=tr('languageHint');$('soundTitle').textContent=tr('soundTitle');$('soundHint').textContent=tr('soundHint');$('fullscreenTitle').textContent=tr('screenTitle');$('fullscreenHint').textContent=tr('screenHint');$('controlsTitle').textContent=tr('controlsTitle');$('controlsHint').textContent=tr('controlsHint');$('settingsHelpButton').textContent=tr('show');$('settingsNote').textContent=tr('settingsNote');
     $('readyText').textContent=tr('ready');$('startButtonText').textContent=tr('go');$('guideMove').textContent=tr('move');$('guideJump').textContent=tr('jump');$('guideRestart').textContent=tr('restart');$('guidePause').textContent=tr('pause');$('finishGuide').textContent=tr('finish');$('jumpKeyLabel').textContent=tr('space');
     $('levelBrand').firstChild.nodeValue=tr('title')+' · ';
-    $('menuButton').title=tr('levels');$('menuButton').setAttribute('aria-label',tr('levels'));$('helpButton').title=tr('helpTitle');$('helpButton').setAttribute('aria-label',tr('helpTitle'));$('restartButton').title=tr('restart');$('restartButton').setAttribute('aria-label',tr('restart'));$('pauseButton').title=tr('pause');$('pauseButton').setAttribute('aria-label',tr('pause'));
+    $('menuButton').title=tr('levels');$('menuButton').setAttribute('aria-label',tr('levels'));$('restartButton').title=tr('restart');$('restartButton').setAttribute('aria-label',tr('restart'));$('pauseButton').title=tr('pause');$('pauseButton').setAttribute('aria-label',tr('pause'));
     $('currentLevelName').textContent=levelDisplayName(g.index);$('hudCurrentName').textContent=levelDisplayName(g.index);$('hudCurrentNumber').textContent=String(g.index+1).padStart(2,'0');updateSound();updateFullscreen();
   }
-  function setLanguage(code){lang=String(code||'ru').toLowerCase().startsWith('ru')?'ru':'en';applyStaticLanguage();}
+  function refreshSettingsState(){
+    $('langRuButton').classList.toggle('active',lang==='ru');$('langEnButton').classList.toggle('active',lang==='en');
+    $('settingsSoundButton').textContent=sound?tr('soundEnabled'):tr('soundDisabled');
+    $('settingsFullscreenButton').textContent=document.fullscreenElement=== $('game-shell')?tr('fullscreenOn'):tr('fullscreenOff');
+  }
+  function setLanguage(code,remember=false){lang=String(code||'ru').toLowerCase().startsWith('ru')?'ru':'en';if(remember){manualLang=lang;try{localStorage.setItem('pulse-ball-lang',lang);}catch{}}applyStaticLanguage();renderProgression();refreshSettingsState();}
   function mergeExternalProgress(raw){
     if(!raw)return;
     let data=raw;try{if(typeof data==='string')data=JSON.parse(data);}catch{return;}
@@ -1139,10 +1188,13 @@ globalThis.PulseBallEngine = (() => {
     }).join('');
   }
   function showMenu(){
-    clearInput();hideTutorial(true);globalThis.YandexPlatform?.gameplayStop?.();globalThis.YandexPlatform?.showBanner?.();mode='menu';$('overlay').hidden=true;$('readyHint').hidden=true;$('menuScreen').hidden=false;$('menuHome').hidden=false;$('levelPicker').hidden=true;renderProgression();
+    clearInput();hideTutorial(true);globalThis.YandexPlatform?.gameplayStop?.();globalThis.YandexPlatform?.showBanner?.();mode='menu';$('overlay').hidden=true;$('readyHint').hidden=true;$('menuScreen').hidden=false;$('menuHome').hidden=false;$('levelPicker').hidden=true;$('settingsPanel').hidden=true;renderProgression();refreshSettingsState();
   }
   function showLevelPicker(){
-    clearInput();globalThis.YandexPlatform?.showBanner?.();mode='menu';$('menuScreen').hidden=false;$('menuHome').hidden=true;$('levelPicker').hidden=false;renderProgression();
+    clearInput();globalThis.YandexPlatform?.showBanner?.();mode='menu';$('menuScreen').hidden=false;$('menuHome').hidden=true;$('settingsPanel').hidden=true;$('levelPicker').hidden=false;renderProgression();
+  }
+  function showSettings(){
+    clearInput();globalThis.YandexPlatform?.showBanner?.();mode='menu';$('menuScreen').hidden=false;$('menuHome').hidden=true;$('levelPicker').hidden=true;$('settingsPanel').hidden=false;refreshSettingsState();
   }
   function formatTime(seconds){const n=Math.floor(seconds);return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');}
   function updateHud(){
@@ -1194,16 +1246,17 @@ globalThis.PulseBallEngine = (() => {
       if(mode==='platformPaused'){mode='playing';globalThis.YandexPlatform?.gameplayStart?.();canvas.focus({preventScroll:true});}
     }
   };
-  function updateSound(){ $('soundButton').setAttribute('aria-label',sound?tr('soundOn'):tr('soundOff'));$('soundButton').setAttribute('aria-pressed',String(sound));$('soundWaves').setAttribute('d',sound?'M15 8c3 2 3 6 0 8m3-11c5 4 5 10 0 14':'m16 9 6 6m0-6-6 6');if($('menuSoundButton'))$('menuSoundButton').textContent=(sound?'♪✓ ':'♪ ')+(lang==='ru'?'Звук':'Sound');}
+  function updateSound(){try{localStorage.setItem('pulse-ball-sound',sound?'on':'off');}catch{}refreshSettingsState();}
   $('startButton').onclick=start;$('restartButton').onclick=()=>loadLevel(g.index,true);$('pauseButton').onclick=pause;
   $('menuButton').onclick=showMenu;
   $('continueButton').onclick=()=>loadLevel(continueLevel(),true);
   $('levelsButton').onclick=showLevelPicker;$('backMenuButton').onclick=showMenu;
+  $('settingsButton').onclick=showSettings;$('backSettingsButton').onclick=showMenu;
+  $('langRuButton').onclick=()=>setLanguage('ru',true);$('langEnButton').onclick=()=>setLanguage('en',true);
+  $('settingsSoundButton').onclick=()=>{sound=!sound;updateSound();unlockAudio();if(sound)tone(660,.1);};
   $('menuHelpButton').onclick=()=>{helpPrevious='menu';openDialog('help');};
+  $('settingsHelpButton').onclick=()=>{helpPrevious='settings';openDialog('help');};
   $('levelGrid').onclick=e=>{const card=e.target.closest('[data-menu-level]');if(card&&!card.disabled)loadLevel(Number(card.dataset.menuLevel),true);};
-  $('helpButton').onclick=()=>{if(mode==='help')return;helpPrevious=mode;openDialog('help');};
-  $('soundButton').onclick=()=>{sound=!sound;updateSound();unlockAudio();if(sound)tone(660,.1);};
-  $('menuSoundButton').onclick=()=>{sound=!sound;updateSound();unlockAudio();if(sound)tone(660,.1);};
   $('dialogRewarded').onclick=async()=>{
     if(dialogKind!=='lost'||$('dialogRewarded').disabled)return;
     $('dialogRewarded').disabled=true;
@@ -1213,13 +1266,12 @@ globalThis.PulseBallEngine = (() => {
     g.status='playing';g.health=3;const p=g.player;p.x=g.spawn.x;p.y=g.spawn.y;p.vx=0;p.vy=0;p.invincible=1.4;p.grounded=false;
     mode='playing';$('overlay').hidden=true;globalThis.YandexPlatform?.hideBanner?.();globalThis.YandexPlatform?.gameplayStart?.();resumeAudio();canvas.focus({preventScroll:true});
   };
-  function updateFullscreen(){const active=document.fullscreenElement===$('game-shell'),label=active?tr('fullscreenOn'):tr('fullscreenOff');$('fullscreenButton').setAttribute('aria-label',label);$('fullscreenButton').title=label;}
+  function updateFullscreen(){refreshSettingsState();}
   document.addEventListener('fullscreenchange',updateFullscreen);
-  $('fullscreenButton').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('game-shell').requestFullscreen();}catch{toast(tr('fullscreenFail'));}};
-  $('menuFullscreenButton').onclick=$('fullscreenButton').onclick;
+  $('settingsFullscreenButton').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('game-shell').requestFullscreen();}catch{toast(tr('fullscreenFail'));}refreshSettingsState();};
   $('dialogPrimary').onclick=async()=>{
     if(dialogKind==='paused')start();
-    else if(dialogKind==='help'){if(helpPrevious==='menu')showMenu();else if(helpPrevious==='ready'){mode='ready';$('overlay').hidden=true;$('readyHint').hidden=false;canvas.focus({preventScroll:true});}else if(helpPrevious==='playing')start();else openDialog(helpPrevious);}
+    else if(dialogKind==='help'){if(helpPrevious==='menu')showMenu();else if(helpPrevious==='settings')showSettings();else if(helpPrevious==='ready'){mode='ready';$('overlay').hidden=true;$('readyHint').hidden=false;canvas.focus({preventScroll:true});}else if(helpPrevious==='playing')start();else openDialog(helpPrevious);}
     else if(dialogKind==='lost'){if(lossesSinceAd>=3){await globalThis.YandexPlatform?.showInterstitial?.();lossesSinceAd=0;}loadLevel(g.index,true);}
     else if(dialogKind==='won'){
       if((g.index+1)%2===0||g.index===E.levels.length-1)await globalThis.YandexPlatform?.showInterstitial?.();
@@ -1239,7 +1291,7 @@ globalThis.PulseBallEngine = (() => {
   addEventListener('keydown',e=>{
     if(e.ctrlKey||e.metaKey||e.altKey)return;
     if(e.code==='Tab'&&!$('overlay').hidden){const buttons=[...$('dialog').querySelectorAll('button')].filter(b=>!b.hidden);if(e.shiftKey&&document.activeElement===buttons[0]){e.preventDefault();buttons.at(-1).focus();}else if(!e.shiftKey&&document.activeElement===buttons.at(-1)){e.preventDefault();buttons[0].focus();}return;}
-    if(e.code==='Escape'||e.code==='KeyP'){if(!e.repeat){if(mode==='help')$('dialogPrimary').click();else if(mode==='menu'&&!$('levelPicker').hidden)showMenu();else if(mode!=='menu')pause();}e.preventDefault();return;}
+    if(e.code==='Escape'||e.code==='KeyP'){if(!e.repeat){if(mode==='help')$('dialogPrimary').click();else if(mode==='menu'&&(!$('levelPicker').hidden||!$('settingsPanel').hidden))showMenu();else if(mode!=='menu')pause();}e.preventDefault();return;}
     if(e.code==='KeyR'&&!e.repeat&&mode!=='help'&&mode!=='menu'){e.preventDefault();loadLevel(g.index,true);return;}
     if(codeMap[e.code]&&(mode==='playing'||mode==='ready')){
       if(e.code==='Space'&&e.target.tagName==='BUTTON'&&e.target!==$('startButton'))return;
@@ -1268,7 +1320,7 @@ globalThis.PulseBallEngine = (() => {
   }
   async function bootstrap(){
     const platform=await globalThis.YandexPlatform.readyPromise;
-    setLanguage(platform.lang);
+    setLanguage(manualLang||platform.lang);
     mergeExternalProgress(platform.safe);mergeExternalProgress(platform.cloud);
     saveProgress();showMenu();updateRecord();updateHud();
     $('bootScreen').hidden=true;
