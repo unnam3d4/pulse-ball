@@ -2,8 +2,10 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#111a2e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Pulse Ball: Побег</title>
 <style>
 :root{color-scheme:light;--ink:#273248;--accent:#7358e8;--safe-top:env(safe-area-inset-top,0px);--safe-right:env(safe-area-inset-right,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px)}
@@ -202,11 +204,20 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
   .menu-level-picker{width:min(900px,100%);padding:10px 14px}.picker-head{margin-bottom:7px}.menu-level-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}.menu-level{min-height:69px;padding:6px}.menu-level-name{min-height:22px;margin:2px 0 4px;font-size:8px}.menu-level-meta{font-size:7px}
 }
 
+
+.boot-screen{position:absolute;z-index:50;inset:0;display:grid;place-items:center;background:linear-gradient(145deg,#8ee3f4,#dff7d1 52%,#fff0b2);transition:opacity .2s}
+.boot-screen[hidden]{display:none}
+.boot-mark{display:flex;flex-direction:column;align-items:center;gap:12px;color:#38556c;font-size:10px;font-weight:850;letter-spacing:2px}
+.boot-orb{width:58px;height:58px;border:4px solid #0a2144;border-radius:50%;background:radial-gradient(circle at 34% 26%,#70a9df,#234f82 45%,#071b3b 100%);box-shadow:0 8px 20px #2547662e}
+.boot-dots{display:flex;gap:5px}.boot-dots i{width:5px;height:5px;border-radius:50%;background:#6d5ed9;animation:bootPulse .9s infinite alternate}.boot-dots i:nth-child(2){animation-delay:.15s}.boot-dots i:nth-child(3){animation-delay:.3s}
+@keyframes bootPulse{to{transform:translateY(-4px);opacity:.45}}
+@media(prefers-reduced-motion:reduce){.boot-dots i{animation:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <main class="game-shell" id="game-shell" aria-label="Pulse Ball: Побег — игра">
+    <div class="boot-screen" id="bootScreen"><div class="boot-mark"><span class="boot-orb"></span><span>PULSE BALL</span><span class="boot-dots"><i></i><i></i><i></i></span></div></div>
     <section class="menu-screen" id="menuScreen" aria-label="Главное меню">
       <div class="menu-home" id="menuHome">
         <div class="menu-brand">
@@ -215,16 +226,16 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
           </div>
           <div class="menu-copy">
             <p class="menu-kicker">PULSE BALL</p>
-            <h1 class="menu-title">Побег!</h1>
-            <p class="menu-tagline">Катись. Прыгай. Включай Pulse.</p>
+            <h1 class="menu-title" id="menuTitle">Побег!</h1>
+            <p class="menu-tagline" id="menuTagline">Катись. Прыгай. Включай Pulse.</p>
           </div>
         </div>
         <div class="menu-primary-actions">
           <button class="menu-play" id="continueButton"><span>Играть</span><b>→</b></button>
-          <button class="menu-levels-button" id="levelsButton"><span>Уровни</span><strong id="menuCompleted">0 / 12</strong></button>
+          <button class="menu-levels-button" id="levelsButton"><span id="levelsButtonText">Уровни</span><strong id="menuCompleted">0 / 12</strong></button>
         </div>
         <div class="menu-progress-row">
-          <span>Прогресс</span>
+          <span id="menuProgressText">Прогресс</span>
           <div class="menu-progress"><i id="menuProgressFill"></i></div>
           <strong id="menuRating">0 / 36 ★</strong>
         </div>
@@ -233,7 +244,7 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
       <div class="menu-level-picker" id="levelPicker" hidden>
         <div class="picker-head">
           <button class="picker-back" id="backMenuButton" aria-label="Назад">←</button>
-          <div><p>ВЫБОР УРОВНЯ</p><h2>Куда дальше?</h2></div>
+          <div><p id="pickerEyebrow">ВЫБОР УРОВНЯ</p><h2 id="pickerTitle">Куда дальше?</h2></div>
           <strong id="pickerProgress">0 / 12</strong>
         </div>
         <div class="menu-level-grid" id="levelGrid"></div>
@@ -255,7 +266,7 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
         <button class="level-tab" data-level="10"><span>11</span><span class="level-name"> Небесный контур</span></button>
         <button class="level-tab" data-level="11"><span>12</span><span class="level-name"> Сияющее ядро</span></button>
       </div>
-      <div class="level-label"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><circle cx="10" cy="10" r="4"/><path d="M15.7 4.3 13 7"/></svg><span>Pulse Ball: Побег · <span id="levelRecord">ТВОЙ РЕКОРД</span></span></div>
+      <div class="level-label"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><circle cx="10" cy="10" r="4"/><path d="M15.7 4.3 13 7"/></svg><span id="levelBrand">Pulse Ball: Побег · <span id="levelRecord">ТВОЙ РЕКОРД</span></span></div>
     </nav>
     <div class="stage" id="stage">
       <canvas id="game" tabindex="0" aria-label="Игра. Стрелки или A и D — движение, пробел — прыжок, E — импульс, P — пауза, R — заново."></canvas>
@@ -263,7 +274,7 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
         <div class="hud-group"><div class="hud-chip hearts" id="hearts" aria-label="3 жизни">♥♥♥</div><div class="hud-chip" aria-label="Собранные звёзды"><span class="star-icon">★</span><span id="starCount">0</span><span class="star-divider">/</span><span id="starTotal">15</span></div><div class="hud-chip pulse-meter" id="pulseMeter" aria-label="Импульс готов"><span id="pulseText">PULSE</span><i id="pulseFill"></i></div><div class="hud-chip time" id="timer">00:00</div></div>
         <div class="hud-group"><button class="icon-btn" id="menuButton" title="Главное меню" aria-label="Главное меню"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="icon-btn help-control" id="helpButton" title="Как играть" aria-label="Как играть">?</button><button class="icon-btn" id="soundButton" aria-label="Включить звук" aria-pressed="false"><svg class="sound-icon" viewBox="0 0 24 24"><path d="M11 4 5 9H2v6h3l6 5V4Z"/><path id="soundWaves" d="m16 9 6 6m0-6-6 6"/></svg></button><button class="icon-btn" id="restartButton" title="Начать заново (R)" aria-label="Начать заново"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1.5 8M4 4v6h6"/></svg></button><button class="icon-btn" id="pauseButton" title="Пауза (P)" aria-label="Пауза"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button><button class="icon-btn fullscreen-btn" id="fullscreenButton" title="На весь экран" aria-label="На весь экран"><svg viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button></div>
       </div>
-      <div class="ready-hint" id="readyHint"><p>Двигайся, прыгай и используй Pulse!</p><button class="start-btn" id="startButton">Поехали <span aria-hidden="true">→</span></button></div>
+      <div class="ready-hint" id="readyHint"><p id="readyText">Двигайся, прыгай и используй Pulse!</p><button class="start-btn" id="startButton"><span id="startButtonText">Поехали</span> <span aria-hidden="true">→</span></button></div>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
       <div class="tutorial" id="tutorial" role="status" aria-live="polite" hidden></div>
       <div class="touch-controls" aria-label="Сенсорное управление"><div class="touch-group"><button class="touch-btn" data-key="left" aria-label="Двигаться влево">←</button><button class="touch-btn" data-key="right" aria-label="Двигаться вправо">→</button></div><div class="touch-group"><button class="touch-btn pulse" id="pulseButton" data-key="pulse" aria-label="Импульс Pulse">PULSE</button><button class="touch-btn jump" data-key="jump" aria-label="Прыгать">↑</button></div></div>
@@ -273,9 +284,74 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
         </div>
       </div>
     </div>
-    <div class="game-bottom"><div class="controls-guide"><div class="key-group"><kbd>←</kbd><kbd>→</kbd><span>двигаться</span></div><div class="key-group"><kbd>Пробел</kbd><span>прыгать</span></div><div class="key-group"><kbd>E</kbd><span>Pulse</span></div><div class="key-group desktop-only"><kbd>R</kbd><span>заново</span></div><div class="key-group desktop-only"><kbd>P</kbd><span>пауза</span></div></div><div class="progress-wrap"><span id="progressText">0%</span><div class="level-progress"><i id="progressBar"></i></div><span>финиш ↗</span></div></div>
+    <div class="game-bottom"><div class="controls-guide"><div class="key-group"><kbd>←</kbd><kbd>→</kbd><span id="guideMove">двигаться</span></div><div class="key-group"><kbd id="jumpKeyLabel">Пробел</kbd><span id="guideJump">прыгать</span></div><div class="key-group"><kbd>E</kbd><span>Pulse</span></div><div class="key-group desktop-only"><kbd>R</kbd><span id="guideRestart">заново</span></div><div class="key-group desktop-only"><kbd>P</kbd><span id="guidePause">пауза</span></div></div><div class="progress-wrap"><span id="progressText">0%</span><div class="level-progress"><i id="progressBar"></i></div><span id="finishGuide">финиш ↗</span></div></div>
   </main>
 </div>
+<script>
+globalThis.YandexPlatform=(()=>{
+  let ysdk=null,player=null,safeStorage=null,gameReady=false,readySent=false,connected=false;
+  let resolveReady;const readyPromise=new Promise(r=>resolveReady=r);
+  const localLang=()=>((navigator.language||'ru').slice(0,2).toLowerCase());
+  const sdkHost=()=>location.hostname.includes('yandex');
+  const forceSdk=new URLSearchParams(location.search).get('yandex-test')==='1';
+  function emitPause(reason='platform'){globalThis.PulseGame?.platformPause?.(reason);}
+  function emitResume(reason='platform'){globalThis.PulseGame?.platformResume?.(reason);}
+  async function loadScript(){
+    if(globalThis.YaGames)return;
+    if(!sdkHost()&&!forceSdk)return;
+    await new Promise((resolve,reject)=>{
+      const script=document.createElement('script');script.async=true;script.src=sdkHost()?'/sdk.js':'https://sdk.games.s3.yandex.net/sdk.js';
+      script.onload=resolve;script.onerror=reject;document.head.appendChild(script);
+    });
+  }
+  async function init(){
+    let cloud=null,safe=null,lang=localLang();
+    try{
+      await loadScript();
+      if(!globalThis.YaGames)throw new Error('Yandex SDK unavailable');
+      ysdk=await globalThis.YaGames.init();connected=true;
+      lang=(ysdk.environment?.i18n?.lang||lang).slice(0,2).toLowerCase();
+      try{safeStorage=await ysdk.getStorage?.();safe=safeStorage?.getItem?.('pulse-ball-progress-v2')||null;}catch{}
+      try{player=await ysdk.getPlayer?.();const data=await player?.getData?.(['pulseBallSave']);cloud=data?.pulseBallSave||null;}catch{}
+      try{ysdk.on?.('game_api_pause',()=>emitPause('platform'));ysdk.on?.('game_api_resume',()=>emitResume('platform'));}catch{}
+    }catch(err){connected=false;}
+    resolveReady({connected,lang,cloud,safe});
+    if(gameReady)sendReady();
+  }
+  function sendReady(){if(ysdk&&!readySent){try{ysdk.features?.LoadingAPI?.ready();readySent=true;}catch{}}}
+  function notifyGameReady(){gameReady=true;sendReady();}
+  function gameplayStart(){try{ysdk?.features?.GameplayAPI?.start();}catch{}}
+  function gameplayStop(){try{ysdk?.features?.GameplayAPI?.stop();}catch{}}
+  function saveProgress(data){
+    try{safeStorage?.setItem?.('pulse-ball-progress-v2',JSON.stringify(data));}catch{}
+    try{player?.setData?.({pulseBallSave:data},false)?.catch?.(()=>{});}catch{}
+  }
+  function showInterstitial(){
+    return new Promise(resolve=>{
+      if(!ysdk?.adv?.showFullscreenAdv){resolve(false);return;}
+      try{ysdk.adv.showFullscreenAdv({callbacks:{
+        onOpen:()=>{gameplayStop();emitPause('ad');},
+        onClose:wasShown=>{emitResume('ad');resolve(!!wasShown);},
+        onError:()=>{emitResume('ad');resolve(false);}
+      }});}catch{resolve(false);}
+    });
+  }
+  function showRewarded(onReward){
+    return new Promise(resolve=>{
+      if(!ysdk?.adv?.showRewardedVideo){resolve(false);return;}
+      let rewarded=false;
+      try{ysdk.adv.showRewardedVideo({callbacks:{
+        onOpen:()=>{gameplayStop();emitPause('ad');},
+        onRewarded:()=>{rewarded=true;try{onReward?.();}catch{}},
+        onClose:()=>{emitResume('ad');resolve(rewarded);},
+        onError:()=>{emitResume('ad');resolve(false);}
+      }});}catch{resolve(false);}
+    });
+  }
+  init();
+  return{readyPromise,notifyGameReady,gameplayStart,gameplayStop,saveProgress,showInterstitial,showRewarded,get connected(){return connected},get sdk(){return ysdk}};
+})();
+</script>
 <script id="engine">
 'use strict';
 globalThis.PulseBallEngine = (() => {
@@ -463,8 +539,8 @@ globalThis.PulseBallEngine = (() => {
   }catch{best=[];unlocked=0;}
   function saveProgress(){
     try{
-      localStorage.setItem(SAVE_KEY,JSON.stringify({version:2,unlocked,best}));
-      localStorage.setItem('pulse-ball-save-v1',JSON.stringify(best));
+      const payload={version:2,unlocked,best};localStorage.setItem(SAVE_KEY,JSON.stringify(payload));
+      localStorage.setItem('pulse-ball-save-v1',JSON.stringify(best));globalThis.YandexPlatform?.saveProgress?.(payload);
     }catch{}
   }
   function recordFor(index){const r=best[index];return r&&r.level===E.levels[index]?.name&&Number.isFinite(r.stars)?r:null;}
@@ -472,6 +548,59 @@ globalThis.PulseBallEngine = (() => {
   function completedCount(){return E.levels.reduce((n,_,i)=>n+(recordFor(i)?1:0),0);}
   function continueLevel(){for(let i=0;i<=unlocked;i++)if(!recordFor(i))return i;return Math.min(unlocked,E.levels.length-1);}
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let lang='ru';
+  const LEVEL_NAMES_EN=['First Pulse','Echo Valley','Energy Rift','Pulse Ascent','Sky Terraces','Heart of the Rift','Resonance Canyon','Above the Clouds','Energy Cascade','Light Frontier','Sky Circuit','Radiant Core'];
+  const I18N={
+    ru:{
+      title:'Pulse Ball: Побег',menuTitle:'Побег!',menuTagline:'Катись. Прыгай. Включай Pulse.',levels:'Уровни',progress:'Прогресс',how:'? Как играть',pickerEyebrow:'ВЫБОР УРОВНЯ',pickerTitle:'Куда дальше?',ready:'Двигайся, прыгай и используй Pulse!',go:'Поехали',move:'двигаться',jump:'прыгать',restart:'заново',pause:'пауза',finish:'финиш ↗',space:'Пробел',
+      play:'Играть',continue:'Продолжить',completed:'пройден',locked:'закрыт',levelLocked:'Сначала пройди предыдущий уровень',record:'РЕКОРД',adventure:'ТВОЁ ПРИКЛЮЧЕНИЕ',lives:'жизни',pulseReady:'Импульс готов',pulseCharging:'Импульс заряжается',
+      tutorialMove:'ДВИЖЕНИЕ',tutorialJump:'ПРЫЖОК',tutorialObject:'ТОЛКНИ ЯЩИК',tutorialOrb:'СФЕРА → ПРИЁМНИК',tutorialRelay:'АКТИВИРУЙ RELAY',tutorialBoost:'АКТИВИРУЙ УСКОРИТЕЛЬ',
+      orbLaunch:'Сфера летит к приёмнику — попади в кристалл!',orbHit:'Приёмник заряжен — мост включён!',hurtCheckpoint:'Ещё попытка — с контрольной точки!',hurtRetry:'Ничего, попробуем ещё раз!',checkpoint:'Контрольная точка! Здесь безопасно.',shatter:'Блок разрушен!',switchOn:'Переключатель включён. Направь ящик на плиту!',bridgeOn:'Мост активирован!',
+      pausedTitle:'Маленькая передышка',pausedText:'Импульс подождёт. Продолжим, когда будешь готов.',resume:'Продолжить →',restartLevel:'С начала уровня',
+      helpTitle:'Как играть',helpText:'Используй Pulse, чтобы открыть путь к финишу.',helpOk:'Всё понятно →',
+      lostTitle:'Ещё один разбег?',lostText:'Каждый прыжок — немного опыта. В этот раз точно получится.',retry:'Попробовать снова →',levelSelect:'К выбору уровней',
+      wonSuffix:' пройден!',collectedA:'Собрано ',collectedB:' из ',starsWord:' звёзд за ',allStars:'Все звёзды твои!',improve:'Можно вернуться и улучшить результат.',unlocked:'Открыт уровень ',next:'Следующий уровень →',replay:'Переиграть этот уровень',
+      soundOn:'Выключить звук',soundOff:'Включить звук',fullscreenOn:'Выйти из полноэкранного режима',fullscreenOff:'На весь экран',fullscreenFail:'Полный экран недоступен в этом окне',
+      finishCaps:'ФИНИШ',receiverCaps:'ПРИЁМНИК',
+      helpMove:'Движение',helpJump:'Прыжок',helpPulse:'Импульс перед героем: ломает голубые блоки, двигает ящик и включает переключатель. На телефоне — кнопка PULSE',helpPlate:'Плита',helpPlateText:'Поставь на неё импульсный ящик, чтобы включить мост',helpOrb:'Энерго-сфера',helpOrbText:'Используй Pulse рядом со сферой: она летит по стрелке, сбивает врагов и включает приёмник',helpFlag:'Белый флаг',helpFlagText:'Контрольная точка',helpPR:'Пауза / начать заново'
+    },
+    en:{
+      title:'Pulse Ball: Escape',menuTitle:'Escape!',menuTagline:'Roll. Jump. Fire your Pulse.',levels:'Levels',progress:'Progress',how:'? How to play',pickerEyebrow:'LEVEL SELECT',pickerTitle:'Where next?',ready:'Move, jump and use Pulse!',go:'Go',move:'move',jump:'jump',restart:'restart',pause:'pause',finish:'finish ↗',space:'Space',
+      play:'Play',continue:'Continue',completed:'cleared',locked:'locked',levelLocked:'Clear the previous level first',record:'BEST',adventure:'YOUR RUN',lives:'lives',pulseReady:'Pulse ready',pulseCharging:'Pulse charging',
+      tutorialMove:'MOVE',tutorialJump:'JUMP',tutorialObject:'PUSH THE CRATE',tutorialOrb:'ORB → RECEIVER',tutorialRelay:'ACTIVATE RELAY',tutorialBoost:'HIT THE BOOST PAD',
+      orbLaunch:'The orb is heading for the receiver — hit the crystal!',orbHit:'Receiver charged — bridge online!',hurtCheckpoint:'One more try — back to the checkpoint!',hurtRetry:'Almost. Try again!',checkpoint:'Checkpoint reached!',shatter:'Block shattered!',switchOn:'Switch on. Push the crate onto the plate!',bridgeOn:'Bridge activated!',
+      pausedTitle:'Quick break',pausedText:'The Pulse can wait. Continue when you are ready.',resume:'Continue →',restartLevel:'Restart level',
+      helpTitle:'How to play',helpText:'Use Pulse to open the path to the finish.',helpOk:'Got it →',
+      lostTitle:'One more run?',lostText:'Every jump gets you closer. Try it again.',retry:'Try again →',levelSelect:'Level select',
+      wonSuffix:' cleared!',collectedA:'Collected ',collectedB:' of ',starsWord:' stars in ',allStars:'All stars collected!',improve:'You can replay and improve your result.',unlocked:'Unlocked level ',next:'Next level →',replay:'Replay this level',
+      soundOn:'Mute sound',soundOff:'Enable sound',fullscreenOn:'Exit fullscreen',fullscreenOff:'Fullscreen',fullscreenFail:'Fullscreen is unavailable here',
+      finishCaps:'FINISH',receiverCaps:'RECEIVER',
+      helpMove:'Move',helpJump:'Jump',helpPulse:'Pulse in front of the hero: breaks blue blocks, pushes crates and activates switches. On mobile, use the PULSE button',helpPlate:'Plate',helpPlateText:'Push a pulse crate onto it to activate the bridge',helpOrb:'Energy orb',helpOrbText:'Use Pulse near an orb: it flies along its arrow, defeats enemies and charges a receiver',helpFlag:'White flag',helpFlagText:'Checkpoint',helpPR:'Pause / restart'
+    }
+  };
+  const tr=k=>I18N[lang]?.[k]??I18N.ru[k]??k;
+  const levelDisplayName=i=>lang==='ru'?E.levels[i].name:(LEVEL_NAMES_EN[i]||E.levels[i].name);
+  function helpHtml(){return '<div class="help-list"><strong>← → / A D</strong><span>'+tr('helpMove')+'</span><strong>↑ W / '+tr('space')+'</strong><span>'+tr('helpJump')+'</span><strong>E</strong><span>'+tr('helpPulse')+'</span><strong>'+tr('helpPlate')+'</strong><span>'+tr('helpPlateText')+'</span><strong>'+tr('helpOrb')+'</strong><span>'+tr('helpOrbText')+'</span><strong>'+tr('helpFlag')+'</strong><span>'+tr('helpFlagText')+'</span><strong>P / R</strong><span>'+tr('helpPR')+'</span></div>';}
+  function applyStaticLanguage(){
+    document.documentElement.lang=lang;document.title=tr('title');
+    $('menuTitle').textContent=tr('menuTitle');$('menuTagline').textContent=tr('menuTagline');$('levelsButtonText').textContent=tr('levels');$('menuProgressText').textContent=tr('progress');$('menuHelpButton').textContent=tr('how');$('pickerEyebrow').textContent=tr('pickerEyebrow');$('pickerTitle').textContent=tr('pickerTitle');
+    $('readyText').textContent=tr('ready');$('startButtonText').textContent=tr('go');$('guideMove').textContent=tr('move');$('guideJump').textContent=tr('jump');$('guideRestart').textContent=tr('restart');$('guidePause').textContent=tr('pause');$('finishGuide').textContent=tr('finish');$('jumpKeyLabel').textContent=tr('space');
+    $('levelBrand').firstChild.nodeValue=tr('title')+' · ';
+    $('menuButton').title=tr('levels');$('menuButton').setAttribute('aria-label',tr('levels'));$('helpButton').title=tr('helpTitle');$('helpButton').setAttribute('aria-label',tr('helpTitle'));$('restartButton').title=tr('restart');$('restartButton').setAttribute('aria-label',tr('restart'));$('pauseButton').title=tr('pause');$('pauseButton').setAttribute('aria-label',tr('pause'));
+    $('currentLevelName').textContent=levelDisplayName(g.index);updateSound();updateFullscreen();
+  }
+  function setLanguage(code){lang=String(code||'ru').toLowerCase().startsWith('ru')?'ru':'en';applyStaticLanguage();}
+  function mergeExternalProgress(raw){
+    if(!raw)return;
+    let data=raw;try{if(typeof data==='string')data=JSON.parse(data);}catch{return;}
+    if(!data||!Array.isArray(data.best))return;
+    unlocked=Math.max(unlocked,Math.max(0,Math.min(E.levels.length-1,Number(data.unlocked)||0)));
+    for(let i=0;i<E.levels.length;i++){
+      const remote=data.best[i];if(!remote||remote.level!==E.levels[i].name||!Number.isFinite(remote.stars))continue;
+      const local=recordFor(i);best[i]={level:E.levels[i].name,stars:Math.max(remote.stars,local?.stars||0),time:Math.min(Number.isFinite(remote.time)?remote.time:Infinity,Number.isFinite(local?.time)?local.time:Infinity)};
+      if(!Number.isFinite(best[i].time))delete best[i].time;
+    }
+  }
   function fit(){
     const box=stage.getBoundingClientRect();if(!box.width||!box.height)return;viewH=600;viewW=600*box.width/box.height;const ratio=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(box.width*ratio);canvas.height=Math.round(box.height*ratio);
     ctx.setTransform(canvas.width/viewW,0,0,canvas.height/viewH,0,0);
@@ -572,7 +701,7 @@ globalThis.PulseBallEngine = (() => {
     ctx.beginPath();ctx.moveTo(x+2,y-106);ctx.bezierCurveTo(x+19,y-116,x+31,y-94,x+49,y-104+wave);ctx.lineTo(x+49,y-67+wave);ctx.bezierCurveTo(x+31,y-57,x+19,y-79,x+2,y-69);ctx.closePath();ctx.fillStyle=finish?'#ef6853':active?'#729859':'#f5f3db';ctx.fill();
     if(finish){ctx.fillStyle='#fff4df';ctx.font='bold 15px Segoe UI';ctx.fillText('★',x+17,y-81);}
     else {path([[x+18,y-88],[x+23,y-83],[x+32,y-94]],null,active?'#f8ffe9':'#99ad87',2.5);}
-    if(finish){rounded(x-36,y+11,74,23,5,'#ffffffad');ctx.fillStyle='#64724d';ctx.font='bold 9px Segoe UI';ctx.textAlign='center';ctx.fillText('ФИНИШ',x+1,y+27);ctx.textAlign='left';}
+    if(finish){rounded(x-36,y+11,74,23,5,'#ffffffad');ctx.fillStyle='#64724d';ctx.font='bold 9px Segoe UI';ctx.textAlign='center';ctx.fillText(tr('finishCaps'),x+1,y+27);ctx.textAlign='left';}
   }
   function crate(c,t){
     if(c.pulse){const x=c.x-camera,y=c.y;rounded(x,y,44,44,6,'#17395b','#2bbfda');rounded(x+5,y+5,34,34,5,'#294f70');ellipse(x+22,y+22,11,11,'#32cde5');ellipse(x+22,y+22,5,5,'#e8ffff');return;}
@@ -650,7 +779,7 @@ globalThis.PulseBallEngine = (() => {
     if(target.flash>0){const age=1-target.flash/.45;ctx.save();ctx.globalAlpha=(1-age)*.75;ctx.strokeStyle='#bfffff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y-7,26+age*32,0,Math.PI*2);ctx.stroke();ctx.restore();}
     if(g.index===9&&!active&&target===g.orbTargets[0]&&g.player.x>1750&&g.player.x<3300){
       ctx.save();ctx.globalAlpha=.9;rounded(x-45,y-70,90,22,7,'#ffffffd9','#77c8a9');
-      ctx.fillStyle='#316d63';ctx.font='700 10px Segoe UI';ctx.textAlign='center';ctx.fillText('ПРИЁМНИК',x,y-55);ctx.restore();
+      ctx.fillStyle='#316d63';ctx.font='700 10px Segoe UI';ctx.textAlign='center';ctx.fillText(tr('receiverCaps'),x,y-55);ctx.restore();
     }
   }
   function orbGuide(o){
@@ -810,11 +939,11 @@ globalThis.PulseBallEngine = (() => {
   }
   function unlockAudio(){if(!sound)return;try{if(!audio)audio=new (window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume().catch(()=>{});}catch{sound=false;updateSound();}}
   function toast(text){$('toast').textContent=text;$('toast').classList.add('visible');toastUntil=visualTime+2.7;}
-  const tutorialCues=[
-    {key:'move',x:150,label:'ДВИЖЕНИЕ',desktop:'← →',touch:'← →'},
-    {key:'jump',x:700,label:'ПРЫЖОК',desktop:'SPACE',touch:'↑'},
+  const tutorialCues=()=>[
+    {key:'move',x:150,label:tr('tutorialMove'),desktop:'← →',touch:'← →'},
+    {key:'jump',x:700,label:tr('tutorialJump'),desktop:'SPACE',touch:'↑'},
     {key:'pulse',x:1650,label:'PULSE',desktop:'E',touch:'PULSE'},
-    {key:'object',x:2400,label:'ТОЛКНИ ЯЩИК',desktop:'E',touch:'PULSE'}
+    {key:'object',x:2400,label:tr('tutorialObject'),desktop:'E',touch:'PULSE'}
   ];
   function hideTutorial(immediate=false){
     const card=$('tutorial');tutorialActive='';tutorialActed=false;clearTimeout(tutorialHideTimer);card.classList.remove('is-visible');
@@ -823,7 +952,7 @@ globalThis.PulseBallEngine = (() => {
   }
   function updateTutorial(){
     if(mode!=='playing'||(g.index!==0&&g.index!==3&&g.index!==6&&g.index!==9)){if(tutorialActive||!$('tutorial').hidden)hideTutorial(true);return;}
-    const cues=g.index===9?[{key:'orb',x:1800,label:'СФЕРА → ПРИЁМНИК',desktop:'E',touch:'PULSE'}]:g.index===6?[{key:'relay',x:850,label:'АКТИВИРУЙ RELAY',desktop:'E',touch:'PULSE'}]:g.index===3?[{key:'boost',x:1870,label:'АКТИВИРУЙ УСКОРИТЕЛЬ',desktop:'E',touch:'PULSE'}]:tutorialCues;
+    const cues=g.index===9?[{key:'orb',x:1800,label:tr('tutorialOrb'),desktop:'E',touch:'PULSE'}]:g.index===6?[{key:'relay',x:850,label:tr('tutorialRelay'),desktop:'E',touch:'PULSE'}]:g.index===3?[{key:'boost',x:1870,label:tr('tutorialBoost'),desktop:'E',touch:'PULSE'}]:tutorialCues();
     if(tutorialActive){
       const acted=tutorialActive==='orb'?g.orbTargets.some(t=>t.on):tutorialActive==='relay'?g.relays.some(n=>n.uses>0):tutorialActive==='boost'?g.boostPads[0].uses>0:tutorialActive==='move'?Math.abs(g.player.vx)>60:tutorialActive==='jump'?g.player.vy< -100:tutorialActive==='pulse'?g.pulseCooldown>.1:g.crates[0].x>g.level.crates[0][0];
       if(acted&&!tutorialActed){tutorialActed=true;tutorialActionAt=visualTime;}
@@ -841,74 +970,74 @@ globalThis.PulseBallEngine = (() => {
   function handleEvents(){
     for(const e of g.events){
       if(e.type==='relay'){burst(e.x,e.y,'#b0faff',5);tone(540,.07,'triangle',0,.025);tone(1080,.12,'sine',.035,.03);}
-      if(e.type==='orbLaunch'){burst(e.x,e.y,'#8cf7ff',8);if(g.index===9&&!g.orbTargets.some(t=>t.on))toast('Сфера летит к приёмнику — попади в кристалл!');tone(510,.09,'triangle',0,.025);tone(820,.12,'sine',.04,.025);}
+      if(e.type==='orbLaunch'){burst(e.x,e.y,'#8cf7ff',8);if(g.index===9&&!g.orbTargets.some(t=>t.on))toast(tr('orbLaunch'));tone(510,.09,'triangle',0,.025);tone(820,.12,'sine',.04,.025);}
       if(e.type==='orbEnemy'){burst(e.x,e.y,'#a6f7ff',14);tone(230,.12,'triangle');tone(760,.1,'sine',.04,.02);}
-      if(e.type==='orbHit'){burst(e.x,e.y,'#c5ffff',20,true);toast('Приёмник заряжен — мост включён!');tone(620,.12,'sine');tone(930,.18,'sine',.06,.03);}
+      if(e.type==='orbHit'){burst(e.x,e.y,'#c5ffff',20,true);toast(tr('orbHit'));tone(620,.12,'sine');tone(930,.18,'sine',.06,.03);}
       if(e.type==='boost'){burst(e.x,e.y,'#8cf0ff',6);tone(330,.09,'sine');tone(660,.13,'sine',.035);tone(990,.16,'sine',.07,.02);}
       if(e.type==='star'){burst(e.x,e.y,'#f6cf65',12,true);tone(880,.13);tone(1320,.12,'sine',.065);}
       else if(e.type==='jump'){burst(e.x,e.y,'#eff0d2',5);tone(390,.08,'triangle');}
       else if(e.type==='land')burst(e.x,e.y,'#e7d4a1',4);
       else if(e.type==='stomp'){burst(e.x,e.y,'#5a6d54',16);tone(170,.15,'triangle');}
-      else if(e.type==='hurt'){burst(e.x,e.y,'#f08064',15);shake=6;tone(130,.2,'sawtooth',0,.018);if(g.health>0)toast(g.checkpoint.active?'Ещё попытка — с контрольной точки!':'Ничего, попробуем ещё раз!');}
-      else if(e.type==='checkpoint'){toast('Контрольная точка! Здесь безопасно.');burst(e.x,e.y,'#c3d989',16,true);tone(660,.15);tone(880,.15,'sine',.1);}
+      else if(e.type==='hurt'){burst(e.x,e.y,'#f08064',15);shake=6;tone(130,.2,'sawtooth',0,.018);if(g.health>0)toast(g.checkpoint.active?tr('hurtCheckpoint'):tr('hurtRetry'));}
+      else if(e.type==='checkpoint'){toast(tr('checkpoint'));burst(e.x,e.y,'#c3d989',16,true);tone(660,.15);tone(880,.15,'sine',.1);}
       else if(e.type==='pulse'){tone(420,.12,'sawtooth',0,.02);tone(670,.13,'sine',.06,.025);}
-      else if(e.type==='shatter'){burst(e.x,e.y,'#8befff',15);toast('Блок разрушен!');}
+      else if(e.type==='shatter'){burst(e.x,e.y,'#8befff',15);toast(tr('shatter'));}
       else if(e.type==='push'){burst(e.x,e.y,'#62e8ff',7);}
-      else if(e.type==='switch'){toast('Переключатель включён. Направь ящик на плиту!');tone(740,.17);}
-      else if(e.type==='bridge'){toast('Мост активирован!');burst(e.x,e.y,'#77ecf5',18);tone(830,.2);}
+      else if(e.type==='switch'){toast(tr('switchOn'));tone(740,.17);}
+      else if(e.type==='bridge'){toast(tr('bridgeOn'));burst(e.x,e.y,'#77ecf5',18);tone(830,.2);}
       else if(e.type==='win'){for(let i=0;i<8;i++)burst(e.x-160+i*45,230,'#f6cb67',12,true);[523,659,784,1047].forEach((f,i)=>tone(f,.25,'sine',i*.1));}
     }
   }
   function renderProgression(){
     document.querySelectorAll('.level-tab[data-level]').forEach(tab=>{
-      const index=Number(tab.dataset.level),locked=index>unlocked;tab.disabled=locked;tab.setAttribute('aria-label',locked?'Уровень '+(index+1)+' заблокирован':E.levels[index].name);
+      const index=Number(tab.dataset.level),locked=index>unlocked;tab.disabled=locked;tab.setAttribute('aria-label',locked?(tr('locked')+' '+(index+1)):levelDisplayName(index));
     });
     const done=completedCount(),rating=E.levels.reduce((sum,_,i)=>sum+ratingFor(i),0),next=continueLevel();
     $('menuCompleted').textContent=done+' / '+E.levels.length;$('menuRating').textContent=rating+' / '+(E.levels.length*3)+' ★';$('menuProgressFill').style.width=Math.round(done/E.levels.length*100)+'%';$('pickerProgress').textContent=done+' / '+E.levels.length;
-    $('continueButton').querySelector('span').textContent=done?'Продолжить · '+String(next+1).padStart(2,'0'):'Играть';
+    $('continueButton').querySelector('span').textContent=done?tr('continue')+' · '+String(next+1).padStart(2,'0'):tr('play');
     $('levelGrid').innerHTML=E.levels.map((level,i)=>{
       const locked=i>unlocked,r=recordFor(i),rating=ratingFor(i),filled='★'.repeat(rating),empty='☆'.repeat(3-rating),chapter=Math.floor(i/3);
-      const meta=r&&Number.isFinite(r.time)?formatTime(r.time):r?'пройден':locked?'закрыт':'играть';
-      return '<button class="menu-level" data-menu-level="'+i+'" data-chapter="'+chapter+'" '+(locked?'disabled':'')+'><span class="menu-level-number">'+String(i+1).padStart(2,'0')+'</span><span class="menu-level-name">'+level.name+'</span><span class="menu-level-meta"><span class="menu-level-stars">'+(r?filled+empty:'☆☆☆')+'</span><span>'+meta+'</span></span>'+(locked?'<span class="menu-level-lock"></span>':'')+'</button>';
+      const meta=r&&Number.isFinite(r.time)?formatTime(r.time):r?tr('completed'):locked?tr('locked'):tr('play').toLowerCase();
+      return '<button class="menu-level" data-menu-level="'+i+'" data-chapter="'+chapter+'" '+(locked?'disabled':'')+'><span class="menu-level-number">'+String(i+1).padStart(2,'0')+'</span><span class="menu-level-name">'+levelDisplayName(i)+'</span><span class="menu-level-meta"><span class="menu-level-stars">'+(r?filled+empty:'☆☆☆')+'</span><span>'+meta+'</span></span>'+(locked?'<span class="menu-level-lock"></span>':'')+'</button>';
     }).join('');
   }
   function showMenu(){
-    clearInput();hideTutorial(true);mode='menu';$('overlay').hidden=true;$('readyHint').hidden=true;$('menuScreen').hidden=false;$('menuHome').hidden=false;$('levelPicker').hidden=true;renderProgression();
+    clearInput();hideTutorial(true);globalThis.YandexPlatform?.gameplayStop?.();mode='menu';$('overlay').hidden=true;$('readyHint').hidden=true;$('menuScreen').hidden=false;$('menuHome').hidden=false;$('levelPicker').hidden=true;renderProgression();
   }
   function showLevelPicker(){
     clearInput();mode='menu';$('menuScreen').hidden=false;$('menuHome').hidden=true;$('levelPicker').hidden=false;renderProgression();
   }
   function formatTime(seconds){const n=Math.floor(seconds);return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');}
   function updateHud(){
-    $('hearts').innerHTML='♥'.repeat(g.health)+'<span class="empty-heart">'+'♥'.repeat(3-g.health)+'</span>';$('hearts').setAttribute('aria-label',g.health+' жизни');
+    $('hearts').innerHTML='♥'.repeat(g.health)+'<span class="empty-heart">'+'♥'.repeat(3-g.health)+'</span>';$('hearts').setAttribute('aria-label',g.health+' '+tr('lives'));
     $('starCount').textContent=g.collected;$('starTotal').textContent=g.stars.length;$('timer').textContent=formatTime(g.time);
-    const charge=1-g.pulseCooldown/.58;$('pulseFill').style.width=Math.round(charge*100)+'%';$('pulseMeter').classList.toggle('cooling',charge<1);$('pulseText').textContent=charge>=1?'PULSE':Math.ceil(g.pulseCooldown*10)/10+'с';$('pulseMeter').setAttribute('aria-label',charge>=1?'Импульс готов':'Импульс заряжается');$('pulseButton').classList.toggle('cooling',charge<1);
+    const charge=1-g.pulseCooldown/.58;$('pulseFill').style.width=Math.round(charge*100)+'%';$('pulseMeter').classList.toggle('cooling',charge<1);$('pulseText').textContent=charge>=1?'PULSE':Math.ceil(g.pulseCooldown*10)/10+(lang==='ru'?'с':'s');$('pulseMeter').setAttribute('aria-label',charge>=1?tr('pulseReady'):tr('pulseCharging'));$('pulseButton').classList.toggle('cooling',charge<1);
     const progress=Math.round(Math.max(0,Math.min(1,(g.player.x-150)/(g.finish.x-150)))*100);$('progressBar').style.width=progress+'%';$('progressText').textContent=progress+'%';
   }
-  function updateRecord(){const r=best[g.index];$('levelRecord').textContent=r&&r.level===g.level.name&&Number.isFinite(r.stars)?'РЕКОРД: '+r.stars+' / '+g.stars.length+' ★':'ТВОЁ ПРИКЛЮЧЕНИЕ';}
+  function updateRecord(){const r=best[g.index];$('levelRecord').textContent=r&&r.level===g.level.name&&Number.isFinite(r.stars)?tr('record')+': '+r.stars+' / '+g.stars.length+' ★':tr('adventure');}
   function clearInput(){heldCodes.clear();touchPointers.clear();pulseQueued=false;input={left:false,right:false,jump:false,pulse:false};g.pulseHeld=false;document.querySelectorAll('.touch-btn').forEach(b=>b.classList.remove('pressed'));}
-  function start(){mode='playing';$('menuScreen').hidden=true;$('readyHint').hidden=true;$('overlay').hidden=true;unlockAudio();canvas.focus({preventScroll:true});}
+  function start(){mode='playing';$('menuScreen').hidden=true;$('readyHint').hidden=true;$('overlay').hidden=true;unlockAudio();globalThis.YandexPlatform?.gameplayStart?.();canvas.focus({preventScroll:true});}
   function loadLevel(index,autostart=false){
-    if(index>unlocked){toast('Сначала пройди предыдущий уровень');return;}
+    if(index>unlocked){toast(tr('levelLocked'));return;}
     clearInput();g=E.createGame(index);mode=autostart?'playing':'ready';camera=0;particles=[];shake=0;accumulator=0;tutorialSeen=new Set();hideTutorial(true);
     $('menuScreen').hidden=true;$('overlay').hidden=true;$('readyHint').hidden=autostart;$('toast').classList.remove('visible');
     document.querySelectorAll('[data-level]').forEach(b=>{const active=Number(b.dataset.level)===index;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','true');else b.removeAttribute('aria-current');});
-    $('currentLevelNumber').textContent=String(index+1).padStart(2,'0');$('currentLevelName').textContent=g.level.name;
-    updateHud();updateRecord();if(autostart){unlockAudio();canvas.focus({preventScroll:true});}
+    $('currentLevelNumber').textContent=String(index+1).padStart(2,'0');$('currentLevelName').textContent=levelDisplayName(index);
+    updateHud();updateRecord();if(autostart){unlockAudio();globalThis.YandexPlatform?.gameplayStart?.();canvas.focus({preventScroll:true});}
   }
   function openDialog(kind){
-    clearInput();hideTutorial(true);dialogKind=kind;mode=kind;$('menuScreen').hidden=true;$('readyHint').hidden=true;$('overlay').hidden=false;$('dialogExtra').innerHTML='';$('dialogSecondary').hidden=false;
-    if(kind==='paused'){$('dialogSymbol').textContent='Ⅱ';$('dialogTitle').textContent='Маленькая передышка';$('dialogText').textContent='Импульс подождёт. Продолжим, когда будешь готов.';$('dialogPrimary').textContent='Продолжить →';$('dialogSecondary').textContent='С начала уровня';}
-    if(kind==='help'){$('dialogSymbol').textContent='↟';$('dialogTitle').textContent='Как играть';$('dialogText').textContent='Используй Pulse, чтобы открыть путь к финишу.';$('dialogExtra').innerHTML='<div class="help-list"><strong>← → или A D</strong><span>Движение</span><strong>↑ W или пробел</strong><span>Прыжок</span><strong>E</strong><span>Импульс перед героем: ломает голубые блоки, двигает ящик и включает переключатель. На телефоне — кнопка PULSE</span><strong>Плита</strong><span>Поставь на неё импульсный ящик, чтобы включить мост</span><strong>Энерго-сфера</strong><span>Используй Pulse рядом со сферой: она летит по стрелке, сбивает врагов и включает приёмник</span><strong>Белый флаг</strong><span>Контрольная точка</span><strong>P / R</strong><span>Пауза / начать заново</span></div>';$('dialogPrimary').textContent='Всё понятно →';$('dialogSecondary').hidden=true;}
-    if(kind==='lost'){$('dialogSymbol').textContent='↻';$('dialogTitle').textContent='Ещё один разбег?';$('dialogText').textContent='Каждый прыжок — немного опыта. В этот раз точно получится.';$('dialogPrimary').textContent='Попробовать снова →';$('dialogSecondary').textContent='К выбору уровней';}
+    clearInput();hideTutorial(true);globalThis.YandexPlatform?.gameplayStop?.();dialogKind=kind;mode=kind;$('menuScreen').hidden=true;$('readyHint').hidden=true;$('overlay').hidden=false;$('dialogExtra').innerHTML='';$('dialogSecondary').hidden=false;
+    if(kind==='paused'){$('dialogSymbol').textContent='Ⅱ';$('dialogTitle').textContent=tr('pausedTitle');$('dialogText').textContent=tr('pausedText');$('dialogPrimary').textContent=tr('resume');$('dialogSecondary').textContent=tr('restartLevel');}
+    if(kind==='help'){$('dialogSymbol').textContent='↟';$('dialogTitle').textContent=tr('helpTitle');$('dialogText').textContent=tr('helpText');$('dialogExtra').innerHTML=helpHtml();$('dialogPrimary').textContent=tr('helpOk');$('dialogSecondary').hidden=true;}
+    if(kind==='lost'){$('dialogSymbol').textContent='↻';$('dialogTitle').textContent=tr('lostTitle');$('dialogText').textContent=tr('lostText');$('dialogPrimary').textContent=tr('retry');$('dialogSecondary').textContent=tr('levelSelect');}
     if(kind==='won'){
       const all=g.collected===g.stars.length,rating=all?3:g.collected>=Math.ceil(g.stars.length/2)?2:1;
       const wasUnlocked=unlocked;
-      $('dialogSymbol').textContent='';$('dialogTitle').textContent=g.level.name+' пройден!';$('dialogText').textContent='Собрано '+g.collected+' из '+g.stars.length+' звёзд за '+formatTime(g.time)+'. '+(all?'Все звёзды твои!':'Можно вернуться и улучшить результат.');
+      $('dialogSymbol').textContent='';$('dialogTitle').textContent=levelDisplayName(g.index)+tr('wonSuffix');$('dialogText').textContent=tr('collectedA')+g.collected+tr('collectedB')+g.stars.length+tr('starsWord')+formatTime(g.time)+'. '+(all?tr('allStars'):tr('improve'));
       const unlocksNext=g.index<E.levels.length-1&&g.index>=wasUnlocked;
       if(unlocksNext)unlocked=Math.min(E.levels.length-1,g.index+1);
-      $('dialogExtra').innerHTML='<div class="result-stars">'+'★'.repeat(rating)+'<span style="color:#dfe4d2">'+'★'.repeat(3-rating)+'</span></div>'+(unlocksNext?'<div class="unlock-note">Открыт уровень '+String(g.index+2).padStart(2,'0')+' · '+E.levels[g.index+1].name+'</div>':'');
-      $('dialogPrimary').textContent=g.index<E.levels.length-1?'Следующий уровень →':'К выбору уровней →';$('dialogSecondary').textContent='Переиграть этот уровень';
+      $('dialogExtra').innerHTML='<div class="result-stars">'+'★'.repeat(rating)+'<span style="color:#dfe4d2">'+'★'.repeat(3-rating)+'</span></div>'+(unlocksNext?'<div class="unlock-note">'+tr('unlocked')+String(g.index+2).padStart(2,'0')+' · '+levelDisplayName(g.index+1)+'</div>':'');
+      $('dialogPrimary').textContent=g.index<E.levels.length-1?tr('next'):tr('levelSelect')+' →';$('dialogSecondary').textContent=tr('replay');
       const old=recordFor(g.index);
       const stars=Math.max(g.collected,Number.isFinite(old?.stars)?old.stars:0),time=Math.min(g.time,Number.isFinite(old?.time)?old.time:Infinity);
       if(!old||stars!==old.stars||time!==old.time||unlocksNext){best[g.index]={level:g.level.name,stars,time};saveProgress();updateRecord();renderProgression();}
@@ -916,7 +1045,19 @@ globalThis.PulseBallEngine = (() => {
     $('dialogPrimary').focus({preventScroll:true});
   }
   function pause(){if(mode==='playing')openDialog('paused');else if(mode==='paused')start();}
-  function updateSound(){ $('soundButton').setAttribute('aria-label',sound?'Выключить звук':'Включить звук');$('soundButton').setAttribute('aria-pressed',String(sound));$('soundWaves').setAttribute('d',sound?'M15 8c3 2 3 6 0 8m3-11c5 4 5 10 0 14':'m16 9 6 6m0-6-6 6');}
+  function suspendAudio(){try{if(audio&&audio.state==='running')audio.suspend().catch(()=>{});}catch{}}
+  function resumeAudio(){try{if(sound&&audio&&audio.state==='suspended')audio.resume().catch(()=>{});}catch{}}
+  globalThis.PulseGame={
+    platformPause(reason){
+      suspendAudio();clearInput();
+      if(mode==='playing'){mode='platformPaused';globalThis.YandexPlatform?.gameplayStop?.();}
+    },
+    platformResume(reason){
+      resumeAudio();
+      if(mode==='platformPaused'){mode='playing';globalThis.YandexPlatform?.gameplayStart?.();canvas.focus({preventScroll:true});}
+    }
+  };
+  function updateSound(){ $('soundButton').setAttribute('aria-label',sound?tr('soundOn'):tr('soundOff'));$('soundButton').setAttribute('aria-pressed',String(sound));$('soundWaves').setAttribute('d',sound?'M15 8c3 2 3 6 0 8m3-11c5 4 5 10 0 14':'m16 9 6 6m0-6-6 6');}
   $('startButton').onclick=start;$('restartButton').onclick=()=>loadLevel(g.index,true);$('pauseButton').onclick=pause;
   $('menuButton').onclick=showMenu;
   $('continueButton').onclick=()=>loadLevel(continueLevel(),true);
@@ -925,14 +1066,17 @@ globalThis.PulseBallEngine = (() => {
   $('levelGrid').onclick=e=>{const card=e.target.closest('[data-menu-level]');if(card&&!card.disabled)loadLevel(Number(card.dataset.menuLevel),true);};
   $('helpButton').onclick=()=>{if(mode==='help')return;helpPrevious=mode;openDialog('help');};
   $('soundButton').onclick=()=>{sound=!sound;updateSound();unlockAudio();if(sound)tone(660,.1);};
-  function updateFullscreen(){const active=document.fullscreenElement===$('game-shell');$('fullscreenButton').setAttribute('aria-label',active?'Выйти из полноэкранного режима':'На весь экран');$('fullscreenButton').title=active?'Выйти из полноэкранного режима':'На весь экран';}
+  function updateFullscreen(){const active=document.fullscreenElement===$('game-shell'),label=active?tr('fullscreenOn'):tr('fullscreenOff');$('fullscreenButton').setAttribute('aria-label',label);$('fullscreenButton').title=label;}
   document.addEventListener('fullscreenchange',updateFullscreen);
-  $('fullscreenButton').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('game-shell').requestFullscreen();}catch{toast('Полный экран недоступен в этом окне');}};
-  $('dialogPrimary').onclick=()=>{
+  $('fullscreenButton').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('game-shell').requestFullscreen();}catch{toast(tr('fullscreenFail'));}};
+  $('dialogPrimary').onclick=async()=>{
     if(dialogKind==='paused')start();
     else if(dialogKind==='help'){if(helpPrevious==='menu')showMenu();else if(helpPrevious==='ready'){mode='ready';$('overlay').hidden=true;$('readyHint').hidden=false;canvas.focus({preventScroll:true});}else if(helpPrevious==='playing')start();else openDialog(helpPrevious);}
     else if(dialogKind==='lost')loadLevel(g.index,true);
-    else if(dialogKind==='won'){if(g.index<E.levels.length-1)loadLevel(g.index+1,true);else showMenu();}
+    else if(dialogKind==='won'){
+      if((g.index+1)%3===0)await globalThis.YandexPlatform?.showInterstitial?.();
+      if(g.index<E.levels.length-1)loadLevel(g.index+1,true);else showMenu();
+    }
   };
   $('dialogSecondary').onclick=()=>{if(dialogKind==='lost')showMenu();else loadLevel(g.index,true);};
   document.querySelectorAll('[data-level]').forEach(b=>b.onclick=()=>{if(!b.disabled)loadLevel(Number(b.dataset.level));});
@@ -961,8 +1105,8 @@ globalThis.PulseBallEngine = (() => {
     b.addEventListener('pointerup',release);b.addEventListener('pointercancel',release);b.addEventListener('lostpointercapture',release);
   });
   stage.addEventListener('contextmenu',e=>e.preventDefault());stage.addEventListener('selectstart',e=>e.preventDefault());
-  addEventListener('blur',()=>{clearInput();if(mode==='playing')openDialog('paused');});
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInput();if(mode==='playing')openDialog('paused');}});
+  addEventListener('blur',()=>{suspendAudio();clearInput();if(mode==='playing')openDialog('paused');});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){suspendAudio();clearInput();if(mode==='playing')openDialog('paused');}else resumeAudio();});
   function frame(now){
     const dt=Math.min(.05,Math.max(0,(now-last)/1000||0));last=now;visualTime+=dt;
     if(mode==='playing'){
@@ -974,7 +1118,15 @@ globalThis.PulseBallEngine = (() => {
     if(visualTime>toastUntil)$('toast').classList.remove('visible');
     updateTutorial();draw();updateHud();requestAnimationFrame(frame);
   }
-  showMenu();updateRecord();updateHud();requestAnimationFrame(frame);
+  async function bootstrap(){
+    const platform=await globalThis.YandexPlatform.readyPromise;
+    setLanguage(platform.lang);
+    mergeExternalProgress(platform.safe);mergeExternalProgress(platform.cloud);
+    saveProgress();showMenu();updateRecord();updateHud();
+    $('bootScreen').hidden=true;
+    globalThis.YandexPlatform.notifyGameReady();
+  }
+  requestAnimationFrame(frame);bootstrap();
 })();
 </script>
 </body>
