@@ -508,23 +508,16 @@ globalThis.PulseBallEngine = (() => {
     for(const spike of g.spikes){
       const x=spike.x-camera;if(x+spike.w< -50||x>viewW+50)continue;
       ctx.save();
-      ctx.shadowColor='#ff3b2f';ctx.shadowBlur=12;
-      rounded(x-8,468,spike.w+16,12,4,'#151820','#050608');
-      ctx.shadowBlur=0;
-      for(let j=0;j<spike.w+8;j+=20){
-        path([[x-4+j,469],[x+6+j,469],[x+14+j,479],[x+4+j,479]],j%40===0?'#ffd84a':'#2c3038');
-      }
+      // Natural canyon thorns: readable silhouette without UI-like warning signs.
+      rounded(x-5,472,spike.w+10,8,4,t.deep);
       for(let j=0;j<spike.w;j+=18){
-        path([[x+j,470],[x+j+9,438],[x+j+18,470]],'#ff4a36','#6f171d',1.8);
-        path([[x+j+6,458],[x+j+9,443],[x+j+12,458]],'#ffd07a');
+        const lean=(j/18)%2===0?2:-2;
+        path([[x+j,474],[x+j+9+lean,438],[x+j+18,474]],'#76505b','#3d3441',1.5);
+        path([[x+j+7+lean*.35,459],[x+j+9+lean,443],[x+j+11+lean*.7,459]],'#d98772');
+        path([[x+j+3,469],[x+j+9+lean,440]],null,'#e5b09a66',1);
       }
-      const pulse=.42+.22*Math.sin(visualTime*6+spike.x*.01);
-      ctx.globalAlpha=pulse;
-      rounded(x-4,432,spike.w+8,4,2,'#ff694f');
-      ctx.globalAlpha=.9;
-      ctx.fillStyle='#fff0a8';ctx.font='bold 10px Segoe UI';ctx.textAlign='center';
-      ctx.fillText('!',x+spike.w/2,429);
-      ctx.textAlign='left';
+      ctx.globalAlpha=.32;
+      rounded(x,475,spike.w,2,1,t.grass);
       ctx.restore();
     }
     flag(g.checkpoint.x,480,g.checkpoint.active,false,t);flag(g.finish.x,480,true,true,t);
