@@ -177,7 +177,7 @@ globalThis.PulseBallEngine = (() => {
       extraSwitches:(level.extraSwitches||[]).map(a=>({x:a.x,bridge:a.bridge,on:false})),
       enemies:level.enemies.map(a=>({x:a[0],y:460,w:a[4]==='heavy'?46:38,h:a[4]==='heavy'?46:40,min:a[1],max:a[2],speed:a[3],type:a[4]||'patrol',dir:-1,dead:false,alert:0})),
       stars:level.stars.map(a=>({x:a[0],y:a[1],taken:false})),
-      spikes:level.spikes.map(a=>({x:a[0],y:463,w:a[1],h:17}))};
+      spikes:level.spikes.map(a=>({x:a[0],y:452,w:a[1],h:28,hitX:a[0]+5,hitY:463,hitW:Math.max(6,a[1]-10),hitH:14}))};
   }
   const overlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
   const relayVelocity={up:[0,-860],right:[325,-760],left:[-325,-760],east:[325,-100],west:[-325,-100]};
@@ -258,7 +258,7 @@ globalThis.PulseBallEngine = (() => {
         else {damage(g);if(g.status!=='playing')return;}
       }
     }
-    for(const spike of g.spikes)if(overlap({x:p.x-r+7,y:p.y-r,w:2*r-14,h:2*r-4},spike))damage(g);
+    for(const spike of g.spikes)if(overlap({x:p.x-r+8,y:p.y-r+3,w:2*r-16,h:2*r-9},{x:spike.hitX,y:spike.hitY,w:spike.hitW,h:spike.hitH}))damage(g);
     if(p.y>720){damage(g,true);if(g.status!=='playing')return;}
     for(const star of g.stars)if(!star.taken&&Math.hypot(p.x-star.x,p.y-star.y)<r+17){star.taken=true;g.collected++;g.events.push({type:'star',x:star.x,y:star.y});}
     if(!g.checkpoint.active&&Math.abs(p.x-g.checkpoint.x)<35&&p.y>330){g.checkpoint.active=true;g.spawn={x:g.checkpoint.x,y:440};g.events.push({type:'checkpoint',x:g.checkpoint.x,y:400});}
@@ -505,7 +505,15 @@ globalThis.PulseBallEngine = (() => {
     const switchX=g.level.switch-camera;rounded(switchX-12,386,24,35,5,g.switchOn?'#2e99ae':'#3e6175');ellipse(switchX,402,7,7,g.switchOn?'#aafff5':'#76c7e4');
     for(const mechanism of g.extraSwitches){const sx=mechanism.x-camera;rounded(sx-12,386,24,35,5,mechanism.on?'#2e99ae':'#3e6175');ellipse(sx,402,7,7,mechanism.on?'#aafff5':'#76c7e4');}
     for(const b of g.breakables)if(!b.broken){const x=b.x-camera;rounded(x,b.y,b.w,b.h,5,'#477b91','#315d75');for(let row=0;row<3;row++){const y=b.y+row*60;rounded(x+3,y+3,b.w-6,54,4,'#8bc7d4');path([[x+8,y+8],[x+23,y+23],[x+15,y+37],[x+33,y+50]],null,'#e8ffff',2.5);}}
-    for(const spike of g.spikes){const x=spike.x-camera;for(let j=0;j<spike.w;j+=16)path([[x+j,480],[x+j+8,463],[x+j+16,480]],'#828775','#667361',1);}
+    for(const spike of g.spikes){
+      const x=spike.x-camera;if(x+spike.w< -40||x>viewW+40)continue;
+      rounded(x-5,474,spike.w+10,8,3,'#402f35','#261d22');
+      for(let j=0;j<spike.w;j+=16){
+        path([[x+j,476],[x+j+8,450],[x+j+16,476]],'#d95645','#6f262c',1.4);
+        path([[x+j+6,466],[x+j+8,454],[x+j+10,466]],'#ffd39b');
+      }
+      ctx.save();ctx.globalAlpha=.38+.18*Math.sin(visualTime*5+spike.x);rounded(x,478,spike.w,2,1,'#ff8f5a');ctx.restore();
+    }
     flag(g.checkpoint.x,480,g.checkpoint.active,false,t);flag(g.finish.x,480,true,true,t);
     for(const c of g.crates)crate(c,t);
     for(let i=0;i<g.stars.length;i++){const s=g.stars[i];if(s.taken)continue;const x=s.x-camera,y=s.y+(reduced?0:Math.sin(visualTime*2.3+i)*4);ellipse(x,y,23,23,'#fff5b530');star(x,y,13,'#f8d264','#d8ad43');path([[x-4,y-3],[x-1,y-8],[x+2,y-2]],null,'#fff1b3',1.7);}
