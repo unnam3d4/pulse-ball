@@ -218,6 +218,14 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
 @media(max-width:900px) and (min-height:501px){.menu-level-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-height:500px) and (orientation:landscape){.menu-level-grid{grid-template-columns:repeat(6,minmax(0,1fr))}}
 
+
+.rewarded-btn{border:1px solid #b9e3d5;border-radius:25px;background:linear-gradient(180deg,#effcf7,#e2f8ef);box-shadow:none;color:#357761;font-size:12px;font-weight:800}
+.rewarded-btn:hover{background:#dcf6eb;transform:translateY(-1px)}
+.rewarded-btn:disabled{opacity:.55;cursor:wait}
+.menu-quick{grid-area:help;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.menu-quick .menu-help-link{grid-area:auto;justify-self:auto}
+.menu-quick-btn{padding:5px 0;border:0;background:transparent;color:#6e8090;font-size:11px;font-weight:700}
+.menu-quick-btn:hover{color:#5545be}
 </style>
 </head>
 <body>
@@ -245,7 +253,7 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
           <div class="menu-progress"><i id="menuProgressFill"></i></div>
           <strong id="menuRating">0 / 36 ★</strong>
         </div>
-        <button class="menu-help-link" id="menuHelpButton">? Как играть</button>
+        <div class="menu-quick"><button class="menu-help-link" id="menuHelpButton">? Как играть</button><button class="menu-quick-btn" id="menuSoundButton">♪ Звук</button><button class="menu-quick-btn" id="menuFullscreenButton">⛶ Экран</button></div>
       </div>
       <div class="menu-level-picker" id="levelPicker" hidden>
         <div class="picker-head">
@@ -286,7 +294,7 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
       <div class="touch-controls" aria-label="Сенсорное управление"><div class="touch-group"><button class="touch-btn" data-key="left" aria-label="Двигаться влево">←</button><button class="touch-btn" data-key="right" aria-label="Двигаться вправо">→</button></div><div class="touch-group"><button class="touch-btn pulse" id="pulseButton" data-key="pulse" aria-label="Импульс Pulse">PULSE</button><button class="touch-btn jump" data-key="jump" aria-label="Прыгать">↑</button></div></div>
       <div class="overlay" id="overlay" hidden>
         <div class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
-          <div class="dialog-symbol" id="dialogSymbol" aria-hidden="true">Ⅱ</div><h2 id="dialogTitle">Передышка</h2><p id="dialogText">Приключение подождёт.</p><div id="dialogExtra"></div><button class="start-btn" id="dialogPrimary">Продолжить →</button><button class="secondary" id="dialogSecondary">С начала уровня</button>
+          <div class="dialog-symbol" id="dialogSymbol" aria-hidden="true">Ⅱ</div><h2 id="dialogTitle">Передышка</h2><p id="dialogText">Приключение подождёт.</p><div id="dialogExtra"></div><button class="start-btn" id="dialogPrimary">Продолжить →</button><button class="rewarded-btn" id="dialogRewarded" hidden>▶ Продолжить с 3 жизнями · реклама</button><button class="secondary" id="dialogSecondary">С начала уровня</button>
         </div>
       </div>
     </div>
@@ -332,6 +340,8 @@ globalThis.YandexPlatform=(()=>{
     try{safeStorage?.setItem?.('pulse-ball-progress-v2',JSON.stringify(data));}catch{}
     try{player?.setData?.({pulseBallSave:data},false)?.catch?.(()=>{});}catch{}
   }
+  function showBanner(){try{ysdk?.adv?.showBannerAdv?.()?.catch?.(()=>{});}catch{}}
+  function hideBanner(){try{ysdk?.adv?.hideBannerAdv?.()?.catch?.(()=>{});}catch{}}
   function showInterstitial(){
     return new Promise(resolve=>{
       if(!ysdk?.adv?.showFullscreenAdv){resolve(false);return;}
@@ -355,7 +365,7 @@ globalThis.YandexPlatform=(()=>{
     });
   }
   init();
-  return{readyPromise,notifyGameReady,gameplayStart,gameplayStop,saveProgress,showInterstitial,showRewarded,get connected(){return connected},get sdk(){return ysdk}};
+  return{readyPromise,notifyGameReady,gameplayStart,gameplayStop,saveProgress,showBanner,hideBanner,showInterstitial,showRewarded,get connected(){return connected},get sdk(){return ysdk}};
 })();
 </script>
 <script id="engine">
@@ -544,7 +554,7 @@ globalThis.PulseBallEngine = (() => {
     {sky:'#8ebaf9',horizon:'#fff0bd',sun:'#fff1a0',far:'#c7b9ec',mid:'#a294d7',near:'#7968bb',tree:'#594e96',dark:'#3b3d73',grass:'#ead76d',edge:'#a99b53',dirt:'#bd856d',deep:'#7e5a67',stone:'#8e7fac',water:'#6b93ca'},
     {sky:'#71c7f5',horizon:'#fff3b0',sun:'#fff08e',far:'#aee5c0',mid:'#7ad0ab',near:'#4bb78f',tree:'#33876c',dark:'#235f58',grass:'#d8ef63',edge:'#79b64c',dirt:'#c69363',deep:'#875e54',stone:'#7e9b90',water:'#53bfc7'}
   ];
-  let g=E.createGame(0),mode='menu',input={left:false,right:false,jump:false,pulse:false},pulseQueued=false,heldCodes=new Set(),touchPointers=new Map(),camera=0,viewW=1200,viewH=600,last=0,accumulator=0,visualTime=0,particles=[],toastUntil=0,shake=0,audio=null,sound=false,dialogKind='',helpPrevious='menu',best=[],unlocked=0,tutorialSeen=new Set(),tutorialActive='',tutorialUntil=0,tutorialActed=false,tutorialActionAt=0,tutorialHideTimer=0;
+  let g=E.createGame(0),mode='menu',input={left:false,right:false,jump:false,pulse:false},pulseQueued=false,heldCodes=new Set(),touchPointers=new Map(),camera=0,viewW=1200,viewH=600,last=0,accumulator=0,visualTime=0,particles=[],toastUntil=0,shake=0,audio=null,sound=false,dialogKind='',helpPrevious='menu',best=[],unlocked=0,lossesSinceAd=0,tutorialSeen=new Set(),tutorialActive='',tutorialUntil=0,tutorialActed=false,tutorialActionAt=0,tutorialHideTimer=0;
   const SAVE_KEY='pulse-ball-progress-v2';
   try{
     const modern=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
@@ -579,7 +589,7 @@ globalThis.PulseBallEngine = (() => {
       lostTitle:'Ещё один разбег?',lostText:'Каждый прыжок — немного опыта. В этот раз точно получится.',retry:'Попробовать снова →',levelSelect:'К выбору уровней',
       wonSuffix:' пройден!',collectedA:'Собрано ',collectedB:' из ',starsWord:' звёзд за ',allStars:'Все звёзды твои!',improve:'Можно вернуться и улучшить результат.',unlocked:'Открыт уровень ',next:'Следующий уровень →',replay:'Переиграть этот уровень',
       soundOn:'Выключить звук',soundOff:'Включить звук',fullscreenOn:'Выйти из полноэкранного режима',fullscreenOff:'На весь экран',fullscreenFail:'Полный экран недоступен в этом окне',
-      finishCaps:'ФИНИШ',receiverCaps:'ПРИЁМНИК',
+      finishCaps:'ФИНИШ',receiverCaps:'ПРИЁМНИК',rewardContinue:'▶ Продолжить с 3 жизнями · реклама',adUnavailable:'Реклама сейчас недоступна',soundMenu:'♪ Звук',fullscreenMenu:'⛶ Экран',
       helpMove:'Движение',helpJump:'Прыжок',helpPulse:'Импульс перед героем: ломает голубые блоки, двигает ящик и включает переключатель. На телефоне — кнопка PULSE',helpPlate:'Плита',helpPlateText:'Поставь на неё импульсный ящик, чтобы включить мост',helpOrb:'Энерго-сфера',helpOrbText:'Используй Pulse рядом со сферой: она летит по стрелке, сбивает врагов и включает приёмник',helpFlag:'Белый флаг',helpFlagText:'Контрольная точка',helpPR:'Пауза / начать заново'
     },
     en:{
@@ -592,7 +602,7 @@ globalThis.PulseBallEngine = (() => {
       lostTitle:'One more run?',lostText:'Every jump gets you closer. Try it again.',retry:'Try again →',levelSelect:'Level select',
       wonSuffix:' cleared!',collectedA:'Collected ',collectedB:' of ',starsWord:' stars in ',allStars:'All stars collected!',improve:'You can replay and improve your result.',unlocked:'Unlocked level ',next:'Next level →',replay:'Replay this level',
       soundOn:'Mute sound',soundOff:'Enable sound',fullscreenOn:'Exit fullscreen',fullscreenOff:'Fullscreen',fullscreenFail:'Fullscreen is unavailable here',
-      finishCaps:'FINISH',receiverCaps:'RECEIVER',
+      finishCaps:'FINISH',receiverCaps:'RECEIVER',rewardContinue:'▶ Continue with 3 hearts · ad',adUnavailable:'Ad is not available right now',soundMenu:'♪ Sound',fullscreenMenu:'⛶ Fullscreen',
       helpMove:'Move',helpJump:'Jump',helpPulse:'Pulse in front of the hero: breaks blue blocks, pushes crates and activates switches. On mobile, use the PULSE button',helpPlate:'Plate',helpPlateText:'Push a pulse crate onto it to activate the bridge',helpOrb:'Energy orb',helpOrbText:'Use Pulse near an orb: it flies along its arrow, defeats enemies and charges a receiver',helpFlag:'White flag',helpFlagText:'Checkpoint',helpPR:'Pause / restart'
     }
   };
@@ -601,7 +611,7 @@ globalThis.PulseBallEngine = (() => {
   function helpHtml(){return '<div class="help-list"><strong>← → / A D</strong><span>'+tr('helpMove')+'</span><strong>↑ W / '+tr('space')+'</strong><span>'+tr('helpJump')+'</span><strong>E</strong><span>'+tr('helpPulse')+'</span><strong>'+tr('helpPlate')+'</strong><span>'+tr('helpPlateText')+'</span><strong>'+tr('helpOrb')+'</strong><span>'+tr('helpOrbText')+'</span><strong>'+tr('helpFlag')+'</strong><span>'+tr('helpFlagText')+'</span><strong>P / R</strong><span>'+tr('helpPR')+'</span></div>';}
   function applyStaticLanguage(){
     document.documentElement.lang=lang;document.title=tr('title');
-    $('menuTitle').textContent=tr('menuTitle');$('menuTagline').textContent=tr('menuTagline');$('levelsButtonText').textContent=tr('levels');$('menuProgressText').textContent=tr('progress');$('menuHelpButton').textContent=tr('how');$('pickerEyebrow').textContent=tr('pickerEyebrow');$('pickerTitle').textContent=tr('pickerTitle');
+    $('menuTitle').textContent=tr('menuTitle');$('menuTagline').textContent=tr('menuTagline');$('levelsButtonText').textContent=tr('levels');$('menuProgressText').textContent=tr('progress');$('menuHelpButton').textContent=tr('how');$('menuSoundButton').textContent=tr('soundMenu');$('menuFullscreenButton').textContent=tr('fullscreenMenu');$('pickerEyebrow').textContent=tr('pickerEyebrow');$('pickerTitle').textContent=tr('pickerTitle');
     $('readyText').textContent=tr('ready');$('startButtonText').textContent=tr('go');$('guideMove').textContent=tr('move');$('guideJump').textContent=tr('jump');$('guideRestart').textContent=tr('restart');$('guidePause').textContent=tr('pause');$('finishGuide').textContent=tr('finish');$('jumpKeyLabel').textContent=tr('space');
     $('levelBrand').firstChild.nodeValue=tr('title')+' · ';
     $('menuButton').title=tr('levels');$('menuButton').setAttribute('aria-label',tr('levels'));$('helpButton').title=tr('helpTitle');$('helpButton').setAttribute('aria-label',tr('helpTitle'));$('restartButton').title=tr('restart');$('restartButton').setAttribute('aria-label',tr('restart'));$('pauseButton').title=tr('pause');$('pauseButton').setAttribute('aria-label',tr('pause'));
@@ -1027,10 +1037,10 @@ globalThis.PulseBallEngine = (() => {
     }).join('');
   }
   function showMenu(){
-    clearInput();hideTutorial(true);globalThis.YandexPlatform?.gameplayStop?.();mode='menu';$('overlay').hidden=true;$('readyHint').hidden=true;$('menuScreen').hidden=false;$('menuHome').hidden=false;$('levelPicker').hidden=true;renderProgression();
+    clearInput();hideTutorial(true);globalThis.YandexPlatform?.gameplayStop?.();globalThis.YandexPlatform?.showBanner?.();mode='menu';$('overlay').hidden=true;$('readyHint').hidden=true;$('menuScreen').hidden=false;$('menuHome').hidden=false;$('levelPicker').hidden=true;renderProgression();
   }
   function showLevelPicker(){
-    clearInput();mode='menu';$('menuScreen').hidden=false;$('menuHome').hidden=true;$('levelPicker').hidden=false;renderProgression();
+    clearInput();globalThis.YandexPlatform?.showBanner?.();mode='menu';$('menuScreen').hidden=false;$('menuHome').hidden=true;$('levelPicker').hidden=false;renderProgression();
   }
   function formatTime(seconds){const n=Math.floor(seconds);return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');}
   function updateHud(){
@@ -1041,20 +1051,20 @@ globalThis.PulseBallEngine = (() => {
   }
   function updateRecord(){const r=best[g.index];$('levelRecord').textContent=r&&r.level===g.level.name&&Number.isFinite(r.stars)?tr('record')+': '+r.stars+' / '+g.stars.length+' ★':tr('adventure');}
   function clearInput(){heldCodes.clear();touchPointers.clear();pulseQueued=false;input={left:false,right:false,jump:false,pulse:false};g.pulseHeld=false;document.querySelectorAll('.touch-btn').forEach(b=>b.classList.remove('pressed'));}
-  function start(){mode='playing';$('menuScreen').hidden=true;$('readyHint').hidden=true;$('overlay').hidden=true;unlockAudio();globalThis.YandexPlatform?.gameplayStart?.();canvas.focus({preventScroll:true});}
+  function start(){globalThis.YandexPlatform?.hideBanner?.();mode='playing';$('menuScreen').hidden=true;$('readyHint').hidden=true;$('overlay').hidden=true;unlockAudio();globalThis.YandexPlatform?.gameplayStart?.();canvas.focus({preventScroll:true});}
   function loadLevel(index,autostart=false){
     if(index>unlocked){toast(tr('levelLocked'));return;}
-    clearInput();g=E.createGame(index);mode=autostart?'playing':'ready';camera=0;particles=[];shake=0;accumulator=0;tutorialSeen=new Set();hideTutorial(true);
+    clearInput();globalThis.YandexPlatform?.hideBanner?.();g=E.createGame(index);mode=autostart?'playing':'ready';camera=0;particles=[];shake=0;accumulator=0;tutorialSeen=new Set();hideTutorial(true);
     $('menuScreen').hidden=true;$('overlay').hidden=true;$('readyHint').hidden=autostart;$('toast').classList.remove('visible');
     document.querySelectorAll('[data-level]').forEach(b=>{const active=Number(b.dataset.level)===index;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','true');else b.removeAttribute('aria-current');});
     $('currentLevelNumber').textContent=String(index+1).padStart(2,'0');$('currentLevelName').textContent=levelDisplayName(index);
     updateHud();updateRecord();if(autostart){unlockAudio();globalThis.YandexPlatform?.gameplayStart?.();canvas.focus({preventScroll:true});}
   }
   function openDialog(kind){
-    clearInput();hideTutorial(true);globalThis.YandexPlatform?.gameplayStop?.();dialogKind=kind;mode=kind;$('menuScreen').hidden=true;$('readyHint').hidden=true;$('overlay').hidden=false;$('dialogExtra').innerHTML='';$('dialogSecondary').hidden=false;
+    clearInput();hideTutorial(true);globalThis.YandexPlatform?.gameplayStop?.();dialogKind=kind;mode=kind;$('menuScreen').hidden=true;$('readyHint').hidden=true;$('overlay').hidden=false;$('dialogExtra').innerHTML='';$('dialogSecondary').hidden=false;$('dialogRewarded').hidden=true;$('dialogRewarded').disabled=false;
     if(kind==='paused'){$('dialogSymbol').textContent='Ⅱ';$('dialogTitle').textContent=tr('pausedTitle');$('dialogText').textContent=tr('pausedText');$('dialogPrimary').textContent=tr('resume');$('dialogSecondary').textContent=tr('restartLevel');}
     if(kind==='help'){$('dialogSymbol').textContent='↟';$('dialogTitle').textContent=tr('helpTitle');$('dialogText').textContent=tr('helpText');$('dialogExtra').innerHTML=helpHtml();$('dialogPrimary').textContent=tr('helpOk');$('dialogSecondary').hidden=true;}
-    if(kind==='lost'){$('dialogSymbol').textContent='↻';$('dialogTitle').textContent=tr('lostTitle');$('dialogText').textContent=tr('lostText');$('dialogPrimary').textContent=tr('retry');$('dialogSecondary').textContent=tr('levelSelect');}
+    if(kind==='lost'){lossesSinceAd++;$('dialogSymbol').textContent='↻';$('dialogTitle').textContent=tr('lostTitle');$('dialogText').textContent=tr('lostText');$('dialogPrimary').textContent=tr('retry');$('dialogSecondary').textContent=tr('levelSelect');if(globalThis.YandexPlatform?.connected){$('dialogRewarded').hidden=false;$('dialogRewarded').textContent=tr('rewardContinue');}}
     if(kind==='won'){
       const all=g.collected===g.stars.length,rating=all?3:g.collected>=Math.ceil(g.stars.length/2)?2:1;
       const wasUnlocked=unlocked;
@@ -1082,7 +1092,7 @@ globalThis.PulseBallEngine = (() => {
       if(mode==='platformPaused'){mode='playing';globalThis.YandexPlatform?.gameplayStart?.();canvas.focus({preventScroll:true});}
     }
   };
-  function updateSound(){ $('soundButton').setAttribute('aria-label',sound?tr('soundOn'):tr('soundOff'));$('soundButton').setAttribute('aria-pressed',String(sound));$('soundWaves').setAttribute('d',sound?'M15 8c3 2 3 6 0 8m3-11c5 4 5 10 0 14':'m16 9 6 6m0-6-6 6');}
+  function updateSound(){ $('soundButton').setAttribute('aria-label',sound?tr('soundOn'):tr('soundOff'));$('soundButton').setAttribute('aria-pressed',String(sound));$('soundWaves').setAttribute('d',sound?'M15 8c3 2 3 6 0 8m3-11c5 4 5 10 0 14':'m16 9 6 6m0-6-6 6');if($('menuSoundButton'))$('menuSoundButton').textContent=(sound?'♪✓ ':'♪ ')+(lang==='ru'?'Звук':'Sound');}
   $('startButton').onclick=start;$('restartButton').onclick=()=>loadLevel(g.index,true);$('pauseButton').onclick=pause;
   $('menuButton').onclick=showMenu;
   $('continueButton').onclick=()=>loadLevel(continueLevel(),true);
@@ -1091,15 +1101,26 @@ globalThis.PulseBallEngine = (() => {
   $('levelGrid').onclick=e=>{const card=e.target.closest('[data-menu-level]');if(card&&!card.disabled)loadLevel(Number(card.dataset.menuLevel),true);};
   $('helpButton').onclick=()=>{if(mode==='help')return;helpPrevious=mode;openDialog('help');};
   $('soundButton').onclick=()=>{sound=!sound;updateSound();unlockAudio();if(sound)tone(660,.1);};
+  $('menuSoundButton').onclick=()=>{sound=!sound;updateSound();unlockAudio();if(sound)tone(660,.1);};
+  $('dialogRewarded').onclick=async()=>{
+    if(dialogKind!=='lost'||$('dialogRewarded').disabled)return;
+    $('dialogRewarded').disabled=true;
+    const ok=await globalThis.YandexPlatform?.showRewarded?.();
+    $('dialogRewarded').disabled=false;
+    if(!ok){toast(tr('adUnavailable'));return;}
+    g.status='playing';g.health=3;const p=g.player;p.x=g.spawn.x;p.y=g.spawn.y;p.vx=0;p.vy=0;p.invincible=1.4;p.grounded=false;
+    mode='playing';$('overlay').hidden=true;globalThis.YandexPlatform?.hideBanner?.();globalThis.YandexPlatform?.gameplayStart?.();resumeAudio();canvas.focus({preventScroll:true});
+  };
   function updateFullscreen(){const active=document.fullscreenElement===$('game-shell'),label=active?tr('fullscreenOn'):tr('fullscreenOff');$('fullscreenButton').setAttribute('aria-label',label);$('fullscreenButton').title=label;}
   document.addEventListener('fullscreenchange',updateFullscreen);
   $('fullscreenButton').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('game-shell').requestFullscreen();}catch{toast(tr('fullscreenFail'));}};
+  $('menuFullscreenButton').onclick=$('fullscreenButton').onclick;
   $('dialogPrimary').onclick=async()=>{
     if(dialogKind==='paused')start();
     else if(dialogKind==='help'){if(helpPrevious==='menu')showMenu();else if(helpPrevious==='ready'){mode='ready';$('overlay').hidden=true;$('readyHint').hidden=false;canvas.focus({preventScroll:true});}else if(helpPrevious==='playing')start();else openDialog(helpPrevious);}
-    else if(dialogKind==='lost')loadLevel(g.index,true);
+    else if(dialogKind==='lost'){if(lossesSinceAd>=3){await globalThis.YandexPlatform?.showInterstitial?.();lossesSinceAd=0;}loadLevel(g.index,true);}
     else if(dialogKind==='won'){
-      if((g.index+1)%3===0)await globalThis.YandexPlatform?.showInterstitial?.();
+      if((g.index+1)%2===0||g.index===E.levels.length-1)await globalThis.YandexPlatform?.showInterstitial?.();
       if(g.index<E.levels.length-1)loadLevel(g.index+1,true);else showMenu();
     }
   };
