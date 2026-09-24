@@ -177,7 +177,7 @@ globalThis.PulseBallEngine = (() => {
       extraSwitches:(level.extraSwitches||[]).map(a=>({x:a.x,bridge:a.bridge,on:false})),
       enemies:level.enemies.map(a=>({x:a[0],y:460,w:a[4]==='heavy'?46:38,h:a[4]==='heavy'?46:40,min:a[1],max:a[2],speed:a[3],type:a[4]||'patrol',dir:-1,dead:false,alert:0})),
       stars:level.stars.map(a=>({x:a[0],y:a[1],taken:false})),
-      spikes:level.spikes.map(a=>({x:a[0],y:452,w:a[1],h:28,hitX:a[0]+5,hitY:463,hitW:Math.max(6,a[1]-10),hitH:14}))};
+      spikes:level.spikes.map(a=>({x:a[0],y:438,w:a[1],h:42,hitX:a[0]+6,hitY:458,hitW:Math.max(6,a[1]-12),hitH:18}))};
   }
   const overlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
   const relayVelocity={up:[0,-860],right:[325,-760],left:[-325,-760],east:[325,-100],west:[-325,-100]};
@@ -506,13 +506,26 @@ globalThis.PulseBallEngine = (() => {
     for(const mechanism of g.extraSwitches){const sx=mechanism.x-camera;rounded(sx-12,386,24,35,5,mechanism.on?'#2e99ae':'#3e6175');ellipse(sx,402,7,7,mechanism.on?'#aafff5':'#76c7e4');}
     for(const b of g.breakables)if(!b.broken){const x=b.x-camera;rounded(x,b.y,b.w,b.h,5,'#477b91','#315d75');for(let row=0;row<3;row++){const y=b.y+row*60;rounded(x+3,y+3,b.w-6,54,4,'#8bc7d4');path([[x+8,y+8],[x+23,y+23],[x+15,y+37],[x+33,y+50]],null,'#e8ffff',2.5);}}
     for(const spike of g.spikes){
-      const x=spike.x-camera;if(x+spike.w< -40||x>viewW+40)continue;
-      rounded(x-5,474,spike.w+10,8,3,'#402f35','#261d22');
-      for(let j=0;j<spike.w;j+=16){
-        path([[x+j,476],[x+j+8,450],[x+j+16,476]],'#d95645','#6f262c',1.4);
-        path([[x+j+6,466],[x+j+8,454],[x+j+10,466]],'#ffd39b');
+      const x=spike.x-camera;if(x+spike.w< -50||x>viewW+50)continue;
+      ctx.save();
+      ctx.shadowColor='#ff3b2f';ctx.shadowBlur=12;
+      rounded(x-8,468,spike.w+16,12,4,'#151820','#050608');
+      ctx.shadowBlur=0;
+      for(let j=0;j<spike.w+8;j+=20){
+        path([[x-4+j,469],[x+6+j,469],[x+14+j,479],[x+4+j,479]],j%40===0?'#ffd84a':'#2c3038');
       }
-      ctx.save();ctx.globalAlpha=.38+.18*Math.sin(visualTime*5+spike.x);rounded(x,478,spike.w,2,1,'#ff8f5a');ctx.restore();
+      for(let j=0;j<spike.w;j+=18){
+        path([[x+j,470],[x+j+9,438],[x+j+18,470]],'#ff4a36','#6f171d',1.8);
+        path([[x+j+6,458],[x+j+9,443],[x+j+12,458]],'#ffd07a');
+      }
+      const pulse=.42+.22*Math.sin(visualTime*6+spike.x*.01);
+      ctx.globalAlpha=pulse;
+      rounded(x-4,432,spike.w+8,4,2,'#ff694f');
+      ctx.globalAlpha=.9;
+      ctx.fillStyle='#fff0a8';ctx.font='bold 10px Segoe UI';ctx.textAlign='center';
+      ctx.fillText('!',x+spike.w/2,429);
+      ctx.textAlign='left';
+      ctx.restore();
     }
     flag(g.checkpoint.x,480,g.checkpoint.active,false,t);flag(g.finish.x,480,true,true,t);
     for(const c of g.crates)crate(c,t);
