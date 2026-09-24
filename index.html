@@ -127,35 +127,121 @@ kbd{min-width:22px;padding:3px 6px;border:1px solid #dfe3eb;border-bottom-width:
 .levels{flex:1;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;overscroll-behavior:contain;gap:22px;scroll-behavior:smooth}.levels::-webkit-scrollbar{display:none}.level-tab{flex-shrink:0;min-height:44px}.level-label{flex-shrink:0}.levels.dragging{scroll-behavior:auto;cursor:grabbing}.level-tab .level-name{font-size:12px;opacity:1}
 @media(max-width:1050px){.level-label{display:none}.levels{gap:22px}.level-tab{font-size:12px}.level-tab span{font-size:10px}}
 @media(max-width:600px){.levels{gap:22px;justify-content:flex-start}.level-tab .level-name{display:inline;font-size:11px}.level-tab[data-level]::after{content:none}.level-tab{font-size:11px;gap:6px}.level-tab span{font-size:10px}}
+
+/* Fast game-first shell: one-screen launcher, no menu scrolling required. */
+.level-bar{flex-basis:46px;min-height:46px;padding:0 16px;align-items:center;background:#ffffffee}
+.levels{display:none!important}
+.game-current{display:flex;align-items:center;gap:10px;min-width:0;color:#52647c}
+.game-current>span{display:grid;place-items:center;width:28px;height:28px;border-radius:9px;background:#eef1ff;color:#715fe3;font-size:10px;font-weight:850}
+.game-current>strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;letter-spacing:.2px}
+.level-label{margin-left:auto;padding-left:12px}
+
+.menu-screen{position:absolute;z-index:20;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(12px,2vw,24px);overflow:hidden;background:
+radial-gradient(circle at 20% 18%,#fff5a9 0 7%,transparent 19%),
+radial-gradient(circle at 82% 18%,#8ef0ff99 0 8%,transparent 23%),
+linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none}
+.menu-screen::before,.menu-screen::after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+.menu-screen::before{width:44vmin;height:44vmin;left:-12vmin;bottom:-18vmin;background:#58c9b840}
+.menu-screen::after{width:38vmin;height:38vmin;right:-11vmin;top:-14vmin;background:#8877ef2f}
+.menu-screen[hidden],.menu-level-picker[hidden]{display:none!important}
+
+.menu-home,.menu-level-picker{position:relative;z-index:1;width:min(720px,100%);border:1px solid #ffffffcc;border-radius:30px;background:#fffffff0;box-shadow:0 24px 70px #2e527126,0 2px 0 #ffffff inset}
+.menu-home{display:grid;grid-template-columns:minmax(0,1fr) 235px;grid-template-areas:"brand actions" "progress actions" "help actions";gap:14px 28px;align-items:center;padding:clamp(22px,4vw,38px)}
+.menu-brand{grid-area:brand;display:flex;align-items:center;gap:22px;min-width:0}
+.menu-logo-orb{position:relative;flex:none;width:116px;height:116px;border:5px solid #071733;border-radius:50%;background:radial-gradient(circle at 34% 25%,#5f8ec4 0 9%,#254d80 28%,#102b55 63%,#07152e 100%);box-shadow:0 13px 25px #183e6238,inset -12px -15px 18px #020c2066,inset 8px 8px 13px #8deaff25}
+.menu-logo-orb::before{content:"";position:absolute;inset:10px;border:2px solid #4ee6ff;border-left-color:transparent;border-top-color:#9af5ff;border-radius:50%;transform:rotate(28deg);opacity:.8}
+.menu-eye{position:absolute;top:38px;width:24px;height:31px;border-radius:50%;background:#f5ffff;box-shadow:inset 0 -8px #71dfff}
+.menu-eye::after{content:"";position:absolute;right:4px;top:10px;width:8px;height:13px;border-radius:50%;background:#061a3b}
+.menu-eye.left{left:27px}.menu-eye.right{right:27px}
+.menu-smile{position:absolute;left:42px;top:76px;width:32px;height:14px;border-bottom:3px solid #9cecff;border-radius:0 0 50% 50%}
+.menu-copy{min-width:0}
+.menu-kicker{margin:0;color:#5278a2;font-size:10px;font-weight:900;letter-spacing:3px}
+.menu-title{margin:2px 0 5px;color:#243858;font-size:clamp(42px,6vw,62px);line-height:.95;letter-spacing:-2.4px}
+.menu-tagline{margin:0;color:#6e8191;font-size:13px;font-weight:650}
+.menu-primary-actions{grid-area:actions;display:flex;flex-direction:column;gap:11px;align-self:stretch;justify-content:center}
+.menu-play,.menu-levels-button{width:100%;border:0;border-radius:19px;font-weight:850}
+.menu-play{min-height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;background:linear-gradient(135deg,#725ce9,#8a70f2);box-shadow:0 6px 0 #5946bc,0 12px 28px #604bd52f;color:#fff;font-size:20px}
+.menu-play b{font-size:26px}.menu-play:hover{transform:translateY(-1px);filter:saturate(1.08)}.menu-play:active{transform:translateY(4px);box-shadow:0 2px 0 #5946bc}
+.menu-levels-button{min-height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border:1px solid #dbe8e5;background:#f8fcfb;color:#49677b;font-size:13px}
+.menu-levels-button strong{padding:5px 8px;border-radius:9px;background:#e8f6ef;color:#438268;font-size:10px}
+.menu-progress-row{grid-area:progress;display:grid;grid-template-columns:auto minmax(80px,1fr) auto;align-items:center;gap:10px;color:#82909a;font-size:10px;font-weight:700}
+.menu-progress-row strong{color:#c4932f;font-size:11px;white-space:nowrap}
+.menu-progress{height:7px;overflow:hidden;border-radius:8px;background:#e6efea}.menu-progress i{display:block;height:100%;width:0;border-radius:8px;background:linear-gradient(90deg,#5bd9be,#8a72ed);transition:width .25s}
+.menu-help-link{grid-area:help;justify-self:start;padding:5px 0;border:0;background:transparent;color:#6e8090;font-size:11px;font-weight:700}
+.menu-help-link:hover{color:#5545be}
+
+.menu-level-picker{padding:22px 24px 24px}
+.picker-head{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:12px;margin-bottom:16px}
+.picker-head p{margin:0 0 2px;color:#82919c;font-size:9px;font-weight:850;letter-spacing:1.6px}
+.picker-head h2{margin:0;color:#2b4261;font-size:23px}
+.picker-head>strong{color:#5b8876;font-size:11px}
+.picker-back{width:40px;height:40px;border:1px solid #deebe7;border-radius:13px;background:#f7fbfa;color:#536d7d;font-size:20px}
+.menu-level-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.menu-level{position:relative;min-width:0;min-height:92px;padding:11px 10px;border:1px solid #dfe9e5;border-radius:15px;background:#fff;color:#526779;text-align:left;box-shadow:0 3px 10px #395b6810}
+.menu-level::before{content:"";position:absolute;left:0;top:11px;bottom:11px;width:4px;border-radius:0 4px 4px 0;background:#68cdb8}
+.menu-level[data-chapter="1"]::before{background:#66b9e8}.menu-level[data-chapter="2"]::before{background:#8b77e8}.menu-level[data-chapter="3"]::before{background:#efb451}
+.menu-level:hover:not(:disabled){transform:translateY(-2px);border-color:#9fd9cf;box-shadow:0 8px 18px #395b6819}
+.menu-level:disabled{opacity:.44;background:#eef2f1;cursor:default}
+.menu-level-number{display:block;margin-left:3px;color:#8070e4;font-size:10px;font-weight:900;letter-spacing:1px}
+.menu-level-name{display:block;min-height:29px;margin:4px 0 7px 3px;overflow:hidden;color:#3e566a;font-size:11px;font-weight:800;line-height:1.25}
+.menu-level-meta{display:flex;justify-content:space-between;gap:4px;margin-left:3px;color:#909da5;font-size:9px}
+.menu-level-stars{color:#dda83b;letter-spacing:.4px}
+.menu-level-lock{position:absolute;right:9px;top:8px;width:8px;height:8px;border:2px solid #88979c;border-radius:50%;font-size:0}
+
+@media(max-width:720px){
+  .level-bar{flex-basis:40px;min-height:40px;padding:0 10px}.game-current>span{width:25px;height:25px}.game-current>strong{font-size:10px}.level-label{display:none!important}
+  .menu-screen{padding:10px}.menu-home,.menu-level-picker{border-radius:24px}
+  .menu-home{width:min(500px,100%);grid-template-columns:1fr;grid-template-areas:"brand" "actions" "progress" "help";gap:13px;padding:19px}
+  .menu-brand{justify-content:center;text-align:center;gap:15px}.menu-logo-orb{width:86px;height:86px;border-width:4px}.menu-logo-orb::before{inset:7px}.menu-eye{top:28px;width:18px;height:24px}.menu-eye.left{left:20px}.menu-eye.right{right:20px}.menu-eye::after{right:3px;top:8px;width:6px;height:10px}.menu-smile{left:31px;top:56px;width:24px;height:11px}
+  .menu-title{font-size:42px}.menu-tagline{font-size:11px}.menu-primary-actions{display:grid;grid-template-columns:1.25fr .9fr;gap:9px}.menu-play{min-height:56px;font-size:16px}.menu-levels-button{min-height:56px}.menu-help-link{justify-self:center}
+  .menu-level-picker{padding:15px}.picker-head{margin-bottom:10px}.picker-head h2{font-size:19px}
+  .menu-level-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.menu-level{min-height:78px;padding:8px 7px;border-radius:12px}.menu-level-name{min-height:25px;font-size:9px}.menu-level-meta{font-size:8px}
+}
+@media(max-height:500px) and (orientation:landscape){
+  .menu-home{width:min(760px,100%);grid-template-columns:minmax(0,1fr) 220px;grid-template-areas:"brand actions" "progress actions" "help actions";padding:14px 20px;gap:8px 22px}.menu-logo-orb{width:78px;height:78px}.menu-eye{top:25px}.menu-eye.left{left:18px}.menu-eye.right{right:18px}.menu-smile{left:28px;top:52px}.menu-title{font-size:38px}.menu-primary-actions{display:flex}.menu-play{min-height:52px}.menu-levels-button{min-height:45px}
+  .menu-level-picker{width:min(900px,100%);padding:10px 14px}.picker-head{margin-bottom:7px}.menu-level-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}.menu-level{min-height:69px;padding:6px}.menu-level-name{min-height:22px;margin:2px 0 4px;font-size:8px}.menu-level-meta{font-size:7px}
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <main class="game-shell" id="game-shell" aria-label="Pulse Ball: Побег — игра">
     <section class="menu-screen" id="menuScreen" aria-label="Главное меню">
-      <div class="menu-panel">
-        <div class="menu-head">
-          <div>
-            <p class="menu-kicker">Pulse Ball</p>
-            <h1 class="menu-title">Побег начинается</h1>
-            <p class="menu-subtitle">12 коротких уровней, Pulse-комбо, звёзды и новые маршруты. Проходи главы, открывай следующий этап и улучшай результат.</p>
+      <div class="menu-home" id="menuHome">
+        <div class="menu-brand">
+          <div class="menu-logo-orb" aria-hidden="true">
+            <span class="menu-eye left"></span><span class="menu-eye right"></span><span class="menu-smile"></span>
           </div>
-          <div class="menu-actions">
-            <button class="start-btn" id="continueButton">Начать приключение →</button>
-            <button class="menu-secondary" id="menuHelpButton">Как играть</button>
+          <div class="menu-copy">
+            <p class="menu-kicker">PULSE BALL</p>
+            <h1 class="menu-title">Побег!</h1>
+            <p class="menu-tagline">Катись. Прыгай. Включай Pulse.</p>
           </div>
         </div>
-        <div class="menu-stats">
-          <div class="menu-stat"><strong id="menuCompleted">0 / 12</strong><span>УРОВНЕЙ ПРОЙДЕНО</span><div class="menu-progress"><i id="menuProgressFill"></i></div></div>
-          <div class="menu-stat"><strong id="menuRating">0 / 36</strong><span>РЕЙТИНГ ★</span></div>
-          <div class="menu-stat"><strong id="menuNext">01</strong><span>СЛЕДУЮЩИЙ УРОВЕНЬ</span></div>
+        <div class="menu-primary-actions">
+          <button class="menu-play" id="continueButton"><span>Играть</span><b>→</b></button>
+          <button class="menu-levels-button" id="levelsButton"><span>Уровни</span><strong id="menuCompleted">0 / 12</strong></button>
         </div>
-        <div class="chapter-grid" id="chapterGrid"></div>
-        <div class="menu-footer-note">Новый уровень открывается после прохождения предыдущего. Лучшие звёзды и время сохраняются на устройстве.</div>
+        <div class="menu-progress-row">
+          <span>Прогресс</span>
+          <div class="menu-progress"><i id="menuProgressFill"></i></div>
+          <strong id="menuRating">0 / 36 ★</strong>
+        </div>
+        <button class="menu-help-link" id="menuHelpButton">? Как играть</button>
+      </div>
+      <div class="menu-level-picker" id="levelPicker" hidden>
+        <div class="picker-head">
+          <button class="picker-back" id="backMenuButton" aria-label="Назад">←</button>
+          <div><p>ВЫБОР УРОВНЯ</p><h2>Куда дальше?</h2></div>
+          <strong id="pickerProgress">0 / 12</strong>
+        </div>
+        <div class="menu-level-grid" id="levelGrid"></div>
       </div>
     </section>
-    <nav class="level-bar" aria-label="Выбор уровня">
-      <div class="levels">
+    <nav class="level-bar" aria-label="Текущий уровень">
+      <div class="game-current"><span id="currentLevelNumber">01</span><strong id="currentLevelName">Первый импульс</strong></div>
+      <div class="levels" aria-hidden="true">
         <button class="level-tab active" data-level="0" aria-current="true"><span>01</span><span class="level-name"> Первый импульс</span></button>
         <button class="level-tab" data-level="1"><span>02</span><span class="level-name"> Эхо долины</span></button>
         <button class="level-tab" data-level="2"><span>03</span><span class="level-name"> Энергетический разлом</span></button>
@@ -773,30 +859,24 @@ globalThis.PulseBallEngine = (() => {
       else if(e.type==='win'){for(let i=0;i<8;i++)burst(e.x-160+i*45,230,'#f6cb67',12,true);[523,659,784,1047].forEach((f,i)=>tone(f,.25,'sine',i*.1));}
     }
   }
-  const chapters=[
-    {title:'Глава 1 · Пробуждение',subtitle:'Основы Pulse',from:0,to:2},
-    {title:'Глава 2 · Высоты',subtitle:'Boost и движение',from:3,to:5},
-    {title:'Глава 3 · Резонанс',subtitle:'Relay и темп',from:6,to:8},
-    {title:'Глава 4 · Световой поток',subtitle:'Энерго-сферы',from:9,to:11}
-  ];
   function renderProgression(){
     document.querySelectorAll('.level-tab[data-level]').forEach(tab=>{
       const index=Number(tab.dataset.level),locked=index>unlocked;tab.disabled=locked;tab.setAttribute('aria-label',locked?'Уровень '+(index+1)+' заблокирован':E.levels[index].name);
     });
     const done=completedCount(),rating=E.levels.reduce((sum,_,i)=>sum+ratingFor(i),0),next=continueLevel();
-    $('menuCompleted').textContent=done+' / '+E.levels.length;$('menuRating').textContent=rating+' / '+(E.levels.length*3);$('menuNext').textContent=String(next+1).padStart(2,'0');$('menuProgressFill').style.width=Math.round(done/E.levels.length*100)+'%';
-    $('continueButton').textContent=done?'Продолжить с '+String(next+1).padStart(2,'0')+' →':'Начать приключение →';
-    $('chapterGrid').innerHTML=chapters.map(ch=>{
-      let cards='';
-      for(let i=ch.from;i<=ch.to;i++){
-        const locked=i>unlocked,r=recordFor(i),rating=ratingFor(i),filled='★'.repeat(rating),empty='☆'.repeat(3-rating);
-        cards+='<button class="menu-level" data-menu-level="'+i+'" '+(locked?'disabled':'')+'><span class="menu-level-number">'+String(i+1).padStart(2,'0')+'</span><span class="menu-level-name">'+E.levels[i].name+'</span><span class="menu-level-meta"><span class="menu-level-stars">'+(r?filled+empty:'☆☆☆')+'</span><span>'+(r&&Number.isFinite(r.time)?formatTime(r.time):r?'пройден':locked?'закрыт':'играть')+'</span></span>'+(locked?'<span class="menu-level-lock">●</span>':'')+'</button>';
-      }
-      return '<section class="chapter-card"><h3>'+ch.title+'</h3><p>'+ch.subtitle+'</p><div class="chapter-levels">'+cards+'</div></section>';
+    $('menuCompleted').textContent=done+' / '+E.levels.length;$('menuRating').textContent=rating+' / '+(E.levels.length*3)+' ★';$('menuProgressFill').style.width=Math.round(done/E.levels.length*100)+'%';$('pickerProgress').textContent=done+' / '+E.levels.length;
+    $('continueButton').querySelector('span').textContent=done?'Продолжить · '+String(next+1).padStart(2,'0'):'Играть';
+    $('levelGrid').innerHTML=E.levels.map((level,i)=>{
+      const locked=i>unlocked,r=recordFor(i),rating=ratingFor(i),filled='★'.repeat(rating),empty='☆'.repeat(3-rating),chapter=Math.floor(i/3);
+      const meta=r&&Number.isFinite(r.time)?formatTime(r.time):r?'пройден':locked?'закрыт':'играть';
+      return '<button class="menu-level" data-menu-level="'+i+'" data-chapter="'+chapter+'" '+(locked?'disabled':'')+'><span class="menu-level-number">'+String(i+1).padStart(2,'0')+'</span><span class="menu-level-name">'+level.name+'</span><span class="menu-level-meta"><span class="menu-level-stars">'+(r?filled+empty:'☆☆☆')+'</span><span>'+meta+'</span></span>'+(locked?'<span class="menu-level-lock"></span>':'')+'</button>';
     }).join('');
   }
   function showMenu(){
-    clearInput();hideTutorial(true);mode='menu';$('overlay').hidden=true;$('readyHint').hidden=true;$('menuScreen').hidden=false;renderProgression();
+    clearInput();hideTutorial(true);mode='menu';$('overlay').hidden=true;$('readyHint').hidden=true;$('menuScreen').hidden=false;$('menuHome').hidden=false;$('levelPicker').hidden=true;renderProgression();
+  }
+  function showLevelPicker(){
+    clearInput();mode='menu';$('menuScreen').hidden=false;$('menuHome').hidden=true;$('levelPicker').hidden=false;renderProgression();
   }
   function formatTime(seconds){const n=Math.floor(seconds);return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');}
   function updateHud(){
@@ -813,7 +893,7 @@ globalThis.PulseBallEngine = (() => {
     clearInput();g=E.createGame(index);mode=autostart?'playing':'ready';camera=0;particles=[];shake=0;accumulator=0;tutorialSeen=new Set();hideTutorial(true);
     $('menuScreen').hidden=true;$('overlay').hidden=true;$('readyHint').hidden=autostart;$('toast').classList.remove('visible');
     document.querySelectorAll('[data-level]').forEach(b=>{const active=Number(b.dataset.level)===index;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','true');else b.removeAttribute('aria-current');});
-    document.querySelector('[data-level="'+index+'"]').scrollIntoView({block:'nearest',inline:'nearest'});
+    $('currentLevelNumber').textContent=String(index+1).padStart(2,'0');$('currentLevelName').textContent=g.level.name;
     updateHud();updateRecord();if(autostart){unlockAudio();canvas.focus({preventScroll:true});}
   }
   function openDialog(kind){
@@ -840,8 +920,9 @@ globalThis.PulseBallEngine = (() => {
   $('startButton').onclick=start;$('restartButton').onclick=()=>loadLevel(g.index,true);$('pauseButton').onclick=pause;
   $('menuButton').onclick=showMenu;
   $('continueButton').onclick=()=>loadLevel(continueLevel(),true);
+  $('levelsButton').onclick=showLevelPicker;$('backMenuButton').onclick=showMenu;
   $('menuHelpButton').onclick=()=>{helpPrevious='menu';openDialog('help');};
-  $('chapterGrid').onclick=e=>{const card=e.target.closest('[data-menu-level]');if(card&&!card.disabled)loadLevel(Number(card.dataset.menuLevel),true);};
+  $('levelGrid').onclick=e=>{const card=e.target.closest('[data-menu-level]');if(card&&!card.disabled)loadLevel(Number(card.dataset.menuLevel),true);};
   $('helpButton').onclick=()=>{if(mode==='help')return;helpPrevious=mode;openDialog('help');};
   $('soundButton').onclick=()=>{sound=!sound;updateSound();unlockAudio();if(sound)tone(660,.1);};
   function updateFullscreen(){const active=document.fullscreenElement===$('game-shell');$('fullscreenButton').setAttribute('aria-label',active?'Выйти из полноэкранного режима':'На весь экран');$('fullscreenButton').title=active?'Выйти из полноэкранного режима':'На весь экран';}
@@ -866,7 +947,7 @@ globalThis.PulseBallEngine = (() => {
   addEventListener('keydown',e=>{
     if(e.ctrlKey||e.metaKey||e.altKey)return;
     if(e.code==='Tab'&&!$('overlay').hidden){const buttons=[...$('dialog').querySelectorAll('button')].filter(b=>!b.hidden);if(e.shiftKey&&document.activeElement===buttons[0]){e.preventDefault();buttons.at(-1).focus();}else if(!e.shiftKey&&document.activeElement===buttons.at(-1)){e.preventDefault();buttons[0].focus();}return;}
-    if(e.code==='Escape'||e.code==='KeyP'){if(!e.repeat){if(mode==='help')$('dialogPrimary').click();else if(mode==='menu'){}else pause();}e.preventDefault();return;}
+    if(e.code==='Escape'||e.code==='KeyP'){if(!e.repeat){if(mode==='help')$('dialogPrimary').click();else if(mode==='menu'&&!$('levelPicker').hidden)showMenu();else if(mode!=='menu')pause();}e.preventDefault();return;}
     if(e.code==='KeyR'&&!e.repeat&&mode!=='help'&&mode!=='menu'){e.preventDefault();loadLevel(g.index,true);return;}
     if(codeMap[e.code]&&(mode==='playing'||mode==='ready')){
       if(e.code==='Space'&&e.target.tagName==='BUTTON'&&e.target!==$('startButton'))return;
@@ -893,7 +974,7 @@ globalThis.PulseBallEngine = (() => {
     if(visualTime>toastUntil)$('toast').classList.remove('visible');
     updateTutorial();draw();updateHud();requestAnimationFrame(frame);
   }
-  renderProgression();$('menuScreen').hidden=false;$('readyHint').hidden=true;updateRecord();updateHud();requestAnimationFrame(frame);
+  showMenu();updateRecord();updateHud();requestAnimationFrame(frame);
 })();
 </script>
 </body>
