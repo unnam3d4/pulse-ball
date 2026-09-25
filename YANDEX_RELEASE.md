@@ -35,7 +35,7 @@ Download the artifact from the latest successful workflow run and upload it to t
 Recommended initial configuration:
 
 - **Platforms:** Desktop, Mobile / Android, Mobile / iOS
-- **Mobile orientation:** Landscape
+- **Mobile orientation:** Landscape (required). In unsupported portrait orientation, Yandex will show its rotate-device placeholder; the build also includes its own fallback for local/GitHub preview.
 - **Languages:** Russian, English
 - **Cloud saves:** Yes
 - **Version:** 0.9.0 for closed draft testing; switch to 1.0.0 only after full 18-level playthrough and Yandex debug-panel verification
@@ -99,8 +99,10 @@ On the **Advertising** tab:
 
 - Enable YAN/internal monetization for the game.
 - Keep fullscreen and rewarded units enabled.
-- For Sticky banners, enable **Use the API to display a sticky-banner**. The game requests the banner only in menu/level-select screens and hides it during gameplay.
-- For mobile landscape, use a banner position that does not cover the active game area; right-side placement is the safest starting point when available.
+- For Sticky banners, enable **Use the API to display a sticky-banner**.
+- **Mobile landscape sticky banner: choose “On the right”.** This matches the intended Yandex Games layout: platform chrome/banner stays outside the game field while the game adapts to the remaining viewport.
+- The game now keeps the sticky banner enabled during normal gameplay for monetization, and hides/restores it around fullscreen/rewarded ads.
+- Do not draw or reserve a fake ad slot inside the game: Yandex owns the banner area and may resize the game viewport when it is shown.
 - Do not add custom or third-party banners.
 
 Current in-game monetization flow:
@@ -121,7 +123,7 @@ Open the game with the Yandex debug panel and check:
 5. Language mock switches the UI between Russian and English before gameplay.
 6. Cloud progress survives reload and a second device/account session.
 7. Startup/fullscreen ads pause gameplay and audio, then resume cleanly.
-8. Desktop and mobile landscape layouts have no browser scroll, swipe-to-refresh, clipping or overlapping UI.
+8. Desktop and mobile landscape layouts have no browser scroll, swipe-to-refresh, clipping or overlapping UI. Test mobile landscape both with and without a right-side sticky banner, including live viewport resize when the banner appears/disappears.
 9. Every level can be completed from a clean save.
 10. Console stays free of gameplay-breaking JavaScript errors.
 
