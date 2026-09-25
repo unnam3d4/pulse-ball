@@ -1909,7 +1909,7 @@ globalThis.PulseBallEngine = (() => {
       o.life+=dt;o.x+=o.vx*dt;
       for(const enemy of g.enemies)if(!enemy.dead&&Math.abs(enemy.x-o.x)<29&&Math.abs(enemy.y-o.y)<48){enemy.dead=true;g.events.push({type:'orbEnemy',x:enemy.x,y:enemy.y});}
       const target=g.orbTargets[o.target];
-      if(target&&!target.on&&Math.hypot(target.x-o.x,target.y-o.y)<32){
+      if(target&&!target.on&&((target.x-o.x)*(target.x-o.x)+(target.y-o.y)*(target.y-o.y)<1024)){
         target.on=true;target.flash=.45;o.active=false;o.spent=true;o.x=target.x;o.y=target.y;o.vx=0;
         if(target.bridgeEnd>target.bridgeStart)g.ground.push({x:target.bridgeStart,y:480,w:target.bridgeEnd-target.bridgeStart,h:300,bridge:true,orbBridge:true});
         g.events.push({type:'orbHit',x:target.x,y:target.y});
@@ -1918,7 +1918,8 @@ globalThis.PulseBallEngine = (() => {
     }
     for(const c of g.crates){
       const oldBottom=c.y+c.h;c.vy=Math.min(850,c.vy+1700*dt);c.y+=c.vy*dt;
-      for(const s of g.ground.concat(g.platforms))if(c.x+c.w>s.x&&c.x<s.x+s.w&&oldBottom<=s.y+2&&c.y+c.h>=s.y&&c.vy>=0){c.y=s.y-c.h;c.vy=0;}
+      for(const s of g.ground)if(c.x+c.w>s.x&&c.x<s.x+s.w&&oldBottom<=s.y+2&&c.y+c.h>=s.y&&c.vy>=0){c.y=s.y-c.h;c.vy=0;}
+      for(const s of g.platforms)if(c.x+c.w>s.x&&c.x<s.x+s.w&&oldBottom<=s.y+2&&c.y+c.h>=s.y&&c.vy>=0){c.y=s.y-c.h;c.vy=0;}
     }
     p.coyote=p.grounded?.10:Math.max(0,p.coyote-dt);p.jumpBuffer=Math.max(0,p.jumpBuffer-dt);
     if(input.jump&&!g.jumpHeld)p.jumpBuffer=.12;g.jumpHeld=!!input.jump;
@@ -1928,22 +1929,35 @@ globalThis.PulseBallEngine = (() => {
     if(p.jumpBuffer>0&&p.coyote>0){p.vy=-665;p.grounded=false;p.coyote=0;p.jumpBuffer=0;p.squash=-.12;g.events.push({type:'jump',x:p.x,y:p.y+r});}
     if(!p.boosted&&!input.jump&&p.vy< -280)p.vy+=1900*dt;
     const oldX=p.x,oldY=p.y;p.x+=p.vx*dt;p.x=Math.max(r,Math.min(g.level.width-r,p.x));
-    for(const c of g.crates.concat(g.breakables.filter(b=>!b.broken))){
-      if(p.y+r>c.y+3&&p.y-r<c.y+c.h-3&&p.x+r>c.x&&p.x-r<c.x+c.w){
-        const side=oldX<c.x+c.w/2?1:-1;const shift=p.vx*dt*.78;const next={x:c.x+shift,y:c.y,w:c.w,h:c.h};
-        if(!c.pulse&&!('broken' in c)&&!g.ground.concat(g.platforms,g.crates.filter(b=>b!==c)).some(s=>overlap(next,s)))c.x+=shift;
-        p.x=side===1?c.x-r:c.x+c.w+r;p.vx*=.98;
+    for(let group=0;group<2;group++){
+      const list=group===0?g.crates:g.breakables;
+      for(const c of list){
+        if(group===1&&c.broken)continue;
+        if(p.y+r>c.y+3&&p.y-r<c.y+c.h-3&&p.x+r>c.x&&p.x-r<c.x+c.w){
+          const side=oldX<c.x+c.w/2?1:-1,shift=p.vx*dt*.78;
+          if(group===0&&!c.pulse){
+            const nx=c.x+shift,ny=c.y,nw=c.w,nh=c.h;let blocked=false;
+            for(const s of g.ground)if(nx+nw>s.x&&nx<s.x+s.w&&ny+nh>s.y&&ny<s.y+s.h){blocked=true;break;}
+            if(!blocked)for(const s of g.platforms)if(nx+nw>s.x&&nx<s.x+s.w&&ny+nh>s.y&&ny<s.y+s.h){blocked=true;break;}
+            if(!blocked)for(const b of g.crates)if(b!==c&&nx+nw>b.x&&nx<b.x+b.w&&ny+nh>b.y&&ny<b.y+b.h){blocked=true;break;}
+            if(!blocked)c.x=nx;
+          }
+          p.x=side===1?c.x-r:c.x+c.w+r;p.vx*=.98;
+        }
       }
     }
     p.vy=Math.min(1000,p.vy+1700*dt);p.y+=p.vy*dt;p.grounded=false;
-    const solids=g.ground.concat(g.platforms,g.crates,g.breakables.filter(b=>!b.broken));
-    for(const s of solids) {
-      if(p.x+r-3<=s.x||p.x-r+3>=s.x+s.w)continue;
-      if(oldY+r<=s.y+3&&p.y+r>=s.y&&p.vy>=0) {
-        if(p.vy>100){p.squash=.16;g.events.push({type:'land',x:p.x,y:s.y});}
-        p.y=s.y-r;p.vy=0;p.grounded=true;p.boosted=false;if(s.moving)p.x+=s.dx;
-      } else if(!s.moving&&!s.oneWay&&oldY-r>=s.y+s.h-2&&p.y-r<s.y+s.h&&p.vy<0){p.y=s.y+s.h+r;p.vy=40;}
-      else if(s.h>100&&p.y+r>s.y+4&&p.y-r<s.y+s.h&&p.x+r>s.x&&p.x-r<s.x+s.w) {p.x=oldX<s.x?s.x-r:s.x+s.w+r;p.vx=0;}
+    for(let group=0;group<4;group++){
+      const list=group===0?g.ground:group===1?g.platforms:group===2?g.crates:g.breakables;
+      for(const s of list) {
+        if(group===3&&s.broken)continue;
+        if(p.x+r-3<=s.x||p.x-r+3>=s.x+s.w)continue;
+        if(oldY+r<=s.y+3&&p.y+r>=s.y&&p.vy>=0) {
+          if(p.vy>100){p.squash=.16;g.events.push({type:'land',x:p.x,y:s.y});}
+          p.y=s.y-r;p.vy=0;p.grounded=true;p.boosted=false;if(s.moving)p.x+=s.dx;
+        } else if(!s.moving&&!s.oneWay&&oldY-r>=s.y+s.h-2&&p.y-r<s.y+s.h&&p.vy<0){p.y=s.y+s.h+r;p.vy=40;}
+        else if(s.h>100&&p.y+r>s.y+4&&p.y-r<s.y+s.h&&p.x+r>s.x&&p.x-r<s.x+s.w) {p.x=oldX<s.x?s.x-r:s.x+s.w+r;p.vx=0;}
+      }
     }
     let rampSlope=0;
     for(const slope of g.ramps){
@@ -1980,9 +1994,11 @@ globalThis.PulseBallEngine = (() => {
         else {damage(g);if(g.status!=='playing')return;}
       }
     }
-    for(const spike of g.spikes)if(overlap({x:p.x-r+8,y:p.y-r+3,w:2*r-16,h:2*r-9},{x:spike.hitX,y:spike.hitY,w:spike.hitW,h:spike.hitH}))damage(g);
+    const phx=p.x-r+8,phy=p.y-r+3,phw=2*r-16,phh=2*r-9;
+    for(const spike of g.spikes)if(phx<spike.hitX+spike.hitW&&phx+phw>spike.hitX&&phy<spike.hitY+spike.hitH&&phy+phh>spike.hitY)damage(g);
     if(p.y>720){damage(g,true);if(g.status!=='playing')return;}
-    for(const star of g.stars)if(!star.taken&&Math.hypot(p.x-star.x,p.y-star.y)<r+17){star.taken=true;g.collected++;g.events.push({type:'star',x:star.x,y:star.y});}
+    const starReach=r+17,starReach2=starReach*starReach;
+    for(const star of g.stars)if(!star.taken){const dx=p.x-star.x,dy=p.y-star.y;if(dx*dx+dy*dy<starReach2){star.taken=true;g.collected++;g.events.push({type:'star',x:star.x,y:star.y});}}
     if(!g.checkpoint.active&&Math.abs(p.x-g.checkpoint.x)<35&&p.y>330){g.checkpoint.active=true;g.spawn={x:g.checkpoint.x,y:440};g.events.push({type:'checkpoint',x:g.checkpoint.x,y:400});}
     if(Math.abs(p.x-g.finish.x)<40&&p.y>360&&p.y<490){g.status='won';g.events.push({type:'win',x:p.x,y:p.y});}
   }
@@ -2134,7 +2150,7 @@ globalThis.PulseBallEngine = (() => {
   new ResizeObserver(fit).observe(stage);addEventListener('resize',fit,{passive:true});addEventListener('orientationchange',()=>requestAnimationFrame(fit),{passive:true});if(window.visualViewport)visualViewport.addEventListener('resize',fit,{passive:true});fit();
   function rounded(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.stroke();}}
   function ellipse(x,y,rx,ry,color){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
-  function path(points,fill,stroke,width=1){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));if(fill){ctx.closePath();ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.lineWidth=width;ctx.strokeStyle=stroke;ctx.stroke();}}
+  function path(points,fill,stroke,width=1){ctx.beginPath();for(let i=0;i<points.length;i++){const p=points[i];if(i)ctx.lineTo(p[0],p[1]);else ctx.moveTo(p[0],p[1]);}if(fill){ctx.closePath();ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.lineWidth=width;ctx.strokeStyle=stroke;ctx.stroke();}}
   function star(x,y,r,fill,stroke,rotation=0){
     const outer=[],inner=[];
     for(let i=0;i<10;i++){
@@ -2236,9 +2252,16 @@ globalThis.PulseBallEngine = (() => {
     ctx.fillStyle=t.water;ctx.fillRect(0,536,viewW,64);
     ctx.strokeStyle='#ffffff45';ctx.lineWidth=2;for(let i=0;i<viewW/110+2;i++){const x=i*110-camera*.75%110+(reduced?0:Math.sin(visualTime+i)*7);ctx.beginPath();ctx.moveTo(x,555+(i%3)*13);ctx.lineTo(x+35,555+(i%3)*13);ctx.stroke();}
   }
+  const terrainGradientCache=new WeakMap();
+  function terrainGradient(t,top,bottom){
+    let cache=terrainGradientCache.get(t);if(!cache){cache=new Map();terrainGradientCache.set(t,cache);}
+    const key=top*2048+bottom;let grd=cache.get(key);
+    if(!grd){grd=ctx.createLinearGradient(0,top,0,bottom);grd.addColorStop(0,t.dirt);grd.addColorStop(1,t.deep);cache.set(key,grd);}
+    return grd;
+  }
   function terrain(s,t,platform=false){
     const x=s.x-camera;if(x+s.w< -50||x>viewW+50)return;
-    const grd=ctx.createLinearGradient(0,s.y,0,s.y+130);grd.addColorStop(0,t.dirt);grd.addColorStop(1,t.deep);
+    const grd=terrainGradient(t,s.y,s.y+130);
     rounded(x,s.y,s.w,s.h,platform?9:4,grd);
     if(!platform){ctx.save();ctx.beginPath();ctx.rect(x,s.y+12,s.w,s.h);ctx.clip();
       for(let row=0;row<6;row++)for(let j=0;j<Math.ceil(s.w/43);j++){const sx=x+j*43+(row%2)*20,sy=s.y+39+row*27;ellipse(sx,sy,3+(j%3)*2,2+(row%2),j%3===0?'#ffffff12':'#67533720');}
@@ -2255,7 +2278,7 @@ globalThis.PulseBallEngine = (() => {
     const left=Math.min(r.x1,r.x2),right=Math.max(r.x1,r.x2);
     if(right-camera< -60||left-camera>viewW+60)return;
     const x1=r.x1-camera,x2=r.x2-camera,bottom=480,top=Math.min(r.y1,r.y2);
-    const grd=ctx.createLinearGradient(0,top,0,bottom);grd.addColorStop(0,t.dirt);grd.addColorStop(1,t.deep);
+    const grd=terrainGradient(t,top,bottom);
     ctx.save();
     ctx.beginPath();ctx.moveTo(x1,r.y1);ctx.lineTo(x2,r.y2);ctx.lineTo(x2,bottom);ctx.lineTo(x1,bottom);ctx.closePath();
     ctx.fillStyle=grd;ctx.fill();
@@ -3062,7 +3085,10 @@ globalThis.PulseBallEngine = (() => {
     const cameraAnchor=coarsePointer?.27:.32;
     const target=Math.max(0,Math.min(g.level.width-viewW,g.player.x-viewW*cameraAnchor));
     camera+=(target-camera)*(1-Math.exp(-dt*7));if(Math.abs(camera-target)<.05)camera=target;
-    for(const p of particles){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=220*dt;}particles=particles.filter(p=>p.life>0);for(const fx of feedbackFx)fx.life-=dt;feedbackFx=feedbackFx.filter(fx=>fx.life>0);shake=Math.max(0,shake-dt*23);finishCelebration=Math.max(0,finishCelebration-dt);
+    let write=0;
+    for(let i=0;i<particles.length;i++){const p=particles[i];p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=220*dt;if(p.life>0)particles[write++]=p;}particles.length=write;
+    write=0;for(let i=0;i<feedbackFx.length;i++){const fx=feedbackFx[i];fx.life-=dt;if(fx.life>0)feedbackFx[write++]=fx;}feedbackFx.length=write;
+    shake=Math.max(0,shake-dt*23);finishCelebration=Math.max(0,finishCelebration-dt);
     if(visualTime>toastUntil)$('toast').classList.remove('visible');
     updateTutorial();draw();updateHud();requestAnimationFrame(frame);
   }
