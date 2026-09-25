@@ -394,6 +394,138 @@ img{-webkit-user-drag:none}button{transition:transform .15s,filter .15s}button:f
 @media(orientation:portrait){.menu-screen{padding:18px}.menu-home{grid-template-columns:1fr;gap:8px;width:min(440px,100%);height:100%}.menu-hero-zone{min-height:0}.menu-kicker{font-size:43px}.menu-title{font-size:22px;margin-top:9px}.menu-tagline{display:none}.menu-orb-stage{max-height:200px}.menu-mascot{max-height:25vh}.menu-command{padding:17px 20px;border-radius:23px}.menu-next-card{display:block;margin-bottom:13px}.menu-play{min-height:57px;font-size:20px}.menu-levels-button{min-height:46px;margin-top:16px}.menu-stats-strip{margin-top:12px}.menu-quick{margin-top:10px}.menu-level-picker{gap:13px;padding:16px}.chapter-tabs{grid-template-columns:repeat(3,1fr)}.chapter-tab{height:66px}.chapter-tab span{font-size:9px}.chapter-heading h3{font-size:21px}.menu-level-grid{grid-template-columns:1fr;gap:9px}.menu-level{display:grid;grid-template-columns:46px 1fr;grid-template-rows:1fr auto;padding:10px 14px;gap:2px 10px;border-radius:14px}.menu-level-number{font-size:27px}.menu-level-name{min-height:0;font-size:15px;margin:0}.menu-level-stars{font-size:17px;letter-spacing:0}.menu-level-meta{font-size:10px;margin:0}.level-status{display:none}.settings-panel{padding:17px;gap:14px}.settings-list{grid-template-columns:1fr;gap:9px}.settings-row{padding:10px;grid-template-columns:32px 1fr;gap:7px}.settings-icon{width:32px;height:32px}.settings-copy strong{font-size:13px}.settings-copy span{font-size:9px}.settings-value,.language-switch{min-height:44px}.language-switch button{min-height:36px}.hud .hud-level-chip{display:none}.hud .time{display:none}}
 @media(prefers-reduced-motion:reduce){.menu-mascot{animation:none}*{transition:none!important}}
 
+
+/* ===== UI polish 2026-09-25 ===== */
+*,*::before,*::after{box-sizing:border-box}
+.menu-screen,.menu-level-picker,.settings-panel,.menu-command{
+  -webkit-font-smoothing:antialiased;
+  text-rendering:geometricPrecision;
+}
+.menu-command{
+  background:linear-gradient(160deg,#0a7ca3,#084f7e)!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+.menu-level-picker,.settings-panel{
+  background:linear-gradient(145deg,#0a7ca4,#073d6d)!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+.menu-play{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+}
+.menu-play b{display:none!important}
+.menu-settings-btn,.menu-help-link,
+.picker-head p,.picker-head h2,
+.chapter-tab span,.chapter-tab b,
+.chapter-heading span,.chapter-heading h3,
+.menu-level-number,.menu-level-name,.menu-level-meta,
+.settings-copy strong,.settings-copy span,.settings-value,
+.menu-next-kicker,.menu-next-card strong{
+  text-shadow:none!important;
+  filter:none!important;
+}
+.menu-settings-btn,.menu-help-link{
+  min-height:44px;
+  font-size:13px!important;
+  font-weight:850!important;
+  color:#f1fdff!important;
+  background:#13759a!important;
+  opacity:1!important;
+}
+.menu-settings-btn strong{font-weight:850!important}
+.picker-head p{
+  margin:0 0 4px!important;
+  color:#b6f4fb!important;
+  font-size:11px!important;
+  font-weight:900!important;
+  letter-spacing:1.45px!important;
+  opacity:1!important;
+}
+.picker-head h2{
+  color:#fff!important;
+  font-weight:900!important;
+  letter-spacing:-.25px!important;
+  opacity:1!important;
+}
+.picker-back,.chapter-arrow{
+  position:relative!important;
+  display:grid!important;
+  place-items:center!important;
+  flex:none!important;
+  width:46px!important;
+  min-width:46px!important;
+  height:46px!important;
+  min-height:46px!important;
+  padding:0!important;
+  border:1px solid #8be6f0!important;
+  border-radius:14px!important;
+  background:linear-gradient(180deg,#2b9dc1,#177da4)!important;
+  box-shadow:inset 0 1px 0 #d9fbff33,0 3px 0 #045a8077!important;
+  color:transparent!important;
+  font-size:0!important;
+  line-height:0!important;
+}
+.picker-back::before,#chapterPrev::before,#chapterNext::before{
+  content:""!important;
+  display:block!important;
+  width:11px!important;
+  height:11px!important;
+  border-top:3px solid #fff!important;
+  border-left:3px solid #fff!important;
+}
+.picker-back::before,#chapterPrev::before{
+  transform:rotate(-45deg) translate(1px,1px)!important;
+}
+#chapterNext::before{
+  transform:rotate(135deg) translate(1px,-1px)!important;
+}
+.picker-back:hover,.chapter-arrow:hover:not(:disabled){filter:brightness(1.08)!important}
+.chapter-arrow:disabled{opacity:.35!important}
+.chapter-tabs,.menu-level-grid{width:100%!important}
+.chapter-tab,.menu-level{width:100%!important;min-width:0!important}
+.menu-level-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  grid-auto-rows:minmax(0,1fr)!important;
+  align-items:stretch!important;
+}
+.menu-level{
+  height:100%!important;
+  min-height:0!important;
+  align-self:stretch!important;
+}
+.menu-level-name{
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important;
+  overflow:hidden!important;
+  min-height:2.4em!important;
+  max-height:2.4em!important;
+  line-height:1.2!important;
+}
+.menu-level-stars{margin-top:auto!important}
+.menu-level-meta{margin-top:8px!important}
+@media(max-height:430px) and (orientation:landscape){
+  .picker-back,.chapter-arrow{
+    width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;border-radius:12px!important;
+  }
+  .picker-back::before,#chapterPrev::before,#chapterNext::before{
+    width:10px!important;height:10px!important;
+  }
+  .menu-level-name{
+    display:block!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:hidden!important;
+    white-space:normal!important;
+  }
+}
+@media(orientation:portrait){
+  .picker-back,.chapter-arrow{width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important}
+}
 </style>
 
 </head>
@@ -421,7 +553,7 @@ img{-webkit-user-drag:none}button{transition:transform .15s,filter .15s}button:f
             <span class="menu-next-kicker" id="menuNextKicker">СЛЕДУЮЩИЙ УРОВЕНЬ</span>
             <strong id="menuNextLevel">01 · Первый импульс</strong>
           </div>
-          <button class="menu-play" id="continueButton"><span id="continueLabel">Играть</span><b>→</b></button>
+          <button class="menu-play" id="continueButton"><span id="continueLabel">Играть</span></button>
           <button class="menu-levels-button" id="levelsButton"><span id="levelsButtonText">Выбрать уровень</span><strong id="menuCompleted">0 / 18</strong></button>
           <div class="menu-stats-strip">
             <div><small id="menuProgressText">Прогресс</small><strong id="menuCompletionText">0%</strong></div>
@@ -433,18 +565,18 @@ img{-webkit-user-drag:none}button{transition:transform .15s,filter .15s}button:f
       </div>
       <div class="menu-level-picker" id="levelPicker" hidden>
         <div class="picker-head">
-          <button class="picker-back" id="backMenuButton" aria-label="Назад">←</button>
+          <button class="picker-back" id="backMenuButton" aria-label="Назад"></button>
           <div><p id="pickerEyebrow">ВЫБОР УРОВНЯ</p><h2 id="pickerTitle">Куда дальше?</h2></div>
           <strong id="pickerProgress">0 / 18</strong>
         </div>
         <div class="chapter-tabs" id="chapterTabs" role="tablist"></div>
         <div class="chapter-heading"><div><span id="chapterEyebrow"></span><h3 id="chapterTitle"></h3></div><span class="chapter-symbol" id="chapterSymbol" aria-hidden="true">↟</span></div>
         <div class="menu-level-grid" id="levelGrid"></div>
-        <div class="chapter-footer"><button id="chapterPrev" class="chapter-arrow" aria-label="Назад">←</button><span id="chapterCount"></span><button id="chapterNext" class="chapter-arrow" aria-label="Вперёд">→</button></div>
+        <div class="chapter-footer"><button id="chapterPrev" class="chapter-arrow" aria-label="Назад"></button><span id="chapterCount"></span><button id="chapterNext" class="chapter-arrow" aria-label="Вперёд"></button></div>
       </div>
       <div class="settings-panel" id="settingsPanel" hidden>
         <div class="picker-head settings-head">
-          <button class="picker-back" id="backSettingsButton" aria-label="Назад">←</button>
+          <button class="picker-back" id="backSettingsButton" aria-label="Назад"></button>
           <div><p id="settingsEyebrow">ИГРА</p><h2 id="settingsTitle">Настройки</h2></div>
           <span class="settings-gear" aria-hidden="true">⚙</span>
         </div>
@@ -498,13 +630,13 @@ img{-webkit-user-drag:none}button{transition:transform .15s,filter .15s}button:f
         <div class="hud-group"><div class="hud-level-chip"><span id="hudCurrentNumber">01</span><strong id="hudCurrentName">Первый импульс</strong></div><div class="hud-chip hearts" id="hearts" aria-label="3 жизни">♥♥♥</div><div class="hud-chip" aria-label="Собранные звёзды"><span class="star-icon">★</span><span id="starCount">0</span><span class="star-divider">/</span><span id="starTotal">15</span></div><div class="hud-chip pulse-meter" id="pulseMeter" aria-label="Импульс готов"><span id="pulseText">PULSE</span><i id="pulseFill"></i></div><div class="hud-chip time" id="timer">00:00</div></div>
         <div class="hud-group"><button class="icon-btn" id="menuButton" title="Главное меню" aria-label="Главное меню"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="icon-btn" id="restartButton" title="Начать заново (R)" aria-label="Начать заново"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1.5 8M4 4v6h6"/></svg></button><button class="icon-btn" id="pauseButton" title="Пауза (P)" aria-label="Пауза"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button></div>
       </div>
-      <div class="ready-hint" id="readyHint"><p id="readyText">Двигайся, прыгай и используй Pulse!</p><button class="start-btn" id="startButton"><span id="startButtonText">Поехали</span> <span aria-hidden="true">→</span></button></div>
+      <div class="ready-hint" id="readyHint"><p id="readyText">Двигайся, прыгай и используй Pulse!</p><button class="start-btn" id="startButton"><span id="startButtonText">Поехали</span></button></div>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
       <div class="tutorial" id="tutorial" role="status" aria-live="polite" hidden></div>
       <div class="touch-controls" aria-label="Сенсорное управление"><div class="touch-group"><button class="touch-btn" data-key="left" aria-label="Двигаться влево">←</button><button class="touch-btn" data-key="right" aria-label="Двигаться вправо">→</button></div><div class="touch-group"><button class="touch-btn pulse" id="pulseButton" data-key="pulse" aria-label="Импульс Pulse">PULSE</button><button class="touch-btn jump" data-key="jump" aria-label="Прыгать">↑</button></div></div>
       <div class="overlay" id="overlay" hidden>
         <div class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
-          <div class="dialog-symbol" id="dialogSymbol" aria-hidden="true">Ⅱ</div><h2 id="dialogTitle">Передышка</h2><p id="dialogText">Приключение подождёт.</p><div id="dialogExtra"></div><button class="start-btn" id="dialogPrimary">Продолжить →</button><button class="rewarded-btn" id="dialogRewarded" hidden>▶ Продолжить с 3 жизнями · реклама</button><button class="secondary" id="dialogSecondary">С начала уровня</button><button class="dialog-menu" id="dialogMenu">Главное меню</button>
+          <div class="dialog-symbol" id="dialogSymbol" aria-hidden="true">Ⅱ</div><h2 id="dialogTitle">Передышка</h2><p id="dialogText">Приключение подождёт.</p><div id="dialogExtra"></div><button class="start-btn" id="dialogPrimary">Продолжить</button><button class="rewarded-btn" id="dialogRewarded" hidden>▶ Продолжить с 3 жизнями · реклама</button><button class="secondary" id="dialogSecondary">С начала уровня</button><button class="dialog-menu" id="dialogMenu">Главное меню</button>
         </div>
       </div>
     </div>
@@ -796,10 +928,10 @@ globalThis.PulseBallEngine = (() => {
       play:'Играть',continue:'Продолжить',completed:'пройден',locked:'закрыт',levelLocked:'Сначала пройди предыдущий уровень',record:'РЕКОРД',adventure:'ТВОЁ ПРИКЛЮЧЕНИЕ',lives:'жизни',pulseReady:'Импульс готов',pulseCharging:'Импульс заряжается',
       tutorialMove:'ДВИЖЕНИЕ',tutorialJump:'ПРЫЖОК',tutorialObject:'ТОЛКНИ ЯЩИК',tutorialOrb:'СФЕРА → ПРИЁМНИК',tutorialRelay:'АКТИВИРУЙ RELAY',tutorialBoost:'АКТИВИРУЙ УСКОРИТЕЛЬ',
       orbLaunch:'Сфера летит к приёмнику — попади в кристалл!',orbHit:'Приёмник заряжен — мост включён!',hurtCheckpoint:'Ещё попытка — с контрольной точки!',hurtRetry:'Ничего, попробуем ещё раз!',checkpoint:'Контрольная точка! Здесь безопасно.',shatter:'Блок разрушен!',switchOn:'Переключатель включён. Направь ящик на плиту!',bridgeOn:'Мост активирован!',
-      pausedTitle:'Маленькая передышка',pausedText:'Импульс подождёт. Продолжим, когда будешь готов.',resume:'Продолжить →',restartLevel:'С начала уровня',
-      helpTitle:'Как играть',helpText:'Используй Pulse, чтобы открыть путь к финишу.',helpOk:'Всё понятно →',
-      lostTitle:'Ещё один разбег?',lostText:'Каждый прыжок — немного опыта. В этот раз точно получится.',retry:'Попробовать снова →',levelSelect:'К выбору уровней',
-      wonSuffix:' пройден!',collectedA:'Собрано ',collectedB:' из ',starsWord:' звёзд за ',allStars:'Все звёзды твои!',improve:'Можно вернуться и улучшить результат.',unlocked:'Открыт уровень ',next:'Следующий уровень →',replay:'Переиграть этот уровень',
+      pausedTitle:'Маленькая передышка',pausedText:'Импульс подождёт. Продолжим, когда будешь готов.',resume:'Продолжить',restartLevel:'С начала уровня',
+      helpTitle:'Как играть',helpText:'Используй Pulse, чтобы открыть путь к финишу.',helpOk:'Всё понятно',
+      lostTitle:'Ещё один разбег?',lostText:'Каждый прыжок — немного опыта. В этот раз точно получится.',retry:'Попробовать снова',levelSelect:'К выбору уровней',
+      wonSuffix:' пройден!',collectedA:'Собрано ',collectedB:' из ',starsWord:' звёзд за ',allStars:'Все звёзды твои!',improve:'Можно вернуться и улучшить результат.',unlocked:'Открыт уровень ',next:'Следующий уровень',replay:'Переиграть этот уровень',
       soundOn:'Выключить звук',soundOff:'Включить звук',fullscreenOn:'Выйти из полноэкранного режима',fullscreenOff:'На весь экран',fullscreenFail:'Полный экран недоступен в этом окне',
       finishCaps:'ФИНИШ',receiverCaps:'ПРИЁМНИК',rewardContinue:'▶ Продолжить с 3 жизнями · реклама',adUnavailable:'Реклама сейчас недоступна',soundMenu:'♪ Звук',fullscreenMenu:'⛶ Экран',
       helpMove:'Движение',helpJump:'Прыжок',helpPulse:'Импульс перед героем: ломает голубые блоки, двигает ящик и включает переключатель. На телефоне — кнопка PULSE',helpPlate:'Плита',helpPlateText:'Поставь на неё импульсный ящик, чтобы включить мост',helpOrb:'Энерго-сфера',helpOrbText:'Используй Pulse рядом со сферой: она летит по стрелке, сбивает врагов и включает приёмник',helpFlag:'Белый флаг',helpFlagText:'Контрольная точка',helpPR:'Пауза / начать заново'
@@ -809,10 +941,10 @@ globalThis.PulseBallEngine = (() => {
       play:'Play',continue:'Continue',completed:'cleared',locked:'locked',levelLocked:'Clear the previous level first',record:'BEST',adventure:'YOUR RUN',lives:'lives',pulseReady:'Pulse ready',pulseCharging:'Pulse charging',
       tutorialMove:'MOVE',tutorialJump:'JUMP',tutorialObject:'PUSH THE CRATE',tutorialOrb:'ORB → RECEIVER',tutorialRelay:'ACTIVATE RELAY',tutorialBoost:'HIT THE BOOST PAD',
       orbLaunch:'The orb is heading for the receiver — hit the crystal!',orbHit:'Receiver charged — bridge online!',hurtCheckpoint:'One more try — back to the checkpoint!',hurtRetry:'Almost. Try again!',checkpoint:'Checkpoint reached!',shatter:'Block shattered!',switchOn:'Switch on. Push the crate onto the plate!',bridgeOn:'Bridge activated!',
-      pausedTitle:'Quick break',pausedText:'The Pulse can wait. Continue when you are ready.',resume:'Continue →',restartLevel:'Restart level',
-      helpTitle:'How to play',helpText:'Use Pulse to open the path to the finish.',helpOk:'Got it →',
-      lostTitle:'One more run?',lostText:'Every jump gets you closer. Try it again.',retry:'Try again →',levelSelect:'Level select',
-      wonSuffix:' cleared!',collectedA:'Collected ',collectedB:' of ',starsWord:' stars in ',allStars:'All stars collected!',improve:'You can replay and improve your result.',unlocked:'Unlocked level ',next:'Next level →',replay:'Replay this level',
+      pausedTitle:'Quick break',pausedText:'The Pulse can wait. Continue when you are ready.',resume:'Continue',restartLevel:'Restart level',
+      helpTitle:'How to play',helpText:'Use Pulse to open the path to the finish.',helpOk:'Got it',
+      lostTitle:'One more run?',lostText:'Every jump gets you closer. Try it again.',retry:'Try again',levelSelect:'Level select',
+      wonSuffix:' cleared!',collectedA:'Collected ',collectedB:' of ',starsWord:' stars in ',allStars:'All stars collected!',improve:'You can replay and improve your result.',unlocked:'Unlocked level ',next:'Next level',replay:'Replay this level',
       soundOn:'Mute sound',soundOff:'Enable sound',fullscreenOn:'Exit fullscreen',fullscreenOff:'Fullscreen',fullscreenFail:'Fullscreen is unavailable here',
       finishCaps:'FINISH',receiverCaps:'RECEIVER',rewardContinue:'▶ Continue with 3 hearts · ad',adUnavailable:'Ad is not available right now',soundMenu:'♪ Sound',fullscreenMenu:'⛶ Fullscreen',
       helpMove:'Move',helpJump:'Jump',helpPulse:'Pulse in front of the hero: breaks blue blocks, pushes crates and activates switches. On mobile, use the PULSE button',helpPlate:'Plate',helpPlateText:'Push a pulse crate onto it to activate the bridge',helpOrb:'Energy orb',helpOrbText:'Use Pulse near an orb: it flies along its arrow, defeats enemies and charges a receiver',helpFlag:'White flag',helpFlagText:'Checkpoint',helpPR:'Pause / restart'
@@ -1317,7 +1449,7 @@ globalThis.PulseBallEngine = (() => {
       const unlocksNext=g.index<E.levels.length-1&&g.index>=wasUnlocked;
       if(unlocksNext)unlocked=Math.min(E.levels.length-1,g.index+1);
       $('dialogExtra').innerHTML='<div class="result-stars">'+'★'.repeat(rating)+'<span style="color:#dfe4d2">'+'★'.repeat(3-rating)+'</span></div>'+(unlocksNext?'<div class="unlock-note">'+tr('unlocked')+String(g.index+2).padStart(2,'0')+' · '+levelDisplayName(g.index+1)+'</div>':'');
-      $('dialogPrimary').textContent=g.index<E.levels.length-1?tr('next'):tr('levelSelect')+' →';$('dialogSecondary').textContent=tr('replay');
+      $('dialogPrimary').textContent=g.index<E.levels.length-1?tr('next'):tr('levelSelect');$('dialogSecondary').textContent=tr('replay');
       const old=recordFor(g.index);
       const stars=Math.max(g.collected,Number.isFinite(old?.stars)?old.stars:0),time=Math.min(g.time,Number.isFinite(old?.time)?old.time:Infinity);
       if(!old||stars!==old.stars||time!==old.time||unlocksNext){best[g.index]={level:g.level.name,stars,time};saveProgress();updateRecord();renderProgression();}
