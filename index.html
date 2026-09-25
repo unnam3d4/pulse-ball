@@ -526,6 +526,105 @@ img{-webkit-user-drag:none}button{transition:transform .15s,filter .15s}button:f
 @media(orientation:portrait){
   .picker-back,.chapter-arrow{width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important}
 }
+
+/* ===== Mobile level-select restoration + mobile gameplay framing ===== */
+.chapter-symbol{display:none!important}
+@media(max-width:760px) and (orientation:portrait){
+  .menu-level-picker{
+    width:min(440px,96vw)!important;
+    height:min(720px,92vh)!important;
+    padding:16px!important;
+    gap:11px!important;
+  }
+  .chapter-tabs{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:7px!important;
+  }
+  .chapter-tab{
+    height:66px!important;
+    border-radius:12px!important;
+  }
+  .chapter-heading{
+    padding:0 3px!important;
+  }
+  .chapter-heading h3{
+    font-size:21px!important;
+    margin:2px 0 0!important;
+  }
+  .menu-level-grid{
+    grid-template-columns:1fr!important;
+    grid-template-rows:repeat(3,minmax(0,1fr))!important;
+    grid-auto-rows:minmax(0,1fr)!important;
+    gap:9px!important;
+    min-height:0!important;
+  }
+  .menu-level{
+    display:grid!important;
+    grid-template-columns:48px minmax(0,1fr)!important;
+    grid-template-rows:minmax(0,1fr) auto!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    padding:10px 14px!important;
+    gap:3px 10px!important;
+    border-radius:14px!important;
+    align-items:center!important;
+  }
+  .level-topline{
+    grid-column:1!important;
+    grid-row:1!important;
+    align-self:center!important;
+  }
+  .menu-level-number{
+    font-size:27px!important;
+  }
+  .level-status{
+    display:none!important;
+  }
+  .menu-level:disabled .level-status{
+    display:block!important;
+    position:absolute!important;
+    right:12px!important;
+    top:12px!important;
+  }
+  .menu-level-name{
+    grid-column:2!important;
+    grid-row:1!important;
+    display:block!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    font-size:15px!important;
+    line-height:1.15!important;
+    align-self:center!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .menu-level-stars{
+    grid-column:1!important;
+    grid-row:2!important;
+    margin:0!important;
+    font-size:17px!important;
+    letter-spacing:0!important;
+    white-space:nowrap!important;
+  }
+  .menu-level-meta{
+    grid-column:2!important;
+    grid-row:2!important;
+    margin:0!important;
+    font-size:10px!important;
+    line-height:1.15!important;
+    align-self:center!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .chapter-footer{
+    height:46px!important;
+    gap:18px!important;
+  }
+}
 </style>
 
 </head>
@@ -996,7 +1095,10 @@ globalThis.PulseBallEngine = (() => {
     }
   }
   function fit(){
-    const box=stage.getBoundingClientRect();if(!box.width||!box.height)return;viewH=600;viewW=600*box.width/box.height;const ratio=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(box.width*ratio);canvas.height=Math.round(box.height*ratio);
+    const box=stage.getBoundingClientRect();if(!box.width||!box.height)return;
+    const mobileView=matchMedia('(pointer:coarse)').matches&&Math.min(box.width,box.height)<760;
+    viewH=mobileView?690:600;viewW=viewH*box.width/box.height;
+    const ratio=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(box.width*ratio);canvas.height=Math.round(box.height*ratio);
     ctx.setTransform(canvas.width/viewW,0,0,canvas.height/viewH,0,0);
   }
   new ResizeObserver(fit).observe(stage);addEventListener('resize',fit,{passive:true});addEventListener('orientationchange',()=>requestAnimationFrame(fit),{passive:true});if(window.visualViewport)visualViewport.addEventListener('resize',fit,{passive:true});fit();
@@ -1553,7 +1655,8 @@ globalThis.PulseBallEngine = (() => {
     if(mode==='playing'){
       accumulator+=dt;while(accumulator>=1/120){E.step(g,pulseQueued?{...input,pulse:true}:input,1/120);pulseQueued=false;handleEvents();accumulator-=1/120;if(g.status!=='playing'){openDialog(g.status);accumulator=0;break;}}
     }else accumulator=0;
-    const target=Math.max(0,Math.min(g.level.width-viewW,g.player.x-viewW*.32));
+    const cameraAnchor=matchMedia('(pointer:coarse)').matches?.25:.32;
+    const target=Math.max(0,Math.min(g.level.width-viewW,g.player.x-viewW*cameraAnchor));
     camera+=(target-camera)*(1-Math.exp(-dt*7));if(Math.abs(camera-target)<.05)camera=target;
     for(const p of particles){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=220*dt;}particles=particles.filter(p=>p.life>0);shake=Math.max(0,shake-dt*23);
     if(visualTime>toastUntil)$('toast').classList.remove('visible');
