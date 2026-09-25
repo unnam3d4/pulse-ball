@@ -779,8 +779,849 @@ img{-webkit-user-drag:none}button{transition:transform .15s,filter .15s}button:f
 }
 </style>
 
+<style id="final-visual-polish">
+/* Final visual polish. Presentation only; no game or platform logic changes. */
+:root {
+  --ui-panel-top: #117fa8;
+  --ui-panel-bottom: #0a527e;
+  --ui-edge: #8bdce9;
+  --ui-text: #f5fdff;
+  --ui-muted: #b9e8f1;
+  --ui-radius: 24px;
+  --ui-button-radius: 14px;
+}
+
+/* Short compositor-friendly interaction; no animated filters or shadows. */
+button {
+  transition: transform 120ms ease, opacity 120ms ease;
+  font-variant-numeric: tabular-nums;
+}
+button:focus-visible {
+  outline: 3px solid #fff0a8;
+  outline-offset: 3px;
+}
+button:disabled { cursor: default; }
+button:hover { filter: none !important; }
+button:active:not(:disabled) { transform: translateY(2px); }
+button:disabled:active { transform: none; }
+.ui-icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+.ui-symbols { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* Keep the approved world and mascot. Unify surfaces and typography. */
+.menu-command,
+.menu-level-picker,
+.settings-panel {
+  background: linear-gradient(155deg, var(--ui-panel-top), var(--ui-panel-bottom)) !important;
+  border: 2px solid var(--ui-edge);
+  border-radius: var(--ui-radius);
+  box-shadow: 0 5px 0 #07507566, inset 0 1px 0 #d6fcff44;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.menu-home { gap: clamp(30px, 5vw, 76px); }
+.menu-command { max-width: 420px; justify-self: center; }
+.menu-kicker {
+  font-weight: 900;
+  letter-spacing: -2px;
+  text-shadow: 0 3px #177ab7, 0 6px #085d8d;
+}
+.menu-title { letter-spacing: .3px; }
+.menu-tagline { font-weight: 700; }
+.menu-mascot { filter: none; }
+.hero-halo { filter: none; background: #155d7033; height: 6%; }
+.menu-next-kicker { letter-spacing: 1.4px; font-size: 10px; }
+.menu-next-card strong { font-weight: 750; line-height: 1.35; }
+.menu-play {
+  border-radius: 18px;
+  border-color: #d2c3ff;
+  background: linear-gradient(180deg, #9874ff, #744ce6);
+  box-shadow: 0 5px 0 #4f34a6, inset 0 2px 0 #d2bfff66;
+  text-shadow: 0 2px #593caa;
+  letter-spacing: .5px;
+}
+.menu-play:active { box-shadow: 0 2px 0 #4f34a6; }
+.menu-levels-button {
+  border-color: #74c9e080;
+  border-radius: var(--ui-button-radius);
+  background: #0a5781;
+  font-size: 14px;
+  font-weight: 700;
+}
+.menu-levels-button strong { background: #a7f2df; color: #155571; }
+.menu-stats-strip small { font-size: 10px; font-weight: 700; }
+.menu-stats-strip strong { font-weight: 750; }
+.menu-stats-strip > div:last-child { gap: 7px; }
+.menu-stats-strip > div:last-child::before {
+  content: "";
+  width: 15px;
+  height: 15px;
+  background: linear-gradient(#fff7cf, #ffcd50);
+  clip-path: polygon(50% 0%,61% 34%,97% 35%,68% 57%,79% 92%,50% 71%,21% 92%,32% 57%,3% 35%,39% 34%);
+}
+.menu-progress { height: 6px; background: #064469; }
+.menu-settings-btn,
+.menu-help-link {
+  border: 1px solid #76d3e24d;
+  border-radius: 12px;
+  background: #1985aa !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+.menu-settings-btn strong { font-weight: 700 !important; }
+.menu-settings-btn .ui-icon { width: 18px; height: 18px; }
+
+/* Chapter cards: consistent hierarchy, explicit lock and next-level states. */
+.picker-head h2 { font-weight: 800 !important; letter-spacing: -.4px !important; }
+.picker-head p { font-size: 10px !important; letter-spacing: 1.3px !important; }
+.picker-head > strong { border-radius: 12px; background: #096389; }
+.picker-back,
+.chapter-arrow {
+  border-color: #91dfeb !important;
+  background: linear-gradient(#2b9bbc, #1a80a5) !important;
+  box-shadow: 0 2px 0 #075a80, inset 0 1px #d9fbff44 !important;
+}
+.chapter-arrow:disabled { opacity: .42 !important; }
+.chapter-tab { border-color: #63bfd4; border-radius: 12px; }
+.chapter-tab::after { background: linear-gradient(#04547700 15%, #054a73e8); }
+.chapter-tab img { opacity: .85; }
+.chapter-tab span { font-weight: 700; line-height: 1.2; }
+.chapter-tab.active { border-color: #ffe594; box-shadow: 0 3px #b39b47; }
+.chapter-heading h3 { font-weight: 750; }
+.menu-level {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  grid-template-rows: auto minmax(0, 1fr) auto auto !important;
+  align-content: stretch;
+  align-items: start;
+  gap: 9px 10px !important;
+  padding: 20px !important;
+  border: 1px solid #80d5e7;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #238caf, #146a92);
+  box-shadow: 0 4px 0 #064971;
+}
+.menu-level:disabled {
+  border-color: #69b7ce;
+  background: linear-gradient(145deg, #2083a4, #18668c);
+  box-shadow: 0 4px 0 #064971;
+}
+.menu-level.is-next {
+  border: 2px solid #ffe39a;
+  background: linear-gradient(145deg, #8770e6, #6352ba);
+  box-shadow: 0 4px 0 #443781;
+}
+.level-topline {
+  display: flex !important;
+  grid-column: 1 / -1 !important;
+  grid-row: 1 !important;
+  width: 100%;
+  align-items: center;
+}
+.menu-level-number {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  height: 42px;
+  padding: 0 6px;
+  border-radius: 12px;
+  color: #f4fcff;
+  background: #06557b66;
+  font-size: 25px !important;
+  font-weight: 800;
+  letter-spacing: -.7px;
+}
+.menu-level.is-next .menu-level-number { background: #493a9166; color: #fff1af; }
+.level-status { display: block !important; position: relative !important; top: auto !important; right: auto !important; transform: none !important; }
+.menu-level-name {
+  grid-column: 1 / -1 !important;
+  grid-row: 2 !important;
+  align-self: start !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 2.4em !important;
+  max-height: 2.4em !important;
+  font-size: clamp(14px, 1.65vw, 20px) !important;
+  font-weight: 750;
+  line-height: 1.2 !important;
+}
+.menu-level-stars { grid-column: 1 / -1 !important; grid-row: 3 !important; margin: 0 !important; }
+.menu-level-meta {
+  grid-column: 1 / -1 !important;
+  grid-row: 4 !important;
+  min-height: 1.25em;
+  margin: 0 !important;
+  color: #d2edf5;
+  font-size: 12px !important;
+  font-weight: 500;
+  line-height: 1.25 !important;
+  white-space: normal !important;
+}
+.rating-stars.menu { gap: 5px; }
+.rating-stars.menu .rating-star { width: 20px; height: 20px; }
+.rating-star.off { opacity: .65; }
+.chapter-footer > span { font-size: 12px; letter-spacing: 1px; }
+
+/* Settings share button sizes, icon strokes and readable secondary text. */
+.settings-row { background: #095c8266; border-color: #70c8dd77; border-radius: 16px; }
+.settings-icon,
+.settings-gear { color: #d5fbff; background: #319abc55; }
+.settings-copy strong { font-weight: 750; }
+.settings-copy span { color: #c1e6ee; font-size: 11px; }
+.settings-value,
+.language-switch {
+  border-color: #76ccdf;
+  border-radius: 12px;
+  background: #126a94;
+  font-size: 13px;
+  font-weight: 700;
+}
+.language-switch button { font-size: 13px; font-weight: 700; }
+.language-switch button.active { background: #c7f6eb; color: #105570; }
+.settings-value[aria-pressed="true"] { color: #d4ffdf; border-color: #96e1bb; }
+.settings-value[aria-pressed="false"] { color: #dbebf4; background: #155e83; }
+.settings-note { font-size: 11px; color: #bce6ef; }
+
+/* HUD is a set of small, opaque instrument chips, with no full-screen strip. */
+.hud { gap: 8px; align-items: start; }
+.hud-group { gap: 6px; }
+.hud-chip,
+.hud-level-chip,
+.hud .icon-btn {
+  border: 1px solid #a5dce5;
+  background: #f0fcff !important;
+  color: #285571;
+  box-shadow: 0 2px 0 #29759624;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 12px;
+}
+.hud-chip { font-size: 12px; font-weight: 750; }
+.hud-level-chip { height: 38px; gap: 8px; }
+.hud-level-chip > span { background: #7863df; }
+.hud-level-chip > strong { font-size: 11px; color: #285571; }
+.hearts { color: #8764d9; letter-spacing: 1px; }
+.empty-heart { color: #ccdce7; }
+.pulse-meter { color: #137a9d; }
+.pulse-meter::after { background: #d3e9ee; }
+.pulse-meter i { background: #25bfcd; }
+.hud .time { display: flex !important; font-size: 11px; min-width: 55px; }
+.icon-btn svg { width: 19px; height: 19px; stroke-width: 1.9; }
+.hud .icon-btn:disabled { opacity: .48; }
+.hud-progress-wrap {
+  position: absolute;
+  display: flex !important;
+  top: 44px;
+  left: 2px;
+  width: min(220px, 36vw);
+  gap: 7px;
+  color: #195876;
+  font-size: 10px;
+  font-weight: 750;
+}
+.hud-progress-wrap .level-progress { flex: 1; height: 4px; background: #ffffffb8; }
+.hud-progress-wrap .level-progress i { background: #558fc2; }
+.hud-progress-wrap #finishGuide { display: none; }
+
+/* Preserve chevrons and button bindings; simplify their surfaces. */
+.touch-btn { transition: transform 100ms ease, opacity 100ms ease; }
+.touch-btn.move-arrow::before { filter: none; }
+.touch-btn.pressed { filter: none !important; opacity: .83; }
+.touch-btn.pulse.cooling { opacity: .65; }
+.touch-btn.pulse:not(.cooling) { opacity: 1; }
+.tutorial,
+.ready-hint,
+.toast {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.tutorial {
+  background: linear-gradient(145deg, #196d92, #115179);
+  border-color: #92d9e8;
+  box-shadow: 0 4px 0 #06466a66;
+}
+.tutorial-label { color: #d1f3f8; letter-spacing: 1.3px; }
+.tutorial-key { box-shadow: 0 3px 0 #07446766; }
+.ready-hint { border-color: #a5dce5; box-shadow: 0 3px 0 #29759624; }
+
+/* Results, pause and help: same shell, clear primary action and honest ad CTA. */
+.overlay {
+  background: #073d687a;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.dialog {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  width: min(440px, 100%);
+  padding: 26px;
+  border: 2px solid #a3e3eb;
+  border-radius: 24px;
+  background: linear-gradient(150deg, #1584a7, #0a5781);
+  box-shadow: 0 5px 0 #06456b80;
+  scrollbar-width: none;
+}
+.dialog h2 { margin: 0; font-size: 26px; line-height: 1.14; font-weight: 800; letter-spacing: -.5px; }
+.dialog p { margin: 0 0 5px; color: #d1ecf2; font-size: 13px; line-height: 1.5; }
+.dialog-symbol { margin: 0; font-size: 30px; line-height: 1; color: #fff0aa; }
+.dialog-symbol:empty { display: none; }
+.dialog button {
+  min-height: 46px;
+  height: auto;
+  margin: 0;
+  padding: 11px 14px;
+  border-radius: 13px;
+  font-size: 13px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+.dialog .start-btn { background: linear-gradient(#9876fb, #7853df); box-shadow: 0 3px 0 #4f389e; }
+.dialog .secondary { background: #0b608866; color: #edfaff; border-color: #7dcbdd99; }
+.dialog .dialog-menu { color: #c9ebf2; font-size: 12px; }
+.dialog .rewarded-btn {
+  background: linear-gradient(#fff0bd, #f8d888);
+  color: #665020;
+  border: 1px solid #fff3cd;
+  box-shadow: 0 3px 0 #ac8744;
+  font-size: 12px;
+  font-weight: 800;
+}
+.dialog button:disabled { opacity: .52; cursor: progress; transform: none; }
+.result-stars { margin: 8px 0 12px !important; }
+.rating-stars.result { gap: 14px; }
+.rating-stars.result .rating-star { width: 42px; height: 42px; filter: none; }
+.unlock-note { background: #188276; border-color: #8fdfbc; color: #e2fff0; font-size: 12px; line-height: 1.35; }
+.help-list { grid-template-columns: 94px minmax(0, 1fr); gap: 11px 15px; margin: 8px 0; font-size: 12px; line-height: 1.4; }
+.help-list strong { color: #fff1ad; font-weight: 700; }
+.help-list span { color: #d5edf4; }
+.dialog:has(.help-list) { width: min(650px, 100%); }
+.rotate-screen { background: linear-gradient(155deg, #178eb3, #0b557e); }
+.rotate-phone { box-shadow: none; }
+
+@media (hover: hover) and (pointer: fine) {
+  .menu-play:hover { transform: translateY(-2px); }
+  .menu-level:hover:not(:disabled) { border-color: #ffecae; box-shadow: 0 4px 0 #064971; transform: translateY(-2px); }
+  .chapter-tab:hover { border-color: #d9faff; }
+  .settings-value:hover, .menu-levels-button:hover { background: #1b80a6; }
+}
+
+@media (pointer: coarse) {
+  .menu-mascot { animation: none; }
+  .menu-screen {
+    padding-top: max(12px, var(--safe-top));
+    padding-right: max(16px, var(--safe-right));
+    padding-bottom: max(12px, var(--safe-bottom));
+    padding-left: max(16px, var(--safe-left));
+  }
+}
+
+@media (pointer: coarse) and (orientation: landscape) {
+  .hud-group { gap: 5px !important; }
+  .hud .icon-btn { width: 44px !important; min-width: 44px !important; height: 44px !important; min-height: 44px !important; }
+  .hud .time { display: flex !important; }
+  .touch-btn {
+    border-color: #efffffba !important;
+    background: #e8faff3d !important;
+    box-shadow: 0 3px 0 #184e7544, inset 0 1px #ffffff55 !important;
+  }
+  .touch-btn.pulse { background: #1686a9dd !important; }
+  .touch-btn.jump { background: #8066e3e8 !important; }
+}
+
+/* Tablet and reduced iframe height. Never scale a text panel as a whole. */
+@media (max-height: 600px) {
+  .menu-level { padding: 14px !important; gap: 7px !important; }
+  .menu-level-number { height: 34px; min-width: 36px; font-size: 23px !important; }
+  .menu-level-name { font-size: 16px !important; }
+  .menu-level-meta { font-size: 11px !important; }
+  .settings-copy span, .settings-note { font-size: 10px; }
+}
+
+@media (max-height: 450px) and (orientation: landscape) {
+  .menu-home { gap: 24px; }
+  .menu-command { padding: 14px 18px; }
+  .menu-next-card { margin-bottom: 11px; }
+  .menu-next-kicker { font-size: 9px; }
+  .menu-stats-strip { margin-top: 12px; }
+  .menu-settings-btn, .menu-help-link { font-size: 11px !important; }
+  .menu-level-picker { gap: 7px; padding: 10px 16px; }
+  .chapter-tab { height: 50px; }
+  .chapter-tab span { font-size: 10px; }
+  .chapter-heading h3 { font-size: 18px; }
+  .menu-level {
+    grid-template-columns: 34px minmax(0, 1fr) !important;
+    grid-template-rows: minmax(28px, 1fr) 20px 14px !important;
+    padding: 9px 11px !important;
+    gap: 4px 9px !important;
+    border-radius: 14px;
+  }
+  .level-topline { grid-column: 1 !important; grid-row: 1 !important; align-self: start !important; }
+  .menu-level-number { height: 30px; min-width: 32px; padding: 0 3px; font-size: 21px !important; border-radius: 8px; }
+  .level-status { display: none !important; }
+  .menu-level:disabled .level-status { display: block !important; position: absolute !important; top: 10px !important; right: 7px !important; width: 12px; height: 15px; }
+  .menu-level-lock { width: 10px; height: 10px; border-width: 1.5px; }
+  .menu-level-lock::before { border-width: 1.5px; }
+  .menu-level-name {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    display: block !important;
+    align-self: center !important;
+    min-height: 0 !important;
+    max-height: 3.6em !important;
+    padding-right: 10px !important;
+    font-size: 13px !important;
+    line-height: 1.16 !important;
+  }
+  .menu-level-stars { grid-column: 1 / -1 !important; grid-row: 2 !important; }
+  .menu-level-meta { grid-column: 1 / -1 !important; grid-row: 3 !important; font-size: 10px !important; line-height: 1.2 !important; }
+  .rating-stars.menu .rating-star { width: 17px; height: 17px; }
+  .settings-copy span { font-size: 9px; }
+  .settings-note { font-size: 9px; }
+  .settings-value, .language-switch button { font-size: 12px; }
+  .dialog {
+    width: min(660px, 100%);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 10px;
+    padding: 17px 22px;
+    border-radius: 20px;
+  }
+  .dialog-symbol { display: none; }
+  .dialog h2, .dialog p, #dialogExtra { grid-column: 1 / -1; }
+  .dialog h2 { font-size: 22px; }
+  .dialog p { font-size: 12px; line-height: 1.35; margin-bottom: 2px; }
+  .dialog button { min-height: 44px; padding: 9px 11px; font-size: 12px; }
+  .dialog .dialog-menu { min-height: 44px; }
+  .dialog .rewarded-btn { font-size: 11px; }
+  .dialog:has(.help-list) #dialogPrimary { grid-column: 1 / -1; }
+  .help-list { grid-template-columns: 100px minmax(0, 1fr); font-size: 11px; gap: 7px 12px; margin: 3px 0; line-height: 1.25; }
+  .result-stars { margin: 2px 0 6px !important; }
+  .rating-stars.result .rating-star { width: 32px; height: 32px; }
+  .unlock-note { margin: 5px 0 0; padding: 7px 10px; font-size: 11px; }
+}
+
+@media (max-width: 650px) and (orientation: landscape) {
+  .menu-home { gap: 16px; }
+  .menu-command { padding: 12px 15px; }
+  .menu-settings-btn, .menu-help-link { font-size: 10px !important; }
+  .menu-settings-btn .ui-icon { width: 16px; height: 16px; }
+  .menu-level-name { font-size: 11px !important; }
+  .menu-level-meta { font-size: 9px !important; }
+  .menu-level { padding: 8px !important; gap: 4px 6px !important; }
+  .chapter-tab { height: 44px; }
+  .chapter-tab span { display: none; }
+  .chapter-tab b { font-size: 19px; top: 9px; }
+  .hud .hud-chip { padding-inline: 5px !important; gap: 4px; }
+  .hud .pulse-meter { min-width: 57px !important; font-size: 10px; }
+  .hud .time { min-width: 47px; font-size: 10px; }
+  .hud-group { gap: 4px !important; }
+  .hud-progress-wrap { top: 43px; font-size: 9px; }
+  .help-list { grid-template-columns: 82px minmax(0, 1fr); font-size: 10px; gap: 5px 10px; }
+  .dialog:has(.help-list) { padding: 12px 17px; gap: 6px; }
+}
+
+@media (max-height: 330px) and (orientation: landscape) {
+  .menu-screen { padding-top: max(8px, var(--safe-top)); padding-bottom: max(8px, var(--safe-bottom)); }
+  .menu-level-picker { gap: 5px; padding: 8px 12px; }
+  .chapter-heading span:first-child { display: none; }
+  .chapter-heading h3 { font-size: 16px; }
+  .chapter-tab { height: 44px; }
+  .menu-level-name { font-size: 11px !important; }
+  .menu-level-meta { font-size: 9px !important; }
+  .menu-level { padding: 7px 9px !important; gap: 3px 7px !important; }
+  .settings-copy span, .settings-note { font-size: 8px; }
+  .dialog { padding: 12px 17px; gap: 6px 9px; }
+  .dialog h2 { font-size: 20px; }
+  .dialog p { font-size: 11px; }
+  .help-list { font-size: 10px; gap: 4px 9px; }
+  .touch-controls { bottom: max(10px, var(--safe-bottom)) !important; }
+  .touch-btn { height: 52px !important; width: 58px !important; border-radius: 17px !important; }
+  .touch-btn.pulse { width: 70px !important; }
+  .touch-btn.jump { width: 58px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+</style>
+<style id="hud-pause-polish">
+/* Final targeted revision: gameplay HUD and pause only. */
+.hud {
+  top: max(8px, var(--safe-top)) !important;
+  left: max(10px, var(--safe-left)) !important;
+  right: max(10px, var(--safe-right)) !important;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 7px !important;
+}
+.hud .hud-group {
+  position: relative;
+  height: 44px;
+  gap: 0 !important;
+  border: 1px solid #80ddec99;
+  border-radius: 12px;
+  background: linear-gradient(120deg, #125272f5, #193e68f5);
+  box-shadow: 0 2px 0 #07314b40, inset 0 1px #ccfaff1c;
+}
+.hud .hud-status { padding: 0 8px 8px; min-width: 0; }
+.hud .hud-chip,
+.hud .hud-level-chip {
+  height: 30px !important;
+  min-height: 0 !important;
+  padding: 0 8px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #effbff;
+  font-size: 12px !important;
+}
+.hud .hud-level-chip {
+  display: flex !important;
+  max-width: 196px !important;
+  padding-left: 0 !important;
+  gap: 8px;
+}
+.hud .hud-level-chip > span {
+  flex: none;
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 7px;
+  background: linear-gradient(145deg, #8f7afa, #6952cc);
+  box-shadow: inset 0 1px #c6baff80;
+  font-size: 11px;
+  color: white;
+}
+.hud .hud-level-chip > strong {
+  display: block !important;
+  max-width: 146px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px !important;
+  font-weight: 650;
+  color: #e3f6ff;
+}
+.hud #hearts { gap: 3px; border-left: 1px solid #b4eaff25 !important; }
+.hud .life-icon {
+  display: inline-block;
+  width: 16px;
+  height: 17px;
+  flex: none;
+  background: linear-gradient(145deg, #e4bdff, #b098fb 60%, #8465d9);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21 3.3 12.4C-2.5 6.4 6-1 12 5.3 18-1 26.5 6.4 20.7 12.4Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21 3.3 12.4C-2.5 6.4 6-1 12 5.3 18-1 26.5 6.4 20.7 12.4Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.hud .life-icon.empty-heart { background: #7190ac; opacity: .4; }
+.hud .hud-stars { gap: 4px; white-space: nowrap; padding-right: 0 !important; }
+.hud .hud-stars .star-divider { color: #91b4ce; margin: 0; }
+.hud #starTotal { color: #bdd8e8; font-size: 10px; }
+.hud .hud-progress-wrap {
+  position: absolute;
+  top: auto;
+  bottom: 2px;
+  left: 9px;
+  right: 9px;
+  width: auto;
+  height: 8px;
+  gap: 6px;
+  flex-direction: row-reverse;
+  color: #aad5e7;
+  font-size: 8px;
+  line-height: 8px;
+}
+.hud .hud-progress-wrap .level-progress { height: 2px; background: #98c7e330; }
+.hud .hud-progress-wrap .level-progress i { background: linear-gradient(90deg, #7c8cf6, #67e6e7); }
+.hud .hud-progress-wrap #progressText { min-width: 23px; text-align: right; }
+.hud .hud-energy { padding: 4px; gap: 7px !important; }
+.hud .pulse-meter {
+  min-width: 84px !important;
+  height: 34px !important;
+  padding: 3px 9px !important;
+  border: 1px solid #59d6e46b !important;
+  border-radius: 8px !important;
+  background: #136d83 !important;
+  color: #daffff;
+  flex-direction: column;
+  gap: 1px !important;
+  isolation: isolate;
+}
+.hud .pulse-meter .energy-label { z-index: 2; font-size: 7px; letter-spacing: 1.2px; line-height: 9px; opacity: .75; }
+.hud .pulse-meter #pulseText { z-index: 2; font-size: 10px; letter-spacing: .5px; line-height: 12px; }
+.hud .pulse-meter::after { display: none; }
+.hud .pulse-meter i { height: 100%; background: #39b8c4; opacity: .3; z-index: 0; transition: none; border-radius: 0; }
+.hud .pulse-meter.cooling { background: #323860 !important; color: #d8ceff; border-color: #a491e780 !important; }
+.hud .pulse-meter.cooling i { background: #9f85f0; opacity: .35; }
+.hud .hud-energy .time { min-width: 40px; height: 32px !important; padding: 0 3px !important; font-size: 10px !important; color: #c9e4f2; }
+.hud .hud-actions { margin-left: auto; padding: 0 2px; }
+.hud .hud-actions .icon-btn {
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  border: 0;
+  border-radius: 9px !important;
+  background: transparent !important;
+  color: #dbf5ff;
+  box-shadow: none;
+  transition: transform 100ms ease, opacity 100ms ease;
+}
+.hud .hud-actions .icon-btn + .icon-btn { border-left: 1px solid #a4d9ef22; border-radius: 0 !important; }
+.hud .hud-actions .icon-btn:hover { background: #75d8f026 !important; transform: none; }
+.hud .hud-actions .icon-btn:active { transform: scale(.91); opacity: .72; }
+.hud .hud-actions .icon-btn:focus-visible { outline: 2px solid #91f2ff; outline-offset: -3px; }
+
+/* This class exists only while the shared dialog displays Pause. */
+#dialog.pause-dialog {
+  position: relative;
+  width: min(370px, 100%);
+  padding: 27px 28px 18px;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr);
+  border: 1px solid #8cd9ec;
+  border-radius: 23px;
+  background: linear-gradient(145deg, #155b7f, #16385f);
+  box-shadow: 0 5px 0 #082d5070, inset 0 1px #d5f9ff30;
+  text-align: left;
+}
+#dialog.pause-dialog::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 28px;
+  width: 48px;
+  height: 3px;
+  background: #71e1ee;
+  border-radius: 0 0 3px 3px;
+}
+#dialog.pause-dialog #dialogSymbol,
+#dialog.pause-dialog #dialogExtra { display: none; }
+#dialog.pause-dialog h2 { font-size: 29px; line-height: 1.1; color: #f1fbff; letter-spacing: -.6px; }
+#dialog.pause-dialog p { margin: 0 0 8px; font-size: 12px; line-height: 1.5; color: #bcd9e9; max-width: 290px; }
+#dialog.pause-dialog button {
+  grid-column: 1;
+  min-height: 44px;
+  margin: 0;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 750;
+  transition: transform 110ms ease, opacity 110ms ease;
+}
+#dialog.pause-dialog #dialogPrimary {
+  border: 1px solid #d2c4ff;
+  background: linear-gradient(180deg, #a18afa, #7b60df);
+  box-shadow: 0 3px 0 #453987, inset 0 1px #e4d9ff70;
+  color: white;
+}
+#dialog.pause-dialog #dialogSecondary { border: 1px solid #92c5e059; background: #79c4e00e; color: #e1f4ff; box-shadow: none; }
+#dialog.pause-dialog #dialogMenu { min-height: 36px; padding: 8px 12px; background: transparent; border: 0; color: #afcde0; font-size: 11px; box-shadow: none; }
+#dialog.pause-dialog button:hover:not(:disabled) { transform: translateY(-1px); opacity: .9; }
+#dialog.pause-dialog button:active:not(:disabled) { transform: translateY(2px); opacity: .8; }
+#dialog.pause-dialog button:focus-visible { outline: 2px solid #90efff; outline-offset: 3px; }
+@media (max-width: 700px) {
+  .hud .hud-status { padding-inline: 6px; }
+  .hud .hud-level-chip { gap: 5px; }
+  .hud .hud-level-chip > strong { max-width: 76px; font-size: 9px !important; }
+  .hud .hud-chip { padding-inline: 6px !important; }
+  .hud .life-icon { width: 13px; height: 15px; }
+  .hud .pulse-meter { min-width: 64px !important; }
+  .hud .hud-energy { gap: 3px !important; }
+  .hud .hud-energy .time { min-width: 34px; padding-inline: 1px !important; font-size: 9px !important; }
+  .hud .hud-actions .icon-btn { width: 40px !important; min-width: 40px !important; }
+}
+@media (max-width: 540px) {
+  .hud { gap: 4px !important; }
+  .hud .hud-level-chip > strong { max-width: 49px; }
+  .hud .hud-chip { padding-inline: 4px !important; }
+  .hud .hud-stars { gap: 3px; }
+  .hud .pulse-meter { min-width: 55px !important; }
+  .hud .hud-energy { gap: 1px !important; }
+}
+@media (max-height: 450px) and (orientation: landscape) {
+  #dialog.pause-dialog { width: min(360px, 100%); padding: 18px 24px 12px; gap: 8px; border-radius: 20px; }
+  #dialog.pause-dialog h2 { font-size: 25px; }
+  #dialog.pause-dialog p { margin-bottom: 3px; font-size: 11px; }
+  #dialog.pause-dialog button { min-height: 42px; padding: 9px 12px; }
+  #dialog.pause-dialog #dialogMenu { min-height: 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hud .hud-actions .icon-btn, #dialog.pause-dialog button { transition: none; }
+}
+
+</style>
+<style id="result-help-polish">
+/* Only result, loss/reward and help screens use these rules. */
+#dialog[data-view]:not(.pause-dialog) {
+  position: relative;
+  width: min(390px, 100%);
+  padding: 26px 28px 17px;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr);
+  border: 1px solid #8cd9ec;
+  border-radius: 23px;
+  background: linear-gradient(145deg, #155b7f, #16385f);
+  box-shadow: 0 5px 0 #082d5070, inset 0 1px #d5f9ff30;
+  text-align: left;
+}
+#dialog[data-view]:not(.pause-dialog)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 28px;
+  width: 48px;
+  height: 3px;
+  background: #71e1ee;
+  border-radius: 0 0 3px 3px;
+}
+#dialog[data-view]:not(.pause-dialog) #dialogSymbol { display: none; }
+#dialog[data-view]:not(.pause-dialog) h2 { margin: 0; color: #f1fbff; font-size: 27px; line-height: 1.12; letter-spacing: -.6px; }
+#dialog[data-view]:not(.pause-dialog) p { margin: 0 0 5px; color: #bcd9e9; font-size: 12px; line-height: 1.45; }
+#dialog[data-view]:not(.pause-dialog) button {
+  grid-column: 1;
+  margin: 0;
+  min-height: 44px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 750;
+  transition: transform 110ms ease, opacity 110ms ease;
+}
+#dialog[data-view]:not(.pause-dialog) #dialogPrimary {
+  border: 1px solid #d2c4ff;
+  background: linear-gradient(180deg, #a18afa, #7b60df);
+  box-shadow: 0 3px 0 #453987, inset 0 1px #e4d9ff70;
+  color: #fff;
+}
+#dialog[data-view]:not(.pause-dialog) #dialogSecondary { border: 1px solid #92c5e059; background: #79c4e00e; color: #e1f4ff; box-shadow: none; }
+#dialog[data-view]:not(.pause-dialog) #dialogMenu { min-height: 36px; padding: 8px 12px; background: transparent; border: 0; color: #afcde0; font-size: 11px; box-shadow: none; }
+#dialog[data-view]:not(.pause-dialog) button:hover:not(:disabled) { transform: translateY(-1px); opacity: .9; }
+#dialog[data-view]:not(.pause-dialog) button:active:not(:disabled) { transform: translateY(2px); opacity: .8; }
+#dialog[data-view]:not(.pause-dialog) button:focus-visible { outline: 2px solid #90efff; outline-offset: 3px; }
+#dialog[data-view]:not(.pause-dialog) button:disabled { transform: none; opacity: .5; }
+
+/* Reward uses the approved star shape. Size and composition change here only. */
+#dialog.dialog[data-view="won"]::before { background: #f6d889; }
+#dialog.dialog[data-view="won"] #dialogExtra { display: grid; gap: 12px; }
+#dialog.dialog[data-view="won"] .result-stars { margin: 5px 0 3px !important; min-height: 66px; }
+#dialog.dialog[data-view="won"] .rating-stars.result { gap: 13px; }
+#dialog.dialog[data-view="won"] .rating-star { width: 46px; height: 46px; filter: none; }
+#dialog.dialog[data-view="won"] .rating-star:nth-child(2) { width: 58px; height: 58px; transform: translateY(-4px); }
+#dialog.dialog[data-view="won"] .rating-star.off { opacity: .24; }
+#dialog.dialog[data-view="won"] .result-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 12px 0;
+  border-top: 1px solid #96cfe333;
+  border-bottom: 1px solid #96cfe333;
+  background: #8bdded08;
+}
+#dialog.dialog[data-view="won"] .result-metric { display: grid; justify-items: center; gap: 4px; }
+#dialog.dialog[data-view="won"] .result-metric + .result-metric { border-left: 1px solid #96cfe333; }
+#dialog.dialog[data-view="won"] .result-metric span { color: #bcd9e9; font-size: 10px; }
+#dialog.dialog[data-view="won"] .result-metric strong { color: #f0fbff; font-size: 23px; font-weight: 750; line-height: 1.1; font-variant-numeric: tabular-nums; }
+#dialog.dialog[data-view="won"] .result-metric small { color: #adcde2; font-size: 13px; font-weight: 500; }
+#dialog.dialog[data-view="won"] .result-caption { color: #dbeccf; font-size: 11px; line-height: 1.35; text-align: center; }
+#dialog.dialog[data-view="won"] .unlock-note { margin: 0 0 3px; padding: 7px 9px; background: #64dac010; border: 1px solid #83d9d033; border-radius: 9px; color: #bdeee5; font-size: 10px; line-height: 1.3; text-align: center; }
+
+/* Loss stays calm; the ad remains optional and clearly labelled. */
+#dialog.dialog[data-view="lost"] #dialogExtra:empty { display: none; }
+#dialog.dialog[data-view="lost"] #dialogRewarded {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 13px;
+  background: #3c79932b;
+  border: 1px solid #8dcfda8c;
+  color: #ddfaff;
+  box-shadow: none;
+  text-align: left;
+}
+#dialog.dialog[data-view="lost"] #dialogRewarded[hidden] { display: none; }
+#dialog.dialog[data-view="lost"] .reward-video { width: 23px; height: 23px; flex: none; fill: none; stroke: #a4e8ee; stroke-width: 1.6; stroke-linejoin: round; }
+#dialog.dialog[data-view="lost"] .reward-copy { display: grid; gap: 3px; }
+#dialog.dialog[data-view="lost"] .reward-copy strong { font-size: 12px; font-weight: 750; }
+#dialog.dialog[data-view="lost"] .reward-copy small { font-size: 10px; color: #aacedd; font-weight: 500; }
+#dialog.dialog[data-view="lost"] .reward-gain { margin-left: auto; padding: 5px 7px; border-radius: 7px; background: #8b77db26; color: #e0cfff; font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Short, labelled help blocks keep every control and object explanation. */
+#dialog.dialog[data-view="help"] { width: min(680px, 100%); }
+#dialog.dialog[data-view="help"] .help-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; }
+#dialog.dialog[data-view="help"] .help-item { display: grid; align-content: start; gap: 5px; padding: 9px 0; border-top: 1px solid #9ccde32e; }
+#dialog.dialog[data-view="help"] .help-item strong { color: #abedf2; font-size: 11px; font-weight: 750; line-height: 1.25; }
+#dialog.dialog[data-view="help"] .help-item span { color: #d3e6f0; font-size: 11px; line-height: 1.4; }
+#dialog.dialog[data-view="help"] .help-shortcuts { grid-column: 1 / -1; display: flex; align-items: center; gap: 13px; }
+#dialog.dialog[data-view="help"] #dialogPrimary { justify-self: end; width: min(220px, 100%); }
+
+@media (max-height: 450px) and (orientation: landscape) {
+  #dialog[data-view]:not(.pause-dialog) { padding: 17px 23px 12px; gap: 8px; border-radius: 20px; }
+  #dialog[data-view]:not(.pause-dialog) h2 { font-size: 24px; }
+  #dialog[data-view]:not(.pause-dialog) p { font-size: 11px; margin: 0; }
+  #dialog[data-view]:not(.pause-dialog) button { min-height: 42px; padding: 9px 11px; font-size: 12px; }
+  #dialog[data-view]:not(.pause-dialog) #dialogMenu { min-height: 32px; }
+  #dialog.dialog[data-view="won"] { width: min(600px, 100%); grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 7px 23px; align-items: center; }
+  #dialog.dialog[data-view="won"] h2 { grid-column: 1; grid-row: 1; font-size: 22px; }
+  #dialog.dialog[data-view="won"] #dialogText { grid-column: 1; grid-row: 2; }
+  #dialog.dialog[data-view="won"] #dialogExtra { grid-column: 1; grid-row: 3 / 6; gap: 7px; }
+  #dialog.dialog[data-view="won"] #dialogPrimary { grid-column: 2; grid-row: 3; }
+  #dialog.dialog[data-view="won"] #dialogSecondary { grid-column: 2; grid-row: 4; }
+  #dialog.dialog[data-view="won"] #dialogMenu { grid-column: 2; grid-row: 5; }
+  #dialog.dialog[data-view="won"] .result-stars { min-height: 40px; margin: 0 !important; }
+  #dialog.dialog[data-view="won"] .rating-star { width: 31px; height: 31px; }
+  #dialog.dialog[data-view="won"] .rating-star:nth-child(2) { width: 39px; height: 39px; transform: translateY(-2px); }
+  #dialog.dialog[data-view="won"] .result-metrics { padding: 7px 0; }
+  #dialog.dialog[data-view="won"] .result-metric { gap: 2px; }
+  #dialog.dialog[data-view="won"] .result-metric strong { font-size: 19px; }
+  #dialog.dialog[data-view="won"] .result-caption { font-size: 10px; }
+  #dialog.dialog[data-view="won"] .unlock-note { padding: 5px 7px; font-size: 9px; margin: 0; }
+  #dialog.dialog[data-view="lost"] { width: min(410px, 100%); grid-template-columns: 1fr 1fr; }
+  #dialog.dialog[data-view="lost"] #dialogPrimary, #dialog.dialog[data-view="lost"] #dialogRewarded { grid-column: 1 / -1; }
+  #dialog.dialog[data-view="lost"] #dialogSecondary { grid-column: 1; font-size: 11px; }
+  #dialog.dialog[data-view="lost"] #dialogMenu { grid-column: 2; font-size: 11px; }
+  #dialog.dialog[data-view="lost"] #dialogRewarded { padding: 7px 11px; }
+  #dialog.dialog[data-view="help"] { width: min(680px, 100%); gap: 6px; padding: 13px 21px 11px; }
+  #dialog.dialog[data-view="help"] .help-grid { gap: 5px 15px; }
+  #dialog.dialog[data-view="help"] .help-item { gap: 3px; padding: 5px 0; }
+  #dialog.dialog[data-view="help"] .help-item strong, #dialog.dialog[data-view="help"] .help-item span { font-size: 10px; line-height: 1.3; }
+  #dialog.dialog[data-view="help"] .help-shortcuts { padding: 4px 0; }
+  #dialog.dialog[data-view="help"] #dialogPrimary { min-height: 36px; padding: 8px 11px; }
+}
+@media (max-height: 330px) and (orientation: landscape) {
+  #dialog.dialog[data-view="help"] #dialogText { display: none; }
+  #dialog.dialog[data-view="help"] { padding: 10px 18px; gap: 5px; }
+  #dialog.dialog[data-view="help"] h2 { font-size: 21px; }
+  #dialog.dialog[data-view="help"] .help-grid { gap: 3px 13px; }
+  #dialog.dialog[data-view="help"] .help-item { padding: 4px 0; }
+  #dialog.dialog[data-view="help"] .help-item strong, #dialog.dialog[data-view="help"] .help-item span { font-size: 9.5px; line-height: 1.23; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #dialog[data-view]:not(.pause-dialog) button { transition: none; }
+}
+@media (max-height: 280px) and (orientation: landscape) {
+  #dialog.dialog[data-view="help"] { padding-block: 8px; gap: 4px; }
+  #dialog.dialog[data-view="help"] .help-grid { row-gap: 2px; }
+  #dialog.dialog[data-view="help"] .help-item { padding-block: 3px; }
+}
+
+</style>
 </head>
 <body>
+<svg class="ui-symbols" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="ui-gear" viewBox="0 0 24 24"><path d="m9 3-.7 2.3-2.2 1-2.3-.5-1.5 2.6 1.6 1.8v2.6l-1.6 1.8 1.5 2.6 2.3-.5 2.2 1L9 20h3l.7-2.3 2.2-1 2.3.5 1.5-2.6-1.6-1.8v-2.6l1.6-1.8-1.5-2.6-2.3.5-2.2-1L12 3Z"/><circle cx="10.5" cy="11.5" r="3"/></symbol>
+  <symbol id="ui-language" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18Z"/></symbol>
+  <symbol id="ui-sound" viewBox="0 0 24 24"><path d="m11 4-5 4H3v8h3l5 4ZM15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/></symbol>
+  <symbol id="ui-screen" viewBox="0 0 24 24"><path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6"/></symbol>
+  <symbol id="ui-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 5 2c-2 1-2 1-2 3m0 3h.01"/></symbol>
+</svg>
 <div class="wrap">
   <main class="game-shell" id="game-shell" aria-label="Pulse Ball: Побег — игра">
     <div class="boot-screen" id="bootScreen"><div class="boot-mark"><span class="boot-orb"></span><span>PULSE BALL</span><span class="boot-dots"><i></i><i></i><i></i></span></div></div>
@@ -812,7 +1653,7 @@ img{-webkit-user-drag:none}button{transition:transform .15s,filter .15s}button:f
             <div><small>★</small><strong id="menuRating">0 / 54 ★</strong></div>
           </div>
           <div class="menu-progress"><i id="menuProgressFill"></i></div>
-          <div class="menu-quick"><button class="menu-settings-btn" id="settingsButton" aria-label="Настройки"><span aria-hidden="true">⚙</span><strong id="settingsButtonText">Настройки</strong></button><button class="menu-help-link" id="menuHelpButton">? Как играть</button></div>
+          <div class="menu-quick"><button class="menu-settings-btn" id="settingsButton" aria-label="Настройки"><svg class="ui-icon" aria-hidden="true"><use href="#ui-gear"></use></svg><strong id="settingsButtonText">Настройки</strong></button><button class="menu-help-link" id="menuHelpButton">? Как играть</button></div>
         </div>
       </div>
       <div class="menu-level-picker" id="levelPicker" hidden>
@@ -830,26 +1671,26 @@ img{-webkit-user-drag:none}button{transition:transform .15s,filter .15s}button:f
         <div class="picker-head settings-head">
           <button class="picker-back" id="backSettingsButton" aria-label="Назад"></button>
           <div><p id="settingsEyebrow">ИГРА</p><h2 id="settingsTitle">Настройки</h2></div>
-          <span class="settings-gear" aria-hidden="true">⚙</span>
+          <span class="settings-gear" aria-hidden="true"><svg class="ui-icon" aria-hidden="true"><use href="#ui-gear"></use></svg></span>
         </div>
         <div class="settings-list">
           <section class="settings-row">
-            <div class="settings-icon" aria-hidden="true">◎</div>
+            <div class="settings-icon" aria-hidden="true"><svg class="ui-icon" aria-hidden="true"><use href="#ui-language"></use></svg></div>
             <div class="settings-copy"><strong id="languageTitle">Язык</strong><span id="languageHint">Определяется Яндекс Играми автоматически</span></div>
             <div class="language-switch" aria-label="Язык"><button id="langRuButton">Русский</button><button id="langEnButton">English</button></div>
           </section>
           <section class="settings-row">
-            <div class="settings-icon" aria-hidden="true">♪</div>
+            <div class="settings-icon" aria-hidden="true"><svg class="ui-icon" aria-hidden="true"><use href="#ui-sound"></use></svg></div>
             <div class="settings-copy"><strong id="soundTitle">Звук</strong><span id="soundHint">Музыка и игровые эффекты</span></div>
             <button class="settings-value" id="settingsSoundButton">Включён</button>
           </section>
           <section class="settings-row">
-            <div class="settings-icon" aria-hidden="true">⛶</div>
+            <div class="settings-icon" aria-hidden="true"><svg class="ui-icon" aria-hidden="true"><use href="#ui-screen"></use></svg></div>
             <div class="settings-copy"><strong id="fullscreenTitle">Экран</strong><span id="fullscreenHint">Использовать всё доступное пространство</span></div>
             <button class="settings-value" id="settingsFullscreenButton">На весь экран</button>
           </section>
           <section class="settings-row">
-            <div class="settings-icon" aria-hidden="true">?</div>
+            <div class="settings-icon" aria-hidden="true"><svg class="ui-icon" aria-hidden="true"><use href="#ui-help"></use></svg></div>
             <div class="settings-copy"><strong id="controlsTitle">Управление</strong><span id="controlsHint">Клавиатура и сенсорные кнопки</span></div>
             <button class="settings-value" id="settingsHelpButton">Показать</button>
           </section>
@@ -879,8 +1720,9 @@ img{-webkit-user-drag:none}button{transition:transform .15s,filter .15s}button:f
     <div class="stage" id="stage">
       <canvas id="game" tabindex="0" aria-label="Игра. Стрелки или A и D — движение, пробел — прыжок, E — импульс, P — пауза, R — заново."></canvas>
       <div class="hud">
-        <div class="hud-group"><div class="hud-level-chip"><span id="hudCurrentNumber">01</span><strong id="hudCurrentName">Первый импульс</strong></div><div class="hud-chip hearts" id="hearts" aria-label="3 жизни">♥♥♥</div><div class="hud-chip" aria-label="Собранные звёзды"><span class="star-icon" aria-hidden="true"></span><span id="starCount">0</span><span class="star-divider">/</span><span id="starTotal">15</span></div><div class="hud-chip pulse-meter" id="pulseMeter" aria-label="Импульс готов"><span id="pulseText">PULSE</span><i id="pulseFill"></i></div><div class="hud-chip time" id="timer">00:00</div></div>
-        <div class="hud-group"><button class="icon-btn" id="menuButton" title="Главное меню" aria-label="Главное меню"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="icon-btn" id="restartButton" title="Начать заново (R)" aria-label="Начать заново"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1.5 8M4 4v6h6"/></svg></button><button class="icon-btn" id="pauseButton" title="Пауза (P)" aria-label="Пауза"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button></div>
+        <!-- Progress is integrated into the status group below. -->
+        <div class="hud-group hud-status"><div class="progress-wrap hud-progress-wrap"><span id="progressText">0%</span><div class="level-progress"><i id="progressBar"></i></div><span id="finishGuide">финиш ↗</span></div><div class="hud-level-chip"><span id="hudCurrentNumber">01</span><strong id="hudCurrentName">Первый импульс</strong></div><div class="hud-chip hearts" id="hearts" aria-label="3 жизни"><i class="life-icon" aria-hidden="true"></i><i class="life-icon" aria-hidden="true"></i><i class="life-icon" aria-hidden="true"></i></div><div class="hud-chip hud-stars" aria-label="Собранные звёзды"><span class="star-icon" aria-hidden="true"></span><span id="starCount">0</span><span class="star-divider">/</span><span id="starTotal">15</span></div></div><div class="hud-group hud-energy"><div class="hud-chip pulse-meter" id="pulseMeter" aria-label="Импульс готов"><span class="energy-label" aria-hidden="true">PULSE</span><span id="pulseText">READY</span><i id="pulseFill"></i></div><div class="hud-chip time" id="timer">00:00</div></div>
+        <div class="hud-group hud-actions"><button class="icon-btn" id="menuButton" title="Главное меню" aria-label="Главное меню"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="icon-btn" id="restartButton" title="Начать заново (R)" aria-label="Начать заново"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1.5 8M4 4v6h6"/></svg></button><button class="icon-btn" id="pauseButton" title="Пауза (P)" aria-label="Пауза"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button></div>
       </div>
       <div class="ready-hint" id="readyHint"><p id="readyText">Двигайся, прыгай и используй Pulse!</p><button class="start-btn" id="startButton"><span id="startButtonText">Поехали</span></button></div>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -888,11 +1730,11 @@ img{-webkit-user-drag:none}button{transition:transform .15s,filter .15s}button:f
       <div class="touch-controls" aria-label="Сенсорное управление"><div class="touch-group"><button class="touch-btn move-arrow move-left" data-key="left" aria-label="Двигаться влево"></button><button class="touch-btn move-arrow move-right" data-key="right" aria-label="Двигаться вправо"></button></div><div class="touch-group"><button class="touch-btn pulse" id="pulseButton" data-key="pulse" aria-label="Импульс Pulse">PULSE</button><button class="touch-btn jump move-arrow move-up" data-key="jump" aria-label="Прыгать"></button></div></div>
       <div class="overlay" id="overlay" hidden>
         <div class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
-          <div class="dialog-symbol" id="dialogSymbol" aria-hidden="true">Ⅱ</div><h2 id="dialogTitle">Передышка</h2><p id="dialogText">Приключение подождёт.</p><div id="dialogExtra"></div><button class="start-btn" id="dialogPrimary">Продолжить</button><button class="rewarded-btn" id="dialogRewarded" hidden>▶ Продолжить с 3 жизнями · реклама</button><button class="secondary" id="dialogSecondary">С начала уровня</button><button class="dialog-menu" id="dialogMenu">Главное меню</button>
+          <div class="dialog-symbol" id="dialogSymbol" aria-hidden="true"></div><h2 id="dialogTitle">Пауза</h2><p id="dialogText">Приключение подождёт.</p><div id="dialogExtra"></div><button class="start-btn" id="dialogPrimary">Продолжить</button><button class="rewarded-btn" id="dialogRewarded" hidden>▶ Продолжить с 3 жизнями · реклама</button><button class="secondary" id="dialogSecondary">С начала уровня</button><button class="dialog-menu" id="dialogMenu">Главное меню</button>
         </div>
       </div>
     </div>
-    <div class="game-bottom"><div class="controls-guide"><div class="key-group"><kbd>←</kbd><kbd>→</kbd><span id="guideMove">двигаться</span></div><div class="key-group"><kbd id="jumpKeyLabel">Пробел</kbd><span id="guideJump">прыгать</span></div><div class="key-group"><kbd>E</kbd><span>Pulse</span></div><div class="key-group desktop-only"><kbd>R</kbd><span id="guideRestart">заново</span></div><div class="key-group desktop-only"><kbd>P</kbd><span id="guidePause">пауза</span></div></div><div class="progress-wrap"><span id="progressText">0%</span><div class="level-progress"><i id="progressBar"></i></div><span id="finishGuide">финиш ↗</span></div></div>
+    <div class="game-bottom"><div class="controls-guide"><div class="key-group"><kbd>←</kbd><kbd>→</kbd><span id="guideMove">двигаться</span></div><div class="key-group"><kbd id="jumpKeyLabel">Пробел</kbd><span id="guideJump">прыгать</span></div><div class="key-group"><kbd>E</kbd><span>Pulse</span></div><div class="key-group desktop-only"><kbd>R</kbd><span id="guideRestart">заново</span></div><div class="key-group desktop-only"><kbd>P</kbd><span id="guidePause">пауза</span></div></div></div>
   </main>
 </div>
 <script>
@@ -1182,35 +2024,47 @@ globalThis.PulseBallEngine = (() => {
       play:'Играть',continue:'Продолжить',completed:'пройден',locked:'закрыт',levelLocked:'Сначала пройди предыдущий уровень',record:'РЕКОРД',adventure:'ТВОЁ ПРИКЛЮЧЕНИЕ',lives:'жизни',pulseReady:'Импульс готов',pulseCharging:'Импульс заряжается',
       tutorialMove:'ДВИЖЕНИЕ',tutorialJump:'ПРЫЖОК',tutorialObject:'ТОЛКНИ ЯЩИК',tutorialOrb:'СФЕРА → ПРИЁМНИК',tutorialRelay:'АКТИВИРУЙ RELAY',tutorialBoost:'АКТИВИРУЙ УСКОРИТЕЛЬ',
       orbLaunch:'Сфера летит к приёмнику — попади в кристалл!',orbHit:'Приёмник заряжен — мост включён!',hurtCheckpoint:'Ещё попытка — с контрольной точки!',hurtRetry:'Ничего, попробуем ещё раз!',checkpoint:'Контрольная точка! Здесь безопасно.',shatter:'Блок разрушен!',switchOn:'Переключатель включён. Направь ящик на плиту!',bridgeOn:'Мост активирован!',
-      pausedTitle:'Маленькая передышка',pausedText:'Импульс подождёт. Продолжим, когда будешь готов.',resume:'Продолжить',restartLevel:'С начала уровня',
+      pausedTitle:'Пауза',pausedText:'Продолжим, когда будешь готов.',resume:'Продолжить',restartLevel:'С начала уровня',
       helpTitle:'Как играть',helpText:'Используй Pulse, чтобы открыть путь к финишу.',helpOk:'Всё понятно',
-      lostTitle:'Ещё один разбег?',lostText:'Каждый прыжок — немного опыта. В этот раз точно получится.',retry:'Попробовать снова',levelSelect:'К выбору уровней',
+      lostTitle:'Ещё один разбег?',lostText:'Без спешки. Попробуй ещё раз, когда будешь готов.',retry:'Попробовать снова',levelSelect:'К выбору уровней',
       wonSuffix:' пройден!',collectedA:'Собрано ',collectedB:' из ',starsWord:' звёзд за ',allStars:'Все звёзды твои!',improve:'Можно вернуться и улучшить результат.',unlocked:'Открыт уровень ',next:'Следующий уровень',replay:'Переиграть этот уровень',
       soundOn:'Выключить звук',soundOff:'Включить звук',fullscreenOn:'Выйти из полноэкранного режима',fullscreenOff:'На весь экран',fullscreenFail:'Полный экран недоступен в этом окне',
       finishCaps:'ФИНИШ',receiverCaps:'ПРИЁМНИК',rewardContinue:'▶ Продолжить с 3 жизнями · реклама',adUnavailable:'Реклама сейчас недоступна',soundMenu:'♪ Звук',fullscreenMenu:'⛶ Экран',
-      helpMove:'Движение',helpJump:'Прыжок',helpPulse:'Импульс перед героем: ломает голубые блоки, двигает ящик и включает переключатель. На телефоне — кнопка PULSE',helpPlate:'Плита',helpPlateText:'Поставь на неё импульсный ящик, чтобы включить мост',helpOrb:'Энерго-сфера',helpOrbText:'Используй Pulse рядом со сферой: она летит по стрелке, сбивает врагов и включает приёмник',helpFlag:'Белый флаг',helpFlagText:'Контрольная точка',helpPR:'Пауза / начать заново'
+      helpMove:'Движение',helpJump:'Прыжок',helpPulse:'Импульс вперёд ломает голубые блоки, двигает ящик, включает переключатель. На телефоне — PULSE.',helpPlate:'Плита',helpPlateText:'Поставь на неё импульсный ящик, чтобы включить мост',helpOrb:'Энерго-сфера',helpOrbText:'Используй Pulse рядом со сферой: она летит по стрелке, сбивает врагов и включает приёмник',helpFlag:'Белый флаг',helpFlagText:'Контрольная точка',helpPR:'Пауза / начать заново'
     },
     en:{
       title:'Pulse Ball: Escape',menuTitle:'Escape!',menuTagline:'Roll. Jump. Fire your Pulse.',levels:'Choose level',progress:'Progress',how:'? How to play',pickerEyebrow:'LEVEL SELECT',pickerTitle:'Where next?',nextLevel:'NEXT LEVEL',featureLevels:'18 LEVELS',featureStars:'STARS',settings:'Settings',settingsEyebrow:'GAME',language:'Language',languageHint:'Detected automatically from Yandex Games',soundTitle:'Sound',soundHint:'Music and game effects',soundEnabled:'On',soundDisabled:'Off',screenTitle:'Screen',screenHint:'Use all available space',controlsTitle:'Controls',controlsHint:'Keyboard and touch buttons',show:'Show',settingsNote:'The game detects the Yandex Games language on first launch. A language selected manually is saved on this device.',rotateTitle:'Rotate your device',rotateText:'The game is optimized for landscape mode',ready:'Move, jump and use Pulse!',go:'Go',move:'move',jump:'jump',restart:'restart',pause:'pause',finish:'finish ↗',space:'Space',
       play:'Play',continue:'Continue',completed:'cleared',locked:'locked',levelLocked:'Clear the previous level first',record:'BEST',adventure:'YOUR RUN',lives:'lives',pulseReady:'Pulse ready',pulseCharging:'Pulse charging',
       tutorialMove:'MOVE',tutorialJump:'JUMP',tutorialObject:'PUSH THE CRATE',tutorialOrb:'ORB → RECEIVER',tutorialRelay:'ACTIVATE RELAY',tutorialBoost:'HIT THE BOOST PAD',
       orbLaunch:'The orb is heading for the receiver — hit the crystal!',orbHit:'Receiver charged — bridge online!',hurtCheckpoint:'One more try — back to the checkpoint!',hurtRetry:'Almost. Try again!',checkpoint:'Checkpoint reached!',shatter:'Block shattered!',switchOn:'Switch on. Push the crate onto the plate!',bridgeOn:'Bridge activated!',
-      pausedTitle:'Quick break',pausedText:'The Pulse can wait. Continue when you are ready.',resume:'Continue',restartLevel:'Restart level',
+      pausedTitle:'Pause',pausedText:'Continue whenever you’re ready.',resume:'Continue',restartLevel:'Restart level',
       helpTitle:'How to play',helpText:'Use Pulse to open the path to the finish.',helpOk:'Got it',
-      lostTitle:'One more run?',lostText:'Every jump gets you closer. Try it again.',retry:'Try again',levelSelect:'Level select',
+      lostTitle:'One more run?',lostText:'Take your time. Try again whenever you’re ready.',retry:'Try again',levelSelect:'Level select',
       wonSuffix:' cleared!',collectedA:'Collected ',collectedB:' of ',starsWord:' stars in ',allStars:'All stars collected!',improve:'You can replay and improve your result.',unlocked:'Unlocked level ',next:'Next level',replay:'Replay this level',
       soundOn:'Mute sound',soundOff:'Enable sound',fullscreenOn:'Exit fullscreen',fullscreenOff:'Fullscreen',fullscreenFail:'Fullscreen is unavailable here',
       finishCaps:'FINISH',receiverCaps:'RECEIVER',rewardContinue:'▶ Continue with 3 hearts · ad',adUnavailable:'Ad is not available right now',soundMenu:'♪ Sound',fullscreenMenu:'⛶ Fullscreen',
-      helpMove:'Move',helpJump:'Jump',helpPulse:'Pulse in front of the hero: breaks blue blocks, pushes crates and activates switches. On mobile, use the PULSE button',helpPlate:'Plate',helpPlateText:'Push a pulse crate onto it to activate the bridge',helpOrb:'Energy orb',helpOrbText:'Use Pulse near an orb: it flies along its arrow, defeats enemies and charges a receiver',helpFlag:'White flag',helpFlagText:'Checkpoint',helpPR:'Pause / restart'
+      helpMove:'Move',helpJump:'Jump',helpPulse:'Forward pulse breaks blue blocks, pushes crates and activates switches. On mobile, tap PULSE.',helpPlate:'Plate',helpPlateText:'Push a pulse crate onto it to activate the bridge',helpOrb:'Energy orb',helpOrbText:'Use Pulse near an orb: it flies along its arrow, defeats enemies and charges a receiver',helpFlag:'White flag',helpFlagText:'Checkpoint',helpPR:'Pause / restart'
     }
   };
   Object.assign(I18N.ru,{chapter:'ГЛАВА',back:'Назад',forward:'Вперёд',mainMenu:'Главное меню',nextAdventure:'ТВОЙ СЛЕДУЮЩИЙ ШАГ',newRun:'Новый маршрут',bestTime:'Лучшее время',starsLabel:'Звёзды',moveLeft:'Двигаться влево',moveRight:'Двигаться вправо',soundHint:'Игровые звуковые эффекты',rewardContinue:'▶ СМОТРЕТЬ РЕКЛАМУ · +3 жизни',chapterNames:['Зелёная долина','Небесные высоты','Резонанс','Энергия сферы','Солнечные сады','Пик энергии']});
   Object.assign(I18N.en,{chapter:'CHAPTER',back:'Back',forward:'Next',mainMenu:'Main menu',nextAdventure:'YOUR NEXT ADVENTURE',newRun:'New adventure',bestTime:'Best time',starsLabel:'Stars',moveLeft:'Move left',moveRight:'Move right',soundHint:'Game sound effects',rewardContinue:'▶ WATCH AD · +3 lives',chapterNames:['Green Valley','Sky Heights','Resonance','Orb Energy','Sunlit Gardens','Energy Peak']});
+  // Labels used only by the result and optional-ad presentation.
+  Object.assign(I18N.ru,{completeTitle:'Уровень пройден!',resultTime:'Время',resultRating:'Рейтинг',watchAd:'Смотреть рекламу',rewardHint:'Продолжить с 3 жизнями',rewardGain:'+3 жизни',replay:'Переиграть'});
+  Object.assign(I18N.en,{completeTitle:'Level complete!',resultTime:'Time',resultRating:'Rating',watchAd:'Watch ad',rewardHint:'Continue with 3 lives',rewardGain:'+3 lives',replay:'Replay'});
   let selectedChapter=0;
   const chapterSymbols=['↟','↑','ϟ','◈','✿','★'];
   const tr=k=>I18N[lang]?.[k]??I18N.ru[k]??k;
   const levelDisplayName=i=>lang==='ru'?E.levels[i].name:(LEVEL_NAMES_EN[i]||E.levels[i].name);
-  function helpHtml(){return '<div class="help-list"><strong>← → / A D</strong><span>'+tr('helpMove')+'</span><strong>↑ W / '+tr('space')+'</strong><span>'+tr('helpJump')+'</span><strong>E</strong><span>'+tr('helpPulse')+'</span><strong>'+tr('helpPlate')+'</strong><span>'+tr('helpPlateText')+'</span><strong>'+tr('helpOrb')+'</strong><span>'+tr('helpOrbText')+'</span><strong>'+tr('helpFlag')+'</strong><span>'+tr('helpFlagText')+'</span><strong>P / R</strong><span>'+tr('helpPR')+'</span></div>';}
+  function helpHtml(){
+    return '<div class="help-grid">'+
+      '<div class="help-item"><strong>← → / A D</strong><span>'+tr('helpMove')+'</span></div>'+
+      '<div class="help-item"><strong>↑ W / '+tr('space')+'</strong><span>'+tr('helpJump')+'</span></div>'+
+      '<div class="help-item"><strong>E · PULSE</strong><span>'+tr('helpPulse')+'</span></div>'+
+      '<div class="help-item"><strong>'+tr('helpOrb')+'</strong><span>'+tr('helpOrbText')+'</span></div>'+
+      '<div class="help-item"><strong>'+tr('helpPlate')+'</strong><span>'+tr('helpPlateText')+'</span></div>'+
+      '<div class="help-item"><strong>'+tr('helpFlag')+'</strong><span>'+tr('helpFlagText')+'</span></div>'+
+      '<div class="help-item help-shortcuts"><strong>P / R</strong><span>'+tr('helpPR')+'</span></div></div>';
+  }
   function applyStaticLanguage(){
     document.documentElement.lang=lang;document.title=tr('title');
     $('game-shell').setAttribute('aria-label',tr('title'));
@@ -1771,11 +2625,11 @@ globalThis.PulseBallEngine = (() => {
   function formatTime(seconds){const n=Math.floor(seconds);return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');}
   let hudCache={health:-1,stars:-1,total:-1,time:'',pulsePct:-1,pulseText:'',pulseReady:null,progress:-1};
   function updateHud(){
-    if(hudCache.health!==g.health){hudCache.health=g.health;$('hearts').innerHTML='♥'.repeat(g.health)+'<span class="empty-heart">'+'♥'.repeat(3-g.health)+'</span>';$('hearts').setAttribute('aria-label',g.health+' '+tr('lives'));}
+    if(hudCache.health!==g.health){hudCache.health=g.health;$('hearts').innerHTML='<i class="life-icon" aria-hidden="true"></i>'.repeat(g.health)+'<i class="life-icon empty-heart" aria-hidden="true"></i>'.repeat(3-g.health);$('hearts').setAttribute('aria-label',g.health+' '+tr('lives'));}
     if(hudCache.stars!==g.collected){hudCache.stars=g.collected;$('starCount').textContent=g.collected;}
     if(hudCache.total!==g.stars.length){hudCache.total=g.stars.length;$('starTotal').textContent=g.stars.length;}
     const time=formatTime(g.time);if(hudCache.time!==time){hudCache.time=time;$('timer').textContent=time;}
-    const charge=Math.max(0,Math.min(1,1-g.pulseCooldown/.58)),pulsePct=Math.round(charge*50)*2,pulseReady=charge>=.999,pulseText=pulseReady?'PULSE':Math.ceil(g.pulseCooldown*10)/10+(lang==='ru'?'с':'s');
+    const charge=Math.max(0,Math.min(1,1-g.pulseCooldown/.58)),pulsePct=Math.round(charge*50)*2,pulseReady=charge>=.999,pulseText=pulseReady?'READY':Math.ceil(g.pulseCooldown*10)/10+(lang==='ru'?'с':'s');
     if(hudCache.pulsePct!==pulsePct){hudCache.pulsePct=pulsePct;$('pulseFill').style.width=pulsePct+'%';}
     if(hudCache.pulseReady!==pulseReady){hudCache.pulseReady=pulseReady;$('pulseMeter').classList.toggle('cooling',!pulseReady);$('pulseMeter').setAttribute('aria-label',pulseReady?tr('pulseReady'):tr('pulseCharging'));$('pulseButton').classList.toggle('cooling',!pulseReady);}
     if(hudCache.pulseText!==pulseText){hudCache.pulseText=pulseText;$('pulseText').textContent=pulseText;}
@@ -1796,16 +2650,18 @@ globalThis.PulseBallEngine = (() => {
   }
   function openDialog(kind){
     clearInput();hideTutorial(true);globalThis.YandexPlatform?.gameplayStop?.();dialogKind=kind;mode=kind;$('dialogMenu').textContent=tr('mainMenu');$('dialogMenu').hidden=kind==='help';$('menuScreen').hidden=true;$('readyHint').hidden=true;$('overlay').hidden=false;$('dialogExtra').innerHTML='';$('dialogSecondary').hidden=false;$('dialogRewarded').hidden=true;$('dialogRewarded').disabled=false;
-    if(kind==='paused'){$('dialogSymbol').textContent='Ⅱ';$('dialogTitle').textContent=tr('pausedTitle');$('dialogText').textContent=tr('pausedText');$('dialogPrimary').textContent=tr('resume');$('dialogSecondary').textContent=tr('restartLevel');}
+    $('dialog').classList.toggle('pause-dialog',kind==='paused');
+    $('dialog').dataset.view=kind;
+    if(kind==='paused'){$('dialogSymbol').textContent='';$('dialogTitle').textContent=tr('pausedTitle');$('dialogText').textContent=tr('pausedText');$('dialogPrimary').textContent=tr('resume');$('dialogSecondary').textContent=tr('restartLevel');}
     if(kind==='help'){$('dialogSymbol').textContent='↟';$('dialogTitle').textContent=tr('helpTitle');$('dialogText').textContent=tr('helpText');$('dialogExtra').innerHTML=helpHtml();$('dialogPrimary').textContent=tr('helpOk');$('dialogSecondary').hidden=true;}
-    if(kind==='lost'){lossesSinceAd++;$('dialogSymbol').textContent='↻';$('dialogTitle').textContent=tr('lostTitle');$('dialogText').textContent=tr('lostText');$('dialogPrimary').textContent=tr('retry');$('dialogSecondary').textContent=tr('levelSelect');if(globalThis.YandexPlatform?.connected){$('dialogRewarded').hidden=false;$('dialogRewarded').textContent=tr('rewardContinue');}}
+    if(kind==='lost'){lossesSinceAd++;$('dialogSymbol').textContent='↻';$('dialogTitle').textContent=tr('lostTitle');$('dialogText').textContent=tr('lostText');$('dialogPrimary').textContent=tr('retry');$('dialogSecondary').textContent=tr('levelSelect');if(globalThis.YandexPlatform?.connected){$('dialogRewarded').hidden=false;$('dialogRewarded').innerHTML='<svg class="reward-video" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="4"/><path d="m10 8 6 4-6 4Z"/></svg><span class="reward-copy"><strong>'+tr('watchAd')+'</strong><small>'+tr('rewardHint')+'</small></span><span class="reward-gain" aria-hidden="true">'+tr('rewardGain')+'</span>';}}
     if(kind==='won'){
       const all=g.collected===g.stars.length,rating=all?3:g.collected>=Math.ceil(g.stars.length/2)?2:1;
       const wasUnlocked=unlocked;
-      $('dialogSymbol').textContent='';$('dialogTitle').textContent=levelDisplayName(g.index)+tr('wonSuffix');$('dialogText').textContent=tr('collectedA')+g.collected+tr('collectedB')+g.stars.length+tr('starsWord')+formatTime(g.time)+'. '+(all?tr('allStars'):tr('improve'));
+      $('dialogSymbol').textContent='';$('dialogTitle').textContent=tr('completeTitle');$('dialogText').textContent=levelDisplayName(g.index);
       const unlocksNext=g.index<E.levels.length-1&&g.index>=wasUnlocked;
       if(unlocksNext)unlocked=Math.min(E.levels.length-1,g.index+1);
-      $('dialogExtra').innerHTML='<div class="result-stars">'+ratingStarsHtml(rating,'result')+'</div>'+(unlocksNext?'<div class="unlock-note">'+tr('unlocked')+String(g.index+2).padStart(2,'0')+' · '+levelDisplayName(g.index+1)+'</div>':'');
+      $('dialogExtra').innerHTML='<div class="result-stars" role="img" aria-label="'+tr('resultRating')+': '+rating+' / 3">'+ratingStarsHtml(rating,'result')+'</div><div class="result-metrics"><div class="result-metric"><span>'+tr('starsLabel')+'</span><strong>'+g.collected+' <small>/ '+g.stars.length+'</small></strong></div><div class="result-metric"><span>'+tr('resultTime')+'</span><strong>'+formatTime(g.time)+'</strong></div></div><div class="result-caption">'+(all?tr('allStars'):tr('improve'))+'</div>'+(unlocksNext?'<div class="unlock-note">'+tr('unlocked')+String(g.index+2).padStart(2,'0')+' · '+levelDisplayName(g.index+1)+'</div>':'');
       $('dialogPrimary').textContent=g.index<E.levels.length-1?tr('next'):tr('levelSelect');$('dialogSecondary').textContent=tr('replay');
       const old=recordFor(g.index);
       const stars=Math.max(g.collected,Number.isFinite(old?.stars)?old.stars:0),time=Math.min(g.time,Number.isFinite(old?.time)?old.time:Infinity);
