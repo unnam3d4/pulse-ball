@@ -715,6 +715,35 @@ img{-webkit-user-drag:none}button{transition:transform .15s,filter .15s}button:f
   .touch-btn.pulse{width:76px!important}
   .touch-btn.jump{width:64px!important}
 }
+
+/* ===== Mobile control icon polish ===== */
+.touch-btn.move-arrow{
+  position:relative;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  font-size:0!important;
+  line-height:0!important;
+}
+.touch-btn.move-arrow::before{
+  content:"";
+  display:block;
+  width:17px;
+  height:17px;
+  border:solid currentColor;
+  border-width:0 4px 4px 0;
+  filter:drop-shadow(0 1px 2px #12344d55);
+}
+.touch-btn.move-left::before{transform:rotate(135deg) translate(-1px,-1px)}
+.touch-btn.move-right::before{transform:rotate(-45deg) translate(-1px,-1px)}
+.touch-btn.move-up::before{transform:rotate(-135deg) translate(-1px,-1px)}
+@media(pointer:coarse) and (orientation:landscape){
+  .touch-btn.move-arrow::before{
+    width:19px;
+    height:19px;
+    border-width:0 4px 4px 0;
+  }
+}
 </style>
 
 </head>
@@ -823,7 +852,7 @@ img{-webkit-user-drag:none}button{transition:transform .15s,filter .15s}button:f
       <div class="ready-hint" id="readyHint"><p id="readyText">Двигайся, прыгай и используй Pulse!</p><button class="start-btn" id="startButton"><span id="startButtonText">Поехали</span></button></div>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
       <div class="tutorial" id="tutorial" role="status" aria-live="polite" hidden></div>
-      <div class="touch-controls" aria-label="Сенсорное управление"><div class="touch-group"><button class="touch-btn" data-key="left" aria-label="Двигаться влево">←</button><button class="touch-btn" data-key="right" aria-label="Двигаться вправо">→</button></div><div class="touch-group"><button class="touch-btn pulse" id="pulseButton" data-key="pulse" aria-label="Импульс Pulse">PULSE</button><button class="touch-btn jump" data-key="jump" aria-label="Прыгать">↑</button></div></div>
+      <div class="touch-controls" aria-label="Сенсорное управление"><div class="touch-group"><button class="touch-btn move-arrow move-left" data-key="left" aria-label="Двигаться влево"></button><button class="touch-btn move-arrow move-right" data-key="right" aria-label="Двигаться вправо"></button></div><div class="touch-group"><button class="touch-btn pulse" id="pulseButton" data-key="pulse" aria-label="Импульс Pulse">PULSE</button><button class="touch-btn jump move-arrow move-up" data-key="jump" aria-label="Прыгать"></button></div></div>
       <div class="overlay" id="overlay" hidden>
         <div class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
           <div class="dialog-symbol" id="dialogSymbol" aria-hidden="true">Ⅱ</div><h2 id="dialogTitle">Передышка</h2><p id="dialogText">Приключение подождёт.</p><div id="dialogExtra"></div><button class="start-btn" id="dialogPrimary">Продолжить</button><button class="rewarded-btn" id="dialogRewarded" hidden>▶ Продолжить с 3 жизнями · реклама</button><button class="secondary" id="dialogSecondary">С начала уровня</button><button class="dialog-menu" id="dialogMenu">Главное меню</button>
