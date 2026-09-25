@@ -1861,7 +1861,7 @@ globalThis.PulseBallEngine = (() => {
       crates:level.crates.map((a,i)=>({x:a[0],y:a[1],w:44,h:44,vy:0,pulse:a[2]==='pulse',bounds:level.crateBounds?.[i]})),
       breakables:level.breakables.map(a=>({x:a[0],y:a[1],w:a[2],h:a[3],broken:false})),
       extraSwitches:(level.extraSwitches||[]).map(a=>({x:a.x,bridge:a.bridge,on:false})),
-      enemies:level.enemies.map(a=>{const type=a[4]||'patrol',drone=type==='drone',y=drone?350:460;return {x:a[0],y,baseY:y,w:type==='heavy'?46:drone?40:38,h:type==='heavy'?46:drone?34:40,min:a[1],max:a[2],speed:a[3],type,dir:-1,dead:false,alert:0,phase:(a[0]%997)/997*Math.PI*2,vx:0};}),
+      enemies:level.enemies.map(a=>{const type=a[4]||'patrol',drone=type==='drone',y=drone?340:460;return {x:a[0],y,baseY:y,w:type==='heavy'?46:drone?40:38,h:type==='heavy'?46:drone?34:40,min:a[1],max:a[2],speed:a[3],type,dir:-1,dead:false,alert:0,phase:(a[0]%997)/997*Math.PI*2,vx:0};}),
       stars:level.stars.map(a=>({x:a[0],y:a[1],taken:false})),
       spikes:level.spikes.map(a=>({x:a[0],y:438,w:a[1],h:42,hitX:a[0]+6,hitY:458,hitW:Math.max(6,a[1]-12),hitH:18}))};
   }
@@ -1949,7 +1949,7 @@ globalThis.PulseBallEngine = (() => {
       if(enemy.dead)continue;
       enemy.alert=Math.max(0,(enemy.alert||0)-dt);let speed=enemy.speed;
       if(enemy.type==='heavy')speed*=.68;
-      if(enemy.type==='drone'){speed*=.9;enemy.y=enemy.baseY+Math.sin(g.time*2.8+enemy.phase)*32;}
+      if(enemy.type==='drone'){speed*=.9;enemy.y=enemy.baseY+Math.sin(g.time*2.8+enemy.phase)*28;}
       if(enemy.type==='charger'&&Math.abs(p.x-enemy.x)<320&&Math.abs(p.y-enemy.y)<95){enemy.dir=p.x>=enemy.x?1:-1;speed*=1.85;enemy.alert=.18;}
       enemy.vx=enemy.dir*speed;enemy.x+=enemy.vx*dt;
       if(enemy.x<enemy.min){enemy.x=enemy.min;enemy.dir=1;}if(enemy.x>enemy.max){enemy.x=enemy.max;enemy.dir=-1;}enemy.vx=enemy.dir*speed;
