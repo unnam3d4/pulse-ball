@@ -115,3 +115,14 @@ test('legacy under-platform rails and ghost bridge stripes are removed',()=>{
   assert.ok(!html.includes("rgba(86,219,242,.16)"));
   assert.ok(!html.includes("rgba(224,252,255,.42)"));
 });
+
+
+test('campaign checkpoints stay safe across trap timing phases',()=>{
+  for(let i=5;i<18;i++)for(const phase of [0,.8,1.6,2.4]){
+    const g=E.createGame(i);g.time=phase;g.spawn={x:g.level.checkpoint,y:440};g.checkpoint.active=true;
+    Object.assign(g.player,{x:g.level.checkpoint,y:440,vx:0,vy:0,invincible:0,grounded:false});
+    for(let f=0;f<240&&g.status==='playing';f++)E.step(g,{},1/120);
+    assert.equal(g.health,3,'level '+(i+1)+' checkpoint unsafe at phase '+phase);
+    assert.equal(g.status,'playing','level '+(i+1)+' checkpoint caused a loss');
+  }
+});
