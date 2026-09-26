@@ -2261,7 +2261,7 @@ globalThis.PulseBallEngine = (() => {
       }
       if(Math.abs(m.vx)>1){m.x+=m.vx*dt;m.vx*=Math.pow(.25,dt);}
       if(m.pulsed&&g.boss&&g.boss.active&&!g.boss.defeated&&Math.abs(m.x-g.boss.x)<78&&Math.abs(m.y-g.boss.y)<105){m.exploded=true;m.vx=0;damageBoss(g,'mine');g.events.push({type:'mineBlast',x:m.x,y:m.y});continue;}
-      if(!m.armed&&Math.abs(p.x-m.x)<105&&Math.abs(p.y-m.y)<75)m.armed=m.fuse||.72;
+      if(!m.armed&&Math.abs(p.x-m.x)<105&&Math.abs(p.y-m.y)<75){m.armed=m.fuse||.72;g.events.push({type:'mineArm',x:m.x,y:m.y});}
       if(m.armed>0){m.armed-=dt;if(m.armed<=0){m.exploded=true;g.events.push({type:'mineBlast',x:m.x,y:m.y});const dx=p.x-m.x,dy=p.y-m.y;if(dx*dx+dy*dy<82*82)damage(g);}}
     }
     for(const pd of g.pendulums){
@@ -2269,7 +2269,8 @@ globalThis.PulseBallEngine = (() => {
       const dx=p.x-pd.bx,dy=p.y-pd.by;if(dx*dx+dy*dy<(r+pd.r-4)*(r+pd.r-4))damage(g);
     }
     for(const t of g.turrets){
-      t.cooldown-=dt;t.shotFlash=Math.max(0,(t.shotFlash||0)-dt);
+      const prevCooldown=t.cooldown;t.cooldown-=dt;t.shotFlash=Math.max(0,(t.shotFlash||0)-dt);
+      if(prevCooldown>.28&&t.cooldown<=.28&&Math.abs(p.x-t.x)<720)g.events.push({type:'turretCharge',x:t.x,y:t.y-20});
       if(t.cooldown<=0&&Math.abs(p.x-t.x)<720){
         const dir=p.x>=t.x?1:-1,dy=Math.max(-110,Math.min(110,p.y-(t.y-20))),shotSpeed=t.projectileSpeed||390;
         g.projectiles.push({x:t.x+dir*48,y:t.y-20,vx:dir*shotSpeed,vy:dy*.72,life:2.4,kind:'energy'});
@@ -2449,7 +2450,7 @@ globalThis.PulseBallEngine = (() => {
         if(group===1&&s.trapDisabled)continue;
         if(p.x+r-3<=s.x||p.x-r+3>=s.x+s.w)continue;
         if(oldY+r<=s.y+3&&p.y+r>=s.y&&p.vy>=0) {
-          if(p.vy>100){p.squash=.16;g.events.push({type:'land',x:p.x,y:s.y});}
+          if(p.vy>100){p.squash=.16;g.events.push({type:'land',x:p.x,y:s.y,speed:p.vy});}
           p.y=s.y-r;p.vy=0;p.grounded=true;p.boosted=false;if(s.moving)p.x+=s.dx;if(s.trapKind==='fall'&&s.fallTimer===0)s.fallTimer=.001;if(s.trapKind==='crumble'&&s.crumbleTimer===0)s.crumbleTimer=.001;
         } else if(!s.moving&&!s.oneWay&&oldY-r>=s.y+s.h-2&&p.y-r<s.y+s.h&&p.vy<0){p.y=s.y+s.h+r;p.vy=40;}
         else if(s.h>100&&p.y+r>s.y+4&&p.y-r<s.y+s.h&&p.x+r>s.x&&p.x-r<s.x+s.w) {p.x=oldX<s.x?s.x-r:s.x+s.w+r;p.vx=0;}
@@ -2463,7 +2464,7 @@ globalThis.PulseBallEngine = (() => {
       const tt=(p.x-slope.x1)/dx;if(tt<0||tt>1)continue;
       const surface=slope.y1+(slope.y2-slope.y1)*tt,foot=p.y+r;
       if(p.vy>=0&&oldY+r<=surface+12&&foot>=surface-4&&foot<=surface+18){
-        if(p.vy>100){p.squash=.12;g.events.push({type:'land',x:p.x,y:surface});}
+        if(p.vy>100){p.squash=.12;g.events.push({type:'land',x:p.x,y:surface,speed:p.vy});}
         p.y=surface-r;p.vy=0;p.grounded=true;p.boosted=false;rampSlope=(slope.y2-slope.y1)/dx;
       }
     }
@@ -3863,7 +3864,7 @@ globalThis.PulseBallEngine = (() => {
     const gain=musicGain,now=audio.currentTime;gain.gain.cancelScheduledValues(now);gain.gain.setValueAtTime(.0001,now);gain.gain.linearRampToValueAtTime(track.volume,now+.38);
     src.connect(gain);src.start(now+.015,0);musicSource=src;musicKey=key;
   }
-  function setMusic(key){musicWanted=key;if(sound)syncMusic(key);}
+  function setMusic(key){musicWanted=key;if(sound&&audio)syncMusic(key);}
   function unlockAudio(){
     if(!sound||pauseReasons.size||adPending||document.hidden)return;
     try{
@@ -3910,7 +3911,7 @@ globalThis.PulseBallEngine = (() => {
       if(e.type==='boost'){burst(e.x,e.y,'#8cf0ff',6);tone(240,.075,'sine',0,.025);tone(520,.12,'triangle',.025,.022);tone(900,.15,'sine',.065,.016);noiseBurst(.07,.007,0,600,5200);}
       if(e.type==='star'){burst(e.x,e.y,'#f6cf65',8,true);feedback('star',e.x,e.y,'#fff0a0');const n=(g.collected%5);tone(760+n*55,.10,'sine',0,.024,Math.random()*24-12);tone(1140+n*70,.13,'sine',.045,.018);}
       else if(e.type==='jump'){burst(e.x,e.y,'#eff0d2',5);tone(280,.065,'triangle',0,.018,Math.random()*40-20);tone(510,.075,'sine',.025,.012);}
-      else if(e.type==='land'){burst(e.x,e.y,'#e7d4a1',4);impactSound(Math.min(1,.55+Math.abs(g.player.vy)/900),145);}
+      else if(e.type==='land'){burst(e.x,e.y,'#e7d4a1',4);impactSound(Math.min(1,.48+Math.abs(e.speed||0)/900),145);}
       else if(e.type==='stomp'){burst(e.x,e.y,'#8de8dc',9);feedback('enemy',e.x,e.y-5,'#d7fff7',g.player.face||1);impactSound(1,125);tone(460,.09,'triangle',.025,.017);}
       else if(e.type==='hurt'){burst(e.x,e.y,'#f08064',12);shake=6;impactSound(1.15,105);tone(190,.16,'sawtooth',.01,.014);duckMusic(.58,.18);if(g.health>0)toast(g.checkpoint.active?tr('hurtCheckpoint'):tr('hurtRetry'));}
       else if(e.type==='checkpoint'){toast(tr('checkpoint'));burst(e.x,e.y+28,'#9cf6ff',8,true);feedback('checkpoint',e.x,458,'#91f4ff');tone(520,.12,'sine',0,.022);tone(690,.14,'sine',.08,.022);tone(920,.19,'sine',.16,.019);}
@@ -3919,7 +3920,9 @@ globalThis.PulseBallEngine = (() => {
       else if(e.type==='push'){const enemyHit=g.enemies.some(enemy=>!enemy.dead&&Math.abs(enemy.x-e.x)<34&&Math.abs(enemy.y-e.y)<48);burst(e.x,e.y,enemyHit?'#a8f7ef':'#62e8ff',enemyHit?5:6);if(enemyHit){feedback('enemy',e.x,e.y-4,'#d8fff9',g.player.face||1);impactSound(.55,220);}}
       else if(e.type==='switch'){toast(tr('switchOn'));burst(e.x,e.y-12,'#91f4ff',5);feedback('switch',e.x,e.y-19,'#b9ffff');tone(410,.07,'square',0,.012);tone(760,.16,'sine',.035,.021);}
       else if(e.type==='bridge'){toast(tr('bridgeOn'));burst(e.x,e.y,'#77ecf5',11);feedback('switch',e.x,e.y-6,'#9ff7ff');tone(180,.13,'triangle',0,.018);tone(650,.20,'sine',.06,.020);}
+      else if(e.type==='turretCharge'){tone(540,.06,'sine',0,.010);tone(760,.08,'sine',.055,.009);}
       else if(e.type==='turretShot'){tone(760,.045,'square',0,.010,-40);tone(310,.08,'triangle',.008,.019);noiseBurst(.055,.011,0,900,7000);}
+      else if(e.type==='mineArm'){tone(620,.055,'square',0,.008);tone(820,.055,'square',.075,.007);}
       else if(e.type==='mineBlast'){impactSound(1.25,92);tone(260,.13,'sawtooth',.01,.015);noiseBurst(.15,.022,0,80,2600);duckMusic(.50,.20);}
       else if(e.type==='wormWarning'){tone(82,.25,'sine',0,.018);noiseBurst(.22,.010,0,45,720);}
       else if(e.type==='wormErupt'){impactSound(1.15,80);noiseBurst(.18,.020,0,60,1900);}
