@@ -2373,7 +2373,7 @@ globalThis.PulseBallEngine = (() => {
   const overlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
   const relayVelocity={up:[0,-860],right:[325,-760],left:[-325,-760],east:[325,-100],west:[-325,-100]};
   function pulse(g){
-    const p=g.player,superPulse=(g.superCharge||0)>=100,reach=superPulse?275:145;
+    const p=g.player,superPulse=g.expansionEnabled!==false&&(g.superCharge||0)>=100,reach=superPulse?275:145;
     g.pulseCooldown=superPulse?.72:.58;g.pulseEffect=.24;
     if(superPulse){g.superCharge=0;g.superPulseEffect=.42;g.events.push({type:'superPulse',x:p.x,y:p.y,dir:p.face});}
     else g.events.push({type:'pulse',x:p.x,y:p.y});
