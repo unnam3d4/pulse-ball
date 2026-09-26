@@ -126,3 +126,19 @@ test('campaign checkpoints stay safe across trap timing phases',()=>{
     assert.equal(g.status,'playing','level '+(i+1)+' checkpoint caused a loss');
   }
 });
+
+
+test('turret shots spawn from the muzzle with a visible flash and readable speed',()=>{
+  const g=E.createGame(12),t=g.turrets[0];
+  assert.ok(t,'level 13 turret missing');
+  Object.assign(g.player,{x:t.x+320,y:418,vx:0,vy:0,invincible:10});
+  t.cooldown=0;
+  E.step(g,{},1/120);
+  assert.ok(g.projectiles.length>0,'turret did not create a projectile');
+  const q=g.projectiles[0];
+  assert.ok(Math.abs(q.y-(t.y-20))<5,'projectile does not leave the visible muzzle');
+  assert.ok(Math.hypot(q.vx,q.vy)>=380,'turret projectile speed unexpectedly changed');
+  assert.ok(t.shotFlash>0,'muzzle flash was not triggered');
+  assert.ok(html.includes('function drawEnergyProjectile(q)'),'high-visibility projectile renderer missing');
+  assert.ok(html.includes("ctx.strokeStyle='#ffc45f'"),'projectile trail highlight missing');
+});
