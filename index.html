@@ -2008,11 +2008,12 @@ globalThis.PulseBallEngine = (() => {
     10:{conveyor:[[.52,-1]],electric:[.67],saw:[.77],spider:[[.43,'crawl']]},
     11:{mine:[.43,.66],worm:[.57],phase:[.72],electric:[.81],spider:[[.52,'crawl']]},
     12:{turret:[.47],worm:[.70],conveyor:[[.79,-1]],spider:[[.60,'spitter']]},
-    13:{press:[.44,.70],saw:[.59],worm:[.84],spider:[[.79,'ambush']]},
-    14:{pendulum:[.46,.71],mine:[.58],electric:[.82],spider:[[.64,'spitter']]},
-    15:{press:[.57],turret:[.71],saw:[.82],worm:[.88],crumble:[.74],spider:[[.65,'armored']]},
-    16:{wave:[[.41,1]],pendulum:[.59],turret:[.71],retract:[.80],worm:[.86],spider:[[.55,'ambush'],[.75,'spitter']]},
-    17:{conveyor:[[.39,-1]],retract:[.47,.84],phase:[.54],turret:[.63],press:[.69],pendulum:[.75],worm:[.81],saw:[.87],wave:[[.58,1]],spider:[[.50,'armored'],[.73,'ambush']]}
+    // 14+ is the mastery arc: each level uses layered threats rather than longer jumps.
+    13:{press:[.38,.69],saw:[.52,.82],worm:[.61,.87],electric:[.76],retract:[.46],spider:[[.58,'ambush'],[.79,'crawl']]},
+    14:{pendulum:[.35,.67],mine:[.48,.73],electric:[.58,.84],saw:[.77],conveyor:[[.42,-1]],spider:[[.62,'spitter'],[.86,'armored']]},
+    15:{press:[.36,.61],turret:[.48,.74],saw:[.56,.82],worm:[.68,.88],crumble:[.76],electric:[.84],conveyor:[[.43,-1]],spider:[[.62,'armored'],[.80,'ambush']]},
+    16:{wave:[[.36,1]],pendulum:[.48,.72],turret:[.57,.79],retract:[.43,.84],worm:[.66,.88],phase:[.74],mine:[.52],spider:[[.46,'ambush'],[.64,'spitter'],[.82,'armored']]},
+    17:{conveyor:[[.33,-1]],retract:[.42,.79],phase:[.48,.69],turret:[.55,.77],press:[.62,.85],pendulum:[.72],worm:[.58,.81,.90],saw:[.66,.87],wave:[[.51,1],[.76,-1]],mine:[.59],electric:[.82],spider:[[.46,'armored'],[.68,'ambush'],[.84,'spitter']]}
   };
   const bossSpecs={
     10:{ru:'Страж Пил',en:'Saw Guardian',weak:'pulse',attack:'saw'},
@@ -2056,6 +2057,17 @@ globalThis.PulseBallEngine = (() => {
     }
     if(!candidates.length)return safeGroundSpot(g.level,f,margin);
     return candidates.reduce((best,x)=>Math.abs(x-target)<Math.abs(best-target)?x:best,candidates[0]);
+  }
+  function lateDifficulty(g){
+    if(g.index<13)return {tier:0,speed:1,warning:1,reload:1,pressure:1};
+    const tier=Math.min(5,g.index-12);
+    return {
+      tier,
+      speed:1+tier*.055,
+      warning:Math.max(.80,1-tier*.035),
+      reload:Math.max(.76,1-tier*.045),
+      pressure:1+tier*.065
+    };
   }
   function addCrumbleBridge(g,f){
     const target=g.level.width*f,gaps=[];
@@ -2127,31 +2139,37 @@ globalThis.PulseBallEngine = (() => {
     }else if(spec.attack==='wave'){
       g.waves.push({x:arenaStart+90,dir:1,cooldown:.8,period:2.15,bossWave:true});
     }else if(spec.attack==='mix'){
-      g.saws.push({baseX:arenaStart+360,x:arenaStart+360,y:430,r:25,range:78,speed:1.55,phase:.3,axis:'x'});
-      g.turrets.push({x:arenaStart+600,y:438,cooldown:1.1,phase:0,bossTurret:true});
-      g.waves.push({x:arenaStart+100,dir:1,cooldown:1.5,period:2.7,bossWave:true});
+      g.saws.push({baseX:arenaStart+360,x:arenaStart+360,y:430,r:25,range:78,speed:1.75,phase:.3,axis:'x'});
+      g.turrets.push({x:arenaStart+600,y:438,cooldown:.85,phase:0,bossTurret:true,reload:1.08,projectileSpeed:430});
+      g.waves.push({x:arenaStart+100,dir:1,cooldown:1.2,period:2.25,bossWave:true,speed:490});
     }
+    // 14-18 boss arenas gain one extra readable layer, never directly on the respawn flag.
+    if(g.index===13)g.retractSpikes.push({x:arenaStart+430,w:74,period:2.35,onTime:.80,phase:.4});
+    if(g.index===14)g.pendulums.push({x:arenaStart+610,anchorY:90,len:225,speed:1.52,phase:2.05,r:25});
+    if(g.index===15)g.turrets.push({x:arenaStart+650,y:438,cooldown:1.05,phase:0,bossTurret:true,reload:1.28,projectileSpeed:410});
+    if(g.index===16)g.waves.push({x:g.level.finish-120,dir:-1,cooldown:1.65,period:3.05,bossWave:true,speed:470});
+    if(g.index>=13&&g.boss){g.boss.difficultyTier=g.index-12;}
   }
   function initExpansion(g){
     g.retractSpikes=[];g.saws=[];g.presses=[];g.electricFloors=[];g.mines=[];g.pendulums=[];g.turrets=[];
     g.projectiles=[];g.conveyors=[];g.waves=[];g.waveShots=[];g.worms=[];g.spiders=[];g.webShots=[];
     g.bossNodes=[];g.bossOrbs=[];g.bossReceivers=[];g.boss=null;g.bossCheckpoint=null;g.expansionEnabled=true;
     if(g.index===5&&!g.bridgeOn&&g.level.bridge[1]>g.level.bridge[0]){g.switchOn=true;g.bridgeOn=true;g.ground.push({x:g.level.bridge[0],y:480,w:g.level.bridge[1]-g.level.bridge[0],h:300,bridge:true,comfortBridge:true});}
-    const plan=expansionPlans[g.index]||{};
-    (plan.fall||[]).forEach((f,i)=>{const p=safeTrapPlatform(g,f);if(p){Object.assign(p,{trapKind:'fall',baseY:p.y,fallTimer:0,fallVy:0,resetTimer:0,trapDisabled:false,trapSeed:i});}});
-    (plan.phase||[]).forEach((f,i)=>{const p=safeTrapPlatform(g,f);if(p){Object.assign(p,{trapKind:'phase',baseY:p.y,phaseOffset:i*.77,phasePeriod:3.15,phaseOn:2.05,trapDisabled:false});}});
+    const plan=expansionPlans[g.index]||{},difficulty=lateDifficulty(g);g.difficulty=difficulty;
+    (plan.fall||[]).forEach((f,i)=>{const p=safeTrapPlatform(g,f);if(p){Object.assign(p,{trapKind:'fall',baseY:p.y,fallTimer:0,fallVy:0,resetTimer:0,trapDisabled:false,trapSeed:i,fallDelay:.52/difficulty.speed});}});
+    (plan.phase||[]).forEach((f,i)=>{const p=safeTrapPlatform(g,f);if(p){Object.assign(p,{trapKind:'phase',baseY:p.y,phaseOffset:i*.77,phasePeriod:3.15/difficulty.speed,phaseOn:2.05*difficulty.warning,trapDisabled:false});}});
     (plan.crumble||[]).forEach(f=>addCrumbleBridge(g,f));
-    (plan.retract||[]).forEach((f,i)=>g.retractSpikes.push({x:safeGroundSpot(g.level,f),w:74,period:2.7,onTime:.72,phase:i*.83}));
-    (plan.saw||[]).forEach((f,i)=>{const x=safeHazardSpot(g,f);g.saws.push({baseX:x,x,y:i%2?365:430,r:i%2?23:27,range:i%2?58:92,speed:1.25+i*.18,phase:i*1.17,axis:i%2?'y':'x'});});
-    (plan.press||[]).forEach((f,i)=>g.presses.push({x:safeGroundSpot(g.level,f),w:88,topY:68,groundY:480,phase:i*.91,bossPress:false,manual:false,trigger:0,hitLatch:false}));
-    (plan.electric||[]).forEach((f,i)=>g.electricFloors.push({x:safeGroundSpot(g.level,f)-52,w:104,period:2.9,onTime:1.02,phase:i*.86}));
-    (plan.mine||[]).forEach((f,i)=>g.mines.push({x:safeGroundSpot(g.level,f),y:456,vx:0,armed:0,exploded:false,pulsed:false,bossMine:false,respawn:0,phase:i}));
-    (plan.pendulum||[]).forEach((f,i)=>g.pendulums.push({x:safeGroundSpot(g.level,f),anchorY:96,len:250,speed:1.15+i*.12,phase:i*1.21,r:28}));
-    (plan.turret||[]).forEach((f,i)=>g.turrets.push({x:safeGroundSpot(g.level,f),y:438,cooldown:.8+i*.3,phase:i,bossTurret:false}));
-    (plan.conveyor||[]).forEach(([f,dir],i)=>g.conveyors.push({x:safeGroundSpot(g.level,f)-115,w:230,dir,phase:i}));
-    (plan.wave||[]).forEach(([f,dir],i)=>g.waves.push({x:safeGroundSpot(g.level,f),dir,cooldown:1+i*.35,period:2.8-i*.15,bossWave:false}));
-    (plan.worm||[]).forEach((f,i)=>g.worms.push({x:safeGroundSpot(g.level,f),state:'dormant',timer:0,stunned:0,phase:i*.7,erupt:0}));
-    (plan.spider||[]).forEach(([f,type],i)=>{const x=safeHazardSpot(g,f);g.spiders.push({x,baseX:x,y:type==='ambush'?155:450,type,dir:i%2?1:-1,min:x-105,max:x+105,dead:false,stun:0,hits:0,cooldown:1.2+i*.2,dropped:type!=='ambush',phase:i*.8});});
+    (plan.retract||[]).forEach((f,i)=>g.retractSpikes.push({x:safeHazardSpot(g,f),w:74,period:2.7/difficulty.speed,onTime:.72*difficulty.pressure,phase:i*.83}));
+    (plan.saw||[]).forEach((f,i)=>{const x=safeHazardSpot(g,f);g.saws.push({baseX:x,x,y:i%2?365:430,r:i%2?23:27,range:(i%2?58:92)+(difficulty.tier*3),speed:(1.25+i*.18)*difficulty.speed,phase:i*1.17,axis:i%2?'y':'x'});});
+    (plan.press||[]).forEach((f,i)=>g.presses.push({x:safeHazardSpot(g,f),w:88,topY:68,groundY:480,phase:i*.91,bossPress:false,manual:false,trigger:0,hitLatch:false,speedScale:difficulty.speed}));
+    (plan.electric||[]).forEach((f,i)=>g.electricFloors.push({x:safeHazardSpot(g,f)-52,w:104,period:2.9/difficulty.speed,onTime:1.02*difficulty.pressure,phase:i*.86}));
+    (plan.mine||[]).forEach((f,i)=>g.mines.push({x:safeHazardSpot(g,f),y:456,vx:0,armed:0,exploded:false,pulsed:false,bossMine:false,respawn:0,phase:i,fuse:.72*difficulty.warning}));
+    (plan.pendulum||[]).forEach((f,i)=>g.pendulums.push({x:safeHazardSpot(g,f),anchorY:96,len:250,speed:(1.15+i*.12)*difficulty.speed,phase:i*1.21,r:28}));
+    (plan.turret||[]).forEach((f,i)=>g.turrets.push({x:safeHazardSpot(g,f),y:438,cooldown:.8+i*.3,phase:i,bossTurret:false,reload:1.85*difficulty.reload,projectileSpeed:390*difficulty.speed}));
+    (plan.conveyor||[]).forEach(([f,dir],i)=>g.conveyors.push({x:safeHazardSpot(g,f)-115,w:230,dir,phase:i,force:920*difficulty.pressure}));
+    (plan.wave||[]).forEach(([f,dir],i)=>g.waves.push({x:safeHazardSpot(g,f),dir,cooldown:1+i*.35,period:(2.8-i*.15)*difficulty.reload,bossWave:false,speed:455*difficulty.speed}));
+    (plan.worm||[]).forEach((f,i)=>g.worms.push({x:safeHazardSpot(g,f),state:'dormant',timer:0,stunned:0,phase:i*.7,erupt:0,warning:.72*difficulty.warning}));
+    (plan.spider||[]).forEach(([f,type],i)=>{const x=safeHazardSpot(g,f);g.spiders.push({x,baseX:x,y:type==='ambush'?155:450,type,dir:i%2?1:-1,min:x-105,max:x+105,dead:false,stun:0,hits:0,cooldown:(1.2+i*.2)*difficulty.reload,shotPeriod:(type==='armored'?2.1:2.55)*difficulty.reload,moveScale:difficulty.speed,dropped:type!=='ambush',phase:i*.8});});
     initBoss(g);
   }
   function pulseExpansion(g,p){
@@ -2186,7 +2204,7 @@ globalThis.PulseBallEngine = (() => {
         const t=(g.time+p.phaseOffset)%p.phasePeriod;
         p.trapDisabled=t>p.phaseOn;
       }else if(p.trapKind==='fall'){
-        if(p.fallTimer>0){p.fallTimer+=dt;if(p.fallTimer>.52){p.fallVy+=1450*dt;p.y+=p.fallVy*dt;}}
+        if(p.fallTimer>0){p.fallTimer+=dt;if(p.fallTimer>(p.fallDelay||.52)){p.fallVy+=1450*dt;p.y+=p.fallVy*dt;}}
         if(p.y>720){p.trapDisabled=true;p.resetTimer+=dt;if(p.resetTimer>1.45){p.y=p.baseY;p.fallTimer=0;p.fallVy=0;p.resetTimer=0;p.trapDisabled=false;}}
       }else if(p.trapKind==='crumble'){
         if(p.crumbleTimer>0){p.crumbleTimer+=dt;if(p.crumbleTimer>.48)p.trapDisabled=true;if(p.crumbleTimer>2.9){p.crumbleTimer=0;p.trapDisabled=false;}}
@@ -2202,7 +2220,7 @@ globalThis.PulseBallEngine = (() => {
       if(t<.88)return 1-(t-.55)/.33;
       return 0;
     }
-    const t=(g.time+pr.phase)%2.85;
+    const speed=pr.speedScale||1,t=(g.time*speed+pr.phase)%2.85;
     if(t<.62)return 0;
     if(t<.92)return (t-.62)/.30;
     if(t<1.28)return 1;
@@ -2227,7 +2245,7 @@ globalThis.PulseBallEngine = (() => {
       const active=(g.time+e.phase)%e.period>e.period-e.onTime;
       if(active&&p.x+r>e.x&&p.x-r<e.x+e.w&&p.y+r>446)damage(g);
     }
-    for(const z of g.conveyors)if(p.grounded&&p.x>z.x&&p.x<z.x+z.w)p.vx=Math.max(-410,Math.min(410,p.vx+z.dir*920*dt));
+    for(const z of g.conveyors)if(p.grounded&&p.x>z.x&&p.x<z.x+z.w)p.vx=Math.max(-430,Math.min(430,p.vx+z.dir*(z.force||920)*dt));
     for(const pr of g.presses){
       if(pr.manual&&pr.trigger>0){pr.trigger=Math.max(0,pr.trigger-dt/1.15);}
       const a=pressAmount(pr,g),bottom=pr.topY+42+a*(pr.groundY-pr.topY-62);
@@ -2243,7 +2261,7 @@ globalThis.PulseBallEngine = (() => {
       }
       if(Math.abs(m.vx)>1){m.x+=m.vx*dt;m.vx*=Math.pow(.25,dt);}
       if(m.pulsed&&g.boss&&g.boss.active&&!g.boss.defeated&&Math.abs(m.x-g.boss.x)<78&&Math.abs(m.y-g.boss.y)<105){m.exploded=true;m.vx=0;damageBoss(g,'mine');g.events.push({type:'mineBlast',x:m.x,y:m.y});continue;}
-      if(!m.armed&&Math.abs(p.x-m.x)<105&&Math.abs(p.y-m.y)<75)m.armed=.72;
+      if(!m.armed&&Math.abs(p.x-m.x)<105&&Math.abs(p.y-m.y)<75)m.armed=m.fuse||.72;
       if(m.armed>0){m.armed-=dt;if(m.armed<=0){m.exploded=true;g.events.push({type:'mineBlast',x:m.x,y:m.y});const dx=p.x-m.x,dy=p.y-m.y;if(dx*dx+dy*dy<82*82)damage(g);}}
     }
     for(const pd of g.pendulums){
@@ -2253,22 +2271,22 @@ globalThis.PulseBallEngine = (() => {
     for(const t of g.turrets){
       t.cooldown-=dt;t.shotFlash=Math.max(0,(t.shotFlash||0)-dt);
       if(t.cooldown<=0&&Math.abs(p.x-t.x)<720){
-        const dir=p.x>=t.x?1:-1,dy=Math.max(-110,Math.min(110,p.y-(t.y-20)));
-        g.projectiles.push({x:t.x+dir*48,y:t.y-20,vx:dir*390,vy:dy*.72,life:2.4,kind:'energy'});
+        const dir=p.x>=t.x?1:-1,dy=Math.max(-110,Math.min(110,p.y-(t.y-20))),shotSpeed=t.projectileSpeed||390;
+        g.projectiles.push({x:t.x+dir*48,y:t.y-20,vx:dir*shotSpeed,vy:dy*.72,life:2.4,kind:'energy'});
         t.shotFlash=.18;g.events.push({type:'turretShot',x:t.x+dir*48,y:t.y-20,dir});
-        t.cooldown=t.bossTurret?1.35:1.85;
+        t.cooldown=t.bossTurret?(t.reload||1.35):(t.reload||1.85);
       }
     }
     let write=0;
     for(let i=0;i<g.projectiles.length;i++){const q=g.projectiles[i];q.life-=dt;q.x+=q.vx*dt;q.y+=q.vy*dt;const dx=p.x-q.x,dy=p.y-q.y;if(dx*dx+dy*dy<(r+9)*(r+9)){damage(g);q.life=0;}if(q.life>0)g.projectiles[write++]=q;}g.projectiles.length=write;
-    for(const w of g.waves){w.cooldown-=dt;if(w.cooldown<=0){g.waveShots.push({x:w.x,y:456,dir:w.dir,life:2.8,hit:false});w.cooldown=w.period;}}
+    for(const w of g.waves){w.cooldown-=dt;if(w.cooldown<=0){g.waveShots.push({x:w.x,y:456,dir:w.dir,life:2.8,hit:false,speed:w.speed||455});w.cooldown=w.period;}}
     write=0;
-    for(let i=0;i<g.waveShots.length;i++){const q=g.waveShots[i];q.life-=dt;q.x+=q.dir*455*dt;if(!q.hit&&Math.abs(p.x-q.x)<25&&p.y+r>418){damage(g);q.hit=true;}if(q.life>0)g.waveShots[write++]=q;}g.waveShots.length=write;
+    for(let i=0;i<g.waveShots.length;i++){const q=g.waveShots[i];q.life-=dt;q.x+=q.dir*(q.speed||455)*dt;if(!q.hit&&Math.abs(p.x-q.x)<25&&p.y+r>418){damage(g);q.hit=true;}if(q.life>0)g.waveShots[write++]=q;}g.waveShots.length=write;
     for(const w of g.worms){
       w.stunned=Math.max(0,w.stunned-dt);
       if(w.stunned>0){w.state='stunned';w.erupt=0;continue;}
       if(w.state==='stunned'){w.state='dormant';w.timer=0;}
-      if(w.state==='dormant'&&Math.abs(p.x-w.x)<190){w.state='warning';w.timer=.72;}
+      if(w.state==='dormant'&&Math.abs(p.x-w.x)<190){w.state='warning';w.timer=w.warning||.72;}
       else if(w.state==='warning'){w.timer-=dt;if(w.timer<=0){w.state='erupt';w.timer=.48;}}
       else if(w.state==='erupt'){w.timer-=dt;w.erupt=Math.sin(Math.max(0,Math.min(1,1-w.timer/.48))*Math.PI);if(w.erupt>.58&&Math.abs(p.x-w.x)<48&&p.y>320)damage(g);if(w.timer<=0){w.state='retreat';w.timer=.62;}}
       else if(w.state==='retreat'){w.timer-=dt;w.erupt=Math.max(0,w.timer/.62);if(w.timer<=0){w.state='dormant';w.timer=0;w.erupt=0;}}
@@ -2278,11 +2296,11 @@ globalThis.PulseBallEngine = (() => {
       if(s.type==='ambush'&&!s.dropped&&Math.abs(p.x-s.x)<135){s.dropped=true;}
       if(s.type==='ambush'&&s.dropped&&s.y<450)s.y=Math.min(450,s.y+520*dt);
       if(s.stun<=0&&s.dropped){
-        const speed=s.type==='armored'?42:s.type==='spitter'?22:58;s.x+=s.dir*speed*dt;
+        const speed=(s.type==='armored'?42:s.type==='spitter'?22:58)*(s.moveScale||1);s.x+=s.dir*speed*dt;
         if(s.x<s.min){s.x=s.min;s.dir=1;}if(s.x>s.max){s.x=s.max;s.dir=-1;}
       }
       if((s.type==='spitter'||s.type==='armored')&&s.dropped&&s.cooldown<=0&&Math.abs(p.x-s.x)<580){
-        const dir=p.x>=s.x?1:-1;g.webShots.push({x:s.x+dir*20,y:s.y-12,vx:dir*300,vy:(p.y-s.y)*.45,life:2.2});s.cooldown=s.type==='armored'?2.1:2.55;
+        const dir=p.x>=s.x?1:-1;g.webShots.push({x:s.x+dir*20,y:s.y-12,vx:dir*300,vy:(p.y-s.y)*.45,life:2.2});s.cooldown=s.shotPeriod||(s.type==='armored'?2.1:2.55);
       }
       const dx=p.x-s.x,dy=p.y-s.y;if(s.dropped&&dx*dx+dy*dy<(r+22)*(r+22)){if(p.vy>70&&p.y<s.y-8){s.dead=true;p.vy=-430;}else damage(g);}
     }
@@ -2297,8 +2315,8 @@ globalThis.PulseBallEngine = (() => {
       b.active=true;if(g.bossCheckpoint&&!g.bossCheckpoint.active){g.bossCheckpoint.active=true;g.spawn={x:g.bossCheckpoint.x,y:440};g.events.push({type:'checkpoint',x:g.bossCheckpoint.x,y:400});}
     }
     if(!b.active)return;
-    if(b.attack!=='press')b.x=b.baseX+Math.sin(g.time*(b.attack==='mix'?1.25:.8))*42;
-    if(b.attack==='turret'||b.attack==='mix')b.y=360+Math.sin(g.time*2.1)*30;else b.y=390+Math.sin(g.time*1.7)*10;
+    if(b.attack!=='press'){const tempo=1+(b.difficultyTier||0)*.055;b.x=b.baseX+Math.sin(g.time*(b.attack==='mix'?1.25:.8)*tempo)*(42+(b.difficultyTier||0)*3);} 
+    if(b.attack==='turret'||b.attack==='mix')b.y=360+Math.sin(g.time*(2.1+(b.difficultyTier||0)*.06))*30;else b.y=390+Math.sin(g.time*(1.7+(b.difficultyTier||0)*.04))*10;
     // Relay boss: every successful arena relay discharge strips one shield layer.
     for(const relay of g.relays)if(relay.bossRelay&&relay.flash>.20&&b.invuln<=0)damageBoss(g,'relay');
     // Dedicated boss orbs: Orb Core uses repeated shots; Wave Reactor uses three receivers.
