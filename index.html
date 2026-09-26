@@ -2378,7 +2378,12 @@ globalThis.PulseBallEngine = (() => {
     if(relay){const v=relayVelocity[relay.dir];p.vx=v[0];p.vy=v[1];p.coyote=0;p.jumpBuffer=0;p.boosted=true;p.boostGlow=.22;relay.cooldown=1.1;relay.flash=.22;relay.uses++;g.events.push({type:'relay',x:relay.x,y:relay.y,dir:relay.dir});}
   }
   function damage(g,fall=false) {
-    const p=g.player;if(!fall&&p.invincible>0)return;
+    const p=g.player;
+    if(!fall){
+      const regularSafe=g.checkpoint&&Math.abs(p.x-g.checkpoint.x)<78&&Math.abs(p.y-440)<82;
+      const bossSafe=g.bossCheckpoint&&g.bossCheckpoint.active&&Math.abs(p.x-g.bossCheckpoint.x)<78&&Math.abs(p.y-440)<82;
+      if(regularSafe||bossSafe||p.invincible>0)return;
+    }
     g.health--;g.events.push({type:'hurt',x:p.x,y:p.y});
     if(g.health<=0){g.status='lost';return;}
     Object.assign(p,{x:g.spawn.x,y:g.spawn.y,vx:0,vy:0,grounded:false,invincible:1.8,coyote:0,jumpBuffer:0,boosted:false,boostGlow:0,slopeMomentum:0});
