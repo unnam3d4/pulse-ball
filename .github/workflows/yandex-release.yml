@@ -53,6 +53,7 @@ jobs:
         run: |
           set -euo pipefail
           node --test tests/release.test.cjs
+          node --test tests/expansion.test.cjs
           node tests/geometry-audit.cjs
 
       - name: Package Yandex archive
