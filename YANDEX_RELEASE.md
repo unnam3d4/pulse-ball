@@ -1,6 +1,6 @@
 # Pulse Ball: Побег — Yandex Games release
 
-This repository is prepared for Yandex Games upload.
+This is a release candidate for final human playtesting. Local automated checks are recorded in `RELEASE_QA.md`; real Yandex Draft, physical-device and catalog-asset checks must be completed before moderation.
 
 ## Build
 
@@ -25,6 +25,8 @@ Download the artifact from the latest successful workflow run and upload it to t
 - Russian and English UI
 - cloud progress through Player `getData/setData`
 - Safe Storage fallback when available
+- independent legacy/v2/Safe Storage/cloud merging, retaining the most stars and fastest valid time from every source
+- platform pause listeners installed before storage/cloud requests; focus and visibility tracked separately through ad completion
 - fullscreen interstitial calls only at natural breaks: level transitions and repeated retry flow; Yandex controls actual fullscreen-ad frequency
 - rewarded video continue after a loss: clearly labeled as an ad, reward is 3 lives and continuation from the current checkpoint/start
 - sticky banner API hooks: banner is requested in menus and normal gameplay, then hidden/restored around fullscreen or rewarded ads
@@ -84,10 +86,10 @@ Suggested English keywords:
 Prepare/upload in the Console:
 
 - Icon: 512 × 512 PNG
-- Maskable icon
+- Optional maskable icon
 - Cover: 800 × 470 PNG
 - Hero image: 1560 × 520 PNG/JPG (optional but recommended)
-- At least 2 real gameplay screenshots for Desktop and for every selected Mobile platform, 16:9 landscape, long side 1280–2560 px
+- Capture target: at least 2 real gameplay screenshots for Desktop and for every selected Mobile platform, 16:9 landscape, long side 1280–2560 px
 - Horizontal gameplay video: 16:9, MP4, up to 28 seconds, height at least 400 px
 - Optional vertical promo video: 9:16, MP4, up to 28 seconds
 
@@ -107,7 +109,7 @@ On the **Advertising** tab:
 
 Current in-game monetization flow:
 
-- fullscreen ad request after every second completed level transition; the Yandex platform controls whether an ad is actually shown and its frequency;
+- fullscreen ad request after every second completed level transition, including the final return to the menu; the Yandex platform controls whether an ad is actually shown and its frequency;
 - fullscreen ad request after every third manual retry following a loss;
 - voluntary rewarded video on the loss screen: **continue with 3 lives from the checkpoint/start**;
 - no fullscreen or rewarded ad calls during active gameplay.
@@ -128,3 +130,31 @@ Open the game with the Yandex debug panel and check:
 10. Console stays free of gameplay-breaking JavaScript errors.
 
 Only after these checks should the draft be submitted for moderation.
+
+## Final release gate (2026-09-26)
+
+- [x] SDK adapter and Game Ready ordering checked with controlled SDK callbacks.
+- [x] Gameplay start/stop, nested platform/ad pauses, focus, reward cancellation and duplicate reward callbacks checked locally.
+- [x] Legacy/local/Safe/cloud merge logic and local reload checked; save keys unchanged.
+- [x] Desktop and mobile landscape emulation, RU/EN screens, portrait return and live resize checked.
+- [x] All 18 levels finish from their normal initial state with 3 lives using recorded input replays.
+- [x] All 719 stars have local kinematic collection routes; moving-gap trials include movement extrema.
+- [x] Single-file build, JavaScript syntax and root-level ZIP packaging checked.
+- [ ] Yandex Draft: real SDK loader, startup/fullscreen/rewarded ads, debug indicators and right-side sticky banner.
+- [ ] Real cloud-save reload and second-device/account session, including offline recovery.
+- [ ] Physical Android/iPhone landscape: multi-touch, safe areas, browser chrome, audio, orientation and stable frame pacing.
+- [ ] Human clean playthrough of all 18 levels and every optional star route. Automated route discovery is not a substitute for timing/readability feedback.
+- [ ] Catalog icon, cover, screenshots and horizontal video exported, inspected and uploaded (see `ASSET_PLAN.md`).
+- [ ] Review branch diff, approve release and submit for moderation. No automatic merge or publication.
+
+The workflow now validates review-branch pushes and pull requests as well as `main`. Run `node --test tests/release.test.cjs` and `node tests/geometry-audit.cjs` locally. Optional browser regressions: `node tests/browser-qa.cjs` with Playwright supplied by the development environment (`PLAYWRIGHT_MODULE` can point to its module directory). No test files or test dependencies enter the upload ZIP.
+
+## Official references checked
+
+- [SDK loading](https://yandex.ru/dev/games/doc/ru/sdk/sdk-about)
+- [Game Ready and Gameplay API](https://yandex.ru/dev/games/doc/ru/sdk/sdk-game-events)
+- [Pause/resume and startup advertisements](https://yandex.ru/dev/games/doc/ru/sdk/sdk-events)
+- [Player data and Safe Storage](https://yandex.ru/dev/games/doc/ru/sdk/sdk-player)
+- [Advertising and sticky placement](https://yandex.ru/dev/games/doc/ru/sdk/sdk-adv)
+- [Current draft media specifications](https://yandex.ru/dev/games/doc/ru/console/add-new-game/draft)
+- [Game requirements](https://yandex.ru/dev/games/doc/ru/concepts/requirements)
