@@ -197,7 +197,7 @@ test('soundtrack routing is split into menu, early, mid and late bands',()=>{
   assert.ok(html.includes("late:{file:'gravity_at_the_end.mp3'"),'levels 14-18 soundtrack mapping missing');
   assert.ok(html.includes("const musicForLevel=index=>index<=5?'early':index<=12?'mid':'late'"),'campaign music split changed');
   for(const key of ['menu','early','mid','late']){
-    const re=new RegExp(key+":\\\\{file:'[^']+',loopStart:([0-9.]+),loopEnd:([0-9.]+),volume:([0-9.]+)\\\\}");
+    const re=new RegExp(key+":\\{file:'[^']+',loopStart:([0-9.]+),loopEnd:([0-9.]+),volume:([0-9.]+)\\}");
     const m=html.match(re);assert.ok(m,key+' loop configuration missing');
     assert.ok(Number(m[2])>Number(m[1])+20,key+' loop window is too short');
   }
