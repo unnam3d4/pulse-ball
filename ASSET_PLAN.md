@@ -187,9 +187,10 @@ Possible later placements only after we add a real meta-economy:
 Do not bolt a fake currency onto the game only to create more rewarded placements.
 
 ### Sticky banner
-- Request banner in main menu / level selection / settings
-- Hide banner during active gameplay
-- Enable API-controlled sticky banners in the Developer Console
+- Use the Yandex API-controlled sticky banner; do not draw or reserve a fake ad slot inside the game
+- Keep the sticky banner enabled in menus and during normal gameplay
+- For mobile landscape, configure the banner **On the right** in the Developer Console
+- Hide the banner while fullscreen/rewarded ads are open, then restore it after the ad closes
 
 ---
 
