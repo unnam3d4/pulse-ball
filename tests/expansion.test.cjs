@@ -216,3 +216,43 @@ test('audio polish adds layered pulse, impacts and trap telegraphs',()=>{
   for(const event of ['turretShot','mineBlast','wormWarning','wormErupt','waveShot','bossHit','bossDefeat'])
     assert.ok(html.includes("e.type==='"+event+"'"),event+' sound feedback missing');
 });
+
+
+test('foreground SFX are mixed above music with a safety limiter',()=>{
+  assert.ok(html.includes('sfxGain.gain.value=1.65'),'foreground SFX bus gain changed');
+  assert.ok(html.includes('masterLimiter=audio.createDynamicsCompressor()'),'master limiter missing');
+  const volumes=[...html.matchAll(/(?:menu|early|mid|late):\{file:'[^']+',loopStart:[0-9.]+,loopEnd:[0-9.]+,volume:([0-9.]+)/g)].map(m=>Number(m[1]));
+  assert.equal(volumes.length,4,'soundtrack volume mappings missing');
+  assert.ok(volumes.every(v=>v<=.064),'music is too loud relative to gameplay SFX');
+});
+
+test('Super Pulse is earned and uses the existing Pulse action',()=>{
+  const g=E.createGame(0);
+  assert.equal(g.superCharge,0);
+  E.addSuperCharge(g,100);
+  assert.equal(g.superCharge,100);
+  const enemy=g.enemies[0];
+  if(enemy){enemy.x=g.player.x+90;enemy.y=g.player.y;enemy.min=enemy.x-10;enemy.max=enemy.x+10;enemy.dead=false;}
+  g.projectiles.push({x:g.player.x+80,y:g.player.y,vx:0,vy:0,life:2,kind:'energy'});
+  E.step(g,{pulse:true},1/120);
+  assert.equal(g.superCharge,0,'Super Pulse did not consume the earned meter');
+  assert.ok(g.events.some(e=>e.type==='superPulse'),'same Pulse input did not trigger Super Pulse');
+  assert.equal(g.projectiles.length,0,'Super Pulse did not clear an incoming projectile');
+  if(enemy&&enemy.type!=='heavy')assert.equal(enemy.dead,true,'Super Pulse did not clear a weak enemy');
+});
+
+test('correct boss mechanics contribute to Super Pulse charge',()=>{
+  const g=E.createGame(10);
+  g.boss.active=true;g.boss.invuln=0;g.superCharge=0;
+  assert.equal(E.bossExpected(g.boss),'pulse');
+  assert.equal(E.damageBoss(g,'pulse'),true);
+  assert.equal(g.superCharge,25);
+});
+
+test('Super Pulse meter has no extra control button and preserves half charge after death',()=>{
+  assert.ok(html.includes('id="superFill"'),'Super Pulse charge strip missing from Pulse HUD');
+  assert.ok(html.includes("$('pulseButton').textContent=superReady?'SUPER':'PULSE'"),'existing Pulse button does not communicate Super readiness');
+  assert.ok(!html.includes('id="superButton"'),'a separate Super button was added');
+  assert.ok(html.includes("g.superCharge=Math.floor((g.superCharge||0)*.5)"),'death should preserve half of earned Super charge');
+  assert.ok(html.includes("pendingSuperCharge=kind==='lost'?(g.superCharge||0):0"),'retry does not carry the preserved Super charge');
+});
