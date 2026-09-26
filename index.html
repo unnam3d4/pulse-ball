@@ -284,14 +284,16 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
 .menu-play{min-height:78px;width:100%;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border:0;border-radius:22px;background:linear-gradient(135deg,#7258f0 0%,#8e6cf7 60%,#9f7cff 100%);box-shadow:0 7px 0 #5640ba,0 18px 35px #684fd34d;color:#fff;font-size:23px;font-weight:950;text-shadow:0 2px 0 #4935a5}
 .menu-play b{font-size:31px}.menu-play:hover{transform:translateY(-2px);filter:saturate(1.08) brightness(1.02)}.menu-play:active{transform:translateY(5px);box-shadow:0 2px 0 #5640ba}
 .menu-levels-button{min-height:58px;width:100%;display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding:0 17px;border:2px solid #d7eee8;border-radius:18px;background:#f6fffb;color:#315d6d;font-size:13px;font-weight:900;box-shadow:0 6px 16px #2d6b6412}
-.menu-levels-button strong{padding:7px 10px;border-radius:10px;background:#dff6e7;color:#31815e;font-size:10px}
-.menu-stats-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:18px}
-.menu-stats-strip>div{min-width:0;padding:10px 9px;border-radius:14px;background:#eff9f6;text-align:left}
-.menu-stats-strip small{display:flex;align-items:center;gap:4px;margin-bottom:4px;color:#7a9694;font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.75px;white-space:nowrap}
-.menu-stats-strip strong{display:block;overflow:hidden;color:#355d69;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap;text-overflow:ellipsis}
-.menu-stat-icon{font-size:10px;line-height:1}
-.menu-stat-stars .menu-stat-icon{color:#e3a835}.menu-stat-master .menu-stat-icon{color:#826ce5}
-.menu-progress{height:8px;margin-top:9px;overflow:hidden;border-radius:999px;background:#dcebe7}.menu-progress i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#4bd7bb,#7666ee,#ffbf52);transition:width .25s}
+.menu-levels-arrow{color:#7aa29a;font-size:18px;font-weight:900;line-height:1}
+.menu-stats-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:16px}
+.menu-stat{min-width:0;min-height:38px;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 7px;border:1px solid #dceee9;border-radius:12px;background:linear-gradient(180deg,#f5fcf9,#eaf7f3);box-shadow:inset 0 1px #ffffffa8}
+.menu-stat strong{color:#355d69;font-size:12px;font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap}
+.menu-stat-icon{flex:none;font-size:11px;line-height:1}
+.menu-stat-levels .menu-stat-icon{color:#52a98f}.menu-stat-stars .menu-stat-icon{color:#e2a72e}.menu-stat-master .menu-stat-icon{color:#826ce5}
+.menu-progress-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding:0 2px}
+.menu-progress-head span{color:#76908e;font-size:8px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
+.menu-progress-head strong{color:#355d69;font-size:11px;font-weight:900;font-variant-numeric:tabular-nums}
+.menu-progress{height:7px;margin-top:5px;overflow:hidden;border-radius:999px;background:#dcebe7}.menu-progress i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#4bd7bb,#7666ee,#ffbf52);transition:width .25s}
 .menu-quick{display:flex;justify-content:center;gap:18px;margin-top:17px;flex-wrap:wrap}
 .menu-help-link,.menu-quick-btn{padding:5px 2px;border:0;background:transparent;color:#55727b;font-size:10px;font-weight:850}.menu-help-link:hover,.menu-quick-btn:hover{color:#5543c4}
 
@@ -314,7 +316,7 @@ linear-gradient(145deg,#8ee3f4 0%,#dff7d1 52%,#fff0b2 100%);backdrop-filter:none
 }
 @media(max-width:680px){
   .hud-level-chip>strong{display:none}.hud-level-chip{max-width:none;padding-right:7px}.hud{gap:4px}.hud-group{gap:5px}.hud-chip{padding-inline:7px}.pulse-meter{min-width:66px}
-  .menu-home{width:min(520px,96vw);min-height:0;grid-template-columns:1fr;gap:8px;padding:8px}.menu-hero-zone{justify-content:center;text-align:center}.menu-orb-stage{width:130px;height:130px}.menu-logo-orb{border-width:5px}.menu-copy{text-align:left}.menu-title{font-size:49px;letter-spacing:-2.5px}.menu-tagline{margin-top:9px;font-size:12px}.menu-feature-row{display:none}.menu-command{padding:16px;border-radius:22px}.menu-next-card{display:none}.menu-play{min-height:56px;font-size:17px}.menu-levels-button{min-height:49px;margin-top:10px}.menu-stats-strip{margin-top:11px;gap:6px}.menu-stats-strip>div{padding:8px 7px}.menu-stats-strip small{font-size:7px;letter-spacing:.45px}.menu-stats-strip strong{font-size:11px}.menu-quick{margin-top:11px}
+  .menu-home{width:min(520px,96vw);min-height:0;grid-template-columns:1fr;gap:8px;padding:8px}.menu-hero-zone{justify-content:center;text-align:center}.menu-orb-stage{width:130px;height:130px}.menu-logo-orb{border-width:5px}.menu-copy{text-align:left}.menu-title{font-size:49px;letter-spacing:-2.5px}.menu-tagline{margin-top:9px;font-size:12px}.menu-feature-row{display:none}.menu-command{padding:16px;border-radius:22px}.menu-next-card{display:none}.menu-play{min-height:56px;font-size:17px}.menu-levels-button{min-height:49px;margin-top:10px}.menu-stats-strip{margin-top:10px;gap:5px}.menu-stat{min-height:34px;padding:7px 5px;gap:4px}.menu-stat strong{font-size:10px}.menu-stat-icon{font-size:10px}.menu-progress-head{margin-top:9px}.menu-progress-head span{font-size:7px}.menu-progress-head strong{font-size:10px}.menu-quick{margin-top:11px}
   .menu-level-picker{width:96vw;padding:14px;border-radius:22px}.picker-head{margin-bottom:10px}.picker-head h2{font-size:20px}.menu-level-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.menu-level{min-height:88px;padding:9px 7px 8px 11px;border-radius:13px}.menu-level-number{font-size:13px}.menu-level-name{min-height:26px;margin:4px 0;font-size:9px}.menu-level-meta{font-size:8px}
 }
 @media(max-height:520px) and (orientation:landscape){
@@ -1798,12 +1800,13 @@ button:disabled:active { transform: none; }
             <strong id="menuNextLevel">01 · Первый импульс</strong>
           </div>
           <button class="menu-play" id="continueButton"><span id="continueLabel">Играть</span></button>
-          <button class="menu-levels-button" id="levelsButton"><span id="levelsButtonText">Выбрать уровень</span><strong id="menuCompleted">0 / 18</strong></button>
+          <button class="menu-levels-button" id="levelsButton"><span id="levelsButtonText">Выбрать уровень</span><span class="menu-levels-arrow" aria-hidden="true">›</span></button>
           <div class="menu-stats-strip">
-            <div><small id="menuProgressText">Прогресс</small><strong id="menuCompletionText">0%</strong></div>
-            <div class="menu-stat-stars"><small><span class="menu-stat-icon" aria-hidden="true">★</span><span id="menuStarsLabel">Звёзды</span></small><strong id="menuRating">0 / 54</strong></div>
-            <div class="menu-stat-master"><small><span class="menu-stat-icon" aria-hidden="true">◆</span><span id="menuMasterLabel">Мастер</span></small><strong id="menuMaster">0 / 18</strong></div>
+            <div class="menu-stat menu-stat-levels"><span class="menu-stat-icon" aria-hidden="true">▦</span><strong id="menuCompleted">0 / 18</strong></div>
+            <div class="menu-stat menu-stat-stars"><span class="menu-stat-icon" aria-hidden="true">★</span><strong id="menuRating">0 / 54</strong></div>
+            <div class="menu-stat menu-stat-master"><span class="menu-stat-icon" aria-hidden="true">◆</span><strong id="menuMaster">0 / 18</strong></div>
           </div>
+          <div class="menu-progress-head"><span id="menuProgressText">Прогресс</span><strong id="menuCompletionText">0%</strong></div>
           <div class="menu-progress" id="menuProgressTrack" role="progressbar" aria-label="Прогресс" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="menuProgressFill"></i></div>
           <div class="menu-quick"><button class="menu-settings-btn" id="settingsButton" aria-label="Настройки"><svg class="ui-icon" aria-hidden="true"><use href="#ui-gear"></use></svg><strong id="settingsButtonText">Настройки</strong></button><button class="menu-help-link" id="menuHelpButton">? Как играть</button></div>
         </div>
@@ -2241,8 +2244,8 @@ globalThis.PulseBallEngine = (() => {
   // Labels used only by the result and optional-ad presentation.
   Object.assign(I18N.ru,{completeTitle:'Уровень пройден!',resultTime:'Время',resultRating:'Рейтинг',watchAd:'Смотреть рекламу',rewardHint:'Продолжить с 3 жизнями',rewardGain:'+3 жизни',replay:'Переиграть'});
   Object.assign(I18N.en,{completeTitle:'Level complete!',resultTime:'Time',resultRating:'Rating',watchAd:'Watch ad',rewardHint:'Continue with 3 lives',rewardGain:'+3 lives',replay:'Replay'});
-  Object.assign(I18N.ru,{flowLabel:'FLOW',bestFlow:'Лучший FLOW',master:'МАСТЕР',masterLabel:'Мастер',masterDone:'Выполнено',masterPending:'Цель',masterClean:'Без урона',masterPerfect:'Все звёзды + без урона'});
-  Object.assign(I18N.en,{flowLabel:'FLOW',bestFlow:'Best FLOW',master:'MASTER',masterLabel:'Master',masterDone:'Complete',masterPending:'Goal',masterClean:'No damage',masterPerfect:'All stars + no damage'});
+  Object.assign(I18N.ru,{flowLabel:'FLOW',bestFlow:'Лучший FLOW',master:'МАСТЕР',masterLabel:'Мастер',levelsCount:'Уровни',masterDone:'Выполнено',masterPending:'Цель',masterClean:'Без урона',masterPerfect:'Все звёзды + без урона'});
+  Object.assign(I18N.en,{flowLabel:'FLOW',bestFlow:'Best FLOW',master:'MASTER',masterLabel:'Master',levelsCount:'Levels',masterDone:'Complete',masterPending:'Goal',masterClean:'No damage',masterPerfect:'All stars + no damage'});
   let selectedChapter=0;
   const chapterSymbols=['↟','↑','ϟ','◈','✿','★'];
   const tr=k=>I18N[lang]?.[k]??I18N.ru[k]??k;
@@ -2288,7 +2291,7 @@ globalThis.PulseBallEngine = (() => {
     $('pulseButton').setAttribute('aria-label','Pulse');canvas.setAttribute('aria-label',tr('ready'));
     document.querySelector('#starCount').parentElement.setAttribute('aria-label',tr('starsLabel'));
     document.querySelector('.level-bar').setAttribute('aria-label',tr('nextLevel'));
-    $('menuTitle').textContent=tr('menuTitle');$('menuTagline').textContent=tr('menuTagline');$('levelsButtonText').textContent=tr('levels');$('menuProgressText').textContent=tr('progress');$('menuStarsLabel').textContent=tr('starsLabel');$('menuMasterLabel').textContent=tr('masterLabel');$('menuHelpButton').textContent=tr('how');$('pickerEyebrow').textContent=tr('pickerEyebrow');$('pickerTitle').textContent=tr('pickerTitle');$('menuNextKicker').textContent=tr('nextLevel');$('featureLevels').textContent=E.levels.length+' '+(lang==='ru'?'УРОВНЕЙ':'LEVELS');$('featureStars').textContent=tr('featureStars');$('settingsButtonText').textContent=tr('settings');$('settingsButton').setAttribute('aria-label',tr('settings'));$('settingsEyebrow').textContent=tr('settingsEyebrow');$('settingsTitle').textContent=tr('settings');$('languageTitle').textContent=tr('language');$('languageHint').textContent=tr('languageHint');$('soundTitle').textContent=tr('soundTitle');$('soundHint').textContent=tr('soundHint');$('fullscreenTitle').textContent=tr('screenTitle');$('fullscreenHint').textContent=tr('screenHint');$('controlsTitle').textContent=tr('controlsTitle');$('controlsHint').textContent=tr('controlsHint');$('settingsHelpButton').textContent=tr('helpTitle');$('settingsNote').textContent=tr('settingsNote');$('rotateTitle').textContent=tr('rotateTitle');$('rotateText').textContent=tr('rotateText');
+    $('menuTitle').textContent=tr('menuTitle');$('menuTagline').textContent=tr('menuTagline');$('levelsButtonText').textContent=tr('levels');$('menuProgressText').textContent=tr('progress');$('menuHelpButton').textContent=tr('how');$('pickerEyebrow').textContent=tr('pickerEyebrow');$('pickerTitle').textContent=tr('pickerTitle');$('menuNextKicker').textContent=tr('nextLevel');$('featureLevels').textContent=E.levels.length+' '+(lang==='ru'?'УРОВНЕЙ':'LEVELS');$('featureStars').textContent=tr('featureStars');$('settingsButtonText').textContent=tr('settings');$('settingsButton').setAttribute('aria-label',tr('settings'));$('settingsEyebrow').textContent=tr('settingsEyebrow');$('settingsTitle').textContent=tr('settings');$('languageTitle').textContent=tr('language');$('languageHint').textContent=tr('languageHint');$('soundTitle').textContent=tr('soundTitle');$('soundHint').textContent=tr('soundHint');$('fullscreenTitle').textContent=tr('screenTitle');$('fullscreenHint').textContent=tr('screenHint');$('controlsTitle').textContent=tr('controlsTitle');$('controlsHint').textContent=tr('controlsHint');$('settingsHelpButton').textContent=tr('helpTitle');$('settingsNote').textContent=tr('settingsNote');$('rotateTitle').textContent=tr('rotateTitle');$('rotateText').textContent=tr('rotateText');
     $('readyText').textContent=tr('ready');$('startButtonText').textContent=tr('go');$('guideMove').textContent=tr('move');$('guideJump').textContent=tr('jump');$('guideRestart').textContent=tr('restart');$('guidePause').textContent=tr('pause');$('finishGuide').textContent=tr('finish');$('jumpKeyLabel').textContent=tr('space');
     $('levelBrand').firstChild.nodeValue=tr('title')+' · ';
     $('menuButton').title=tr('mainMenu');$('menuButton').setAttribute('aria-label',tr('mainMenu'));$('restartButton').title=tr('restart');$('restartButton').setAttribute('aria-label',tr('restart'));$('pauseButton').title=tr('pause');$('pauseButton').setAttribute('aria-label',tr('pause'));
@@ -3105,8 +3108,8 @@ globalThis.PulseBallEngine = (() => {
     $('menuCompleted').textContent=done+' / '+E.levels.length;$('menuRating').textContent=rating+' / '+(E.levels.length*3);$('menuMaster').textContent=masters+' / '+E.levels.length;$('menuProgressFill').style.width=completion+'%';$('menuCompletionText').textContent=completion+'%';$('pickerProgress').textContent=done+' / '+E.levels.length;
     $('menuProgressTrack').setAttribute('aria-label',tr('progress'));
     $('menuProgressTrack').setAttribute('aria-valuenow',String(completion));
-    $('menuCompleted').setAttribute('aria-label',tr('chapterCleared')+': '+done+' / '+E.levels.length);
-    $('menuRating').setAttribute('aria-label',tr('resultRating')+': '+rating+' / '+(E.levels.length*3));$('menuMaster').setAttribute('aria-label',tr('masterLabel')+': '+masters+' / '+E.levels.length);
+    $('menuCompleted').setAttribute('aria-label',tr('levelsCount')+': '+done+' / '+E.levels.length);
+    $('menuRating').setAttribute('aria-label',tr('starsLabel')+': '+rating+' / '+(E.levels.length*3));$('menuMaster').setAttribute('aria-label',tr('masterLabel')+': '+masters+' / '+E.levels.length);
     $('continueLabel').textContent=done?tr('continue'):tr('play');$('menuNextLevel').textContent=String(next+1).padStart(2,'0')+' · '+levelDisplayName(next);
     const tabs=$('chapterTabs'),hadTabFocus=tabs.contains(document.activeElement),scroll=tabs.scrollLeft;
     tabs.innerHTML=Array.from({length:count},(_,i)=>'<button id="chapterTab'+i+'" role="tab" tabindex="'+(i===selectedChapter?'0':'-1')+'" aria-controls="levelGrid" aria-selected="'+(i===selectedChapter)+'" class="chapter-tab '+(i===selectedChapter?'active':'')+'" data-chapter-select="'+i+'" style="--chapter-accent:'+chapterColors[i%chapterColors.length]+'"><img src="'+CHAPTER_IMAGES[i%CHAPTER_IMAGES.length]+'" alt="" draggable="false"><b>'+String(i+1).padStart(2,'0')+'</b><span>'+chapterName(i)+'</span></button>').join('');
