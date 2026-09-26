@@ -27,7 +27,7 @@ Download the artifact from the latest successful workflow run and upload it to t
 - Safe Storage fallback when available
 - fullscreen interstitial calls only at natural breaks: level transitions and repeated retry flow; Yandex controls actual fullscreen-ad frequency
 - rewarded video continue after a loss: clearly labeled as an ad, reward is 3 lives and continuation from the current checkpoint/start
-- sticky banner API hooks: banner is requested in menus and hidden during active gameplay
+- sticky banner API hooks: banner is requested in menus and normal gameplay, then hidden/restored around fullscreen or rewarded ads
 - local fallback outside Yandex Games, so GitHub Pages stays usable
 
 ## Draft settings
