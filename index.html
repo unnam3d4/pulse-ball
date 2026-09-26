@@ -2064,7 +2064,8 @@ globalThis.PulseBallEngine = (() => {
     const spec=bossSpecs[g.index];if(!spec)return;
     const arenaStart=Math.max(g.level.checkpoint+260,g.level.finish-880),bossX=g.level.finish-270;
     g.boss={...spec,x:bossX,baseX:bossX,y:390,hp:3,maxHp:3,active:false,defeated:false,invuln:0,flash:0,arenaStart,phase:0,attackTimer:1.6};
-    g.bossCheckpoint={x:arenaStart-85,y:480,active:false};
+    const bossCheckpointX=safeGroundSpot(g.level,Math.max(0,(arenaStart-120)/g.level.width),70);
+    g.bossCheckpoint={x:bossCheckpointX,y:480,active:false};
     if(spec.weak==='relay'){
       g.relays.push({x:arenaStart+330,y:320,dir:'right',cooldown:0,flash:0,uses:0,bossRelay:true});
     }
@@ -2147,10 +2148,10 @@ globalThis.PulseBallEngine = (() => {
       node.cooldown=1.2;
       if(node.type==='switch'){
         node.active=true;const press=g.presses.find(v=>v.bossPress);if(press)press.trigger=1;
-      }else{
-        node.active=true;damageBoss(g,'node');
+        g.events.push({type:'bossNode',x:node.x,y:node.y});
+      }else if(damageBoss(g,'node')){
+        node.active=true;g.events.push({type:'bossNode',x:node.x,y:node.y});
       }
-      g.events.push({type:'bossNode',x:node.x,y:node.y});
     }
     for(const o of g.bossOrbs)if(!o.active&&!o.spent&&Math.abs(o.x-p.x)<reach&&Math.abs(o.y-p.y)<115&&(o.x-p.x)*p.face>0){
       o.active=true;o.vx=540;o.reset=0;g.events.push({type:'orbLaunch',x:o.x,y:o.y,dir:1});
@@ -2279,7 +2280,10 @@ globalThis.PulseBallEngine = (() => {
         o.x+=o.vx*dt;
         if(Number.isInteger(o.receiver)){
           const target=g.bossReceivers[o.receiver];
-          if(target&&!target.on&&Math.abs(o.x-target.x)<24){target.on=true;o.active=false;o.spent=true;o.reset=99;damageBoss(g,'receiver');g.events.push({type:'orbHit',x:target.x,y:target.y});}
+          if(target&&!target.on&&Math.abs(o.x-target.x)<24){
+            if(b.invuln>0){o.x=target.x-18;o.vx=0;}
+            else{target.on=true;o.active=false;o.spent=true;o.reset=99;if(damageBoss(g,'receiver'))g.events.push({type:'orbHit',x:target.x,y:target.y});}
+          }
         }else if(Math.abs(o.x-b.x)<58){o.active=false;o.spent=true;o.reset=1.35;damageBoss(g,'orb');g.events.push({type:'orbHit',x:b.x,y:b.y});}
         else if(o.x>g.level.width){o.x=o.homeX;o.y=o.homeY;o.active=false;o.vx=0;}
       }
