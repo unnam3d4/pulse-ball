@@ -188,3 +188,31 @@ test('levels 11-18 use eight different late-game sky palettes',()=>{
   assert.equal(late.length,8);
   assert.equal(new Set(late).size,8,'late-game skies should not repeat');
 });
+
+
+test('soundtrack routing is split into menu, early, mid and late bands',()=>{
+  assert.ok(html.includes("menu:{file:'before_the_jump.mp3'"),'menu soundtrack mapping missing');
+  assert.ok(html.includes("early:{file:'piston_gardens.mp3'"),'levels 1-6 soundtrack mapping missing');
+  assert.ok(html.includes("mid:{file:'velocity_gate.mp3'"),'levels 7-13 soundtrack mapping missing');
+  assert.ok(html.includes("late:{file:'gravity_at_the_end.mp3'"),'levels 14-18 soundtrack mapping missing');
+  assert.ok(html.includes("const musicForLevel=index=>index<=5?'early':index<=12?'mid':'late'"),'campaign music split changed');
+  for(const key of ['menu','early','mid','late']){
+    const re=new RegExp(key+":\\\\{file:'[^']+',loopStart:([0-9.]+),loopEnd:([0-9.]+),volume:([0-9.]+)\\\\}");
+    const m=html.match(re);assert.ok(m,key+' loop configuration missing');
+    assert.ok(Number(m[2])>Number(m[1])+20,key+' loop window is too short');
+  }
+});
+
+test('music obeys sound, ad, focus and preview path rules',()=>{
+  assert.ok(html.includes("location.pathname.includes('/preview/')?'../':''"),'preview music path handling missing');
+  assert.ok(html.includes('if(value)suspendAudio();else resumeAudio()'),'ad audio suspension missing');
+  assert.ok(html.includes("if(!sound){musicLoadToken++;stopMusic(.08);suspendAudio();}"),'sound-off should stop music');
+  assert.ok(html.includes('pauseReasons.size||adPending||document.hidden'),'music pause guards missing');
+});
+
+test('audio polish adds layered pulse, impacts and trap telegraphs',()=>{
+  for(const fn of ['noiseBurst','impactSound','pulseSound','duckMusic'])
+    assert.ok(html.includes('function '+fn+'('),fn+' audio helper missing');
+  for(const event of ['turretShot','mineBlast','wormWarning','wormErupt','waveShot','bossHit','bossDefeat'])
+    assert.ok(html.includes("e.type==='"+event+"'"),event+' sound feedback missing');
+});
