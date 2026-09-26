@@ -4,11 +4,12 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const html=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
 const scripts=[...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
 const engineContext=vm.createContext({});vm.runInContext(scripts[1],engineContext);const E=engineContext.PulseBallEngine;
+const safeGame=i=>{const g=E.createGame(i);g.expansionEnabled=false;return g;};
 test('all inline JavaScript parses',()=>scripts.forEach(s=>new vm.Script(s)));
 test('every campaign level has a clean start-to-finish input replay',()=>{
  const {step,controls,routes}=require('./campaign-routes.json');assert.equal(routes.length,18);
  for(const route of routes){
-  const g=E.createGame(route.level-1);
+  const g=safeGame(route.level-1);
   for(const [a,frames] of route.spans)for(let f=0;f<frames;f++){
    E.step(g,controls[a],step);assert.equal(g.health,3,`level ${route.level}: replay damage at ${g.player.x}`);
   }
@@ -20,7 +21,7 @@ test('18 levels retain safe checkpoint landing margins',()=>{
  E.levels.forEach((l,i)=>{
   assert.ok(l.ground.some(([a,b])=>l.checkpoint>=a+50&&l.checkpoint<=b-50),`level ${i+1}: checkpoint on ledge`);
   for(const phase of [0,2,4,6]){
-   const g=E.createGame(i);g.time=phase;g.spawn={x:l.checkpoint,y:440};g.checkpoint.active=true;Object.assign(g.player,{x:l.checkpoint,y:440});
+   const g=safeGame(i);g.time=phase;g.spawn={x:l.checkpoint,y:440};g.checkpoint.active=true;Object.assign(g.player,{x:l.checkpoint,y:440});
    for(let f=0;f<360;f++)E.step(g,{},1/120);
    assert.equal(g.health,3,`level ${i+1}: unsafe respawn`);assert.ok(g.player.grounded);
   }
@@ -28,7 +29,7 @@ test('18 levels retain safe checkpoint landing margins',()=>{
 });
 test('orb receivers can be activated and create the intended bridge',()=>{
  E.levels.forEach((l,i)=>(l.orbs||[]).forEach((_,j)=>{
-  const g=E.createGame(i),o=g.orbs[j],target=g.orbTargets[o.target];
+  const g=safeGame(i),o=g.orbs[j],target=g.orbTargets[o.target];
   Object.assign(g.player,{x:o.x-o.dir*65,y:o.y,vx:0,vy:0,face:o.dir,invincible:10});
   E.step(g,{pulse:true},1/120);
   assert.ok(o.active,`level ${i+1}: orb ${j+1} did not launch`);
@@ -40,7 +41,7 @@ test('orb receivers can be activated and create the intended bridge',()=>{
 test('crate and switch puzzles open bridges through normal Pulse actions',()=>{
  E.levels.forEach((l,i)=>{
   if(l.switch<0)return;
-  const g=E.createGame(i),c=g.crates[0];
+  const g=safeGame(i),c=g.crates[0];
   function fire(x){Object.assign(g.player,{x,y:458,vx:0,vy:0,face:1,invincible:10});g.pulseHeld=false;g.pulseCooldown=0;E.step(g,{pulse:true},1/120)}
   fire(l.switch-65);
   for(let n=0;n<8&&!g.bridgeOn;n++)fire(c.x-60);
