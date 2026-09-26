@@ -60,3 +60,58 @@ test('creature and trap runtime objects are initialized with readable telegraphs
   assert.ok(l12.mines.every(m=>m.armed===0&&!m.exploded));
   assert.ok(l12.worms.every(w=>w.state==='dormant'));
 });
+
+
+test('level 6 comfort bridge is already solid and cannot softlock the player',()=>{
+  const g=E.createGame(5),[a,b]=g.level.bridge;
+  assert.equal(g.bridgeOn,true);
+  assert.ok(g.ground.some(s=>s.comfortBridge&&s.x===a&&s.w===b-a),'level 6 bridge is not physically present');
+});
+
+test('falling and disappearing platforms are optional because solid ground exists below them',()=>{
+  for(let i=5;i<18;i++){
+    const g=E.createGame(i);
+    for(const p of g.platforms.filter(p=>p.trapKind==='fall'||p.trapKind==='phase'||p.trapKind==='crumble')){
+      if(p.trapKind==='crumble')continue; // crumble bridge is deliberately used later as a timed crossing.
+      assert.ok(g.ground.some(s=>p.x>=s.x+20&&p.x+p.w<=s.x+s.w-20),
+        'level '+(i+1)+' '+p.trapKind+' platform became a mandatory gap support at '+p.x);
+    }
+  }
+});
+
+test('late-campaign recorded route remains geometry-safe with the expansion enabled',()=>{
+  const routes=require('./campaign-routes.json'),{step,controls}=routes;
+  for(const route of routes.routes.filter(r=>r.level>=6)){
+    const g=E.createGame(route.level-1);g.player.invincible=1e6;
+    const stopX=g.boss?g.boss.arenaStart-70:Infinity;let reachedBoss=false;
+    outer: for(const [a,frames] of route.spans)for(let f=0;f<frames;f++){
+      E.step(g,controls[a],step);g.player.invincible=1e6;
+      assert.ok(g.health===3,'level '+route.level+' suffered fall/geometry damage at '+Math.round(g.player.x));
+      assert.ok(Number.isFinite(g.player.x)&&Number.isFinite(g.player.y),'level '+route.level+' non-finite player state');
+      if(g.boss&&g.player.x>=stopX){reachedBoss=true;break outer;}
+      if(!g.boss&&g.status==='won')break outer;
+    }
+    if(g.boss)assert.ok(reachedBoss,'level '+route.level+' recorded route cannot reach boss arena');
+    else assert.equal(g.status,'won','level '+route.level+' expansion route cannot finish');
+  }
+});
+
+test('checkpoints, exits and boss entries keep a clear hazard buffer',()=>{
+  const hazardX=g=>[
+    ...g.retractSpikes.map(v=>v.x+v.w/2),...g.saws.map(v=>v.baseX),...g.presses.map(v=>v.x),
+    ...g.electricFloors.map(v=>v.x+v.w/2),...g.mines.map(v=>v.x),...g.pendulums.map(v=>v.x),
+    ...g.turrets.map(v=>v.x),...g.worms.map(v=>v.x),...g.spiders.map(v=>v.baseX)
+  ];
+  for(let i=5;i<18;i++){
+    const g=E.createGame(i),critical=[g.level.checkpoint,g.level.finish];
+    if(g.boss)critical.push(g.bossCheckpoint.x,g.boss.arenaStart);
+    for(const x of hazardX(g))for(const q of critical)
+      assert.ok(Math.abs(x-q)>=70,'level '+(i+1)+' hazard too close to critical point '+q+' at '+x);
+  }
+});
+
+test('legacy under-platform rails and ghost bridge stripes are removed',()=>{
+  assert.ok(!html.includes('railX=s.base-s.range-camera'));
+  assert.ok(!html.includes("rgba(86,219,242,.16)"));
+  assert.ok(!html.includes("rgba(224,252,255,.42)"));
+});
