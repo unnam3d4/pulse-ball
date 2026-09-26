@@ -2031,9 +2031,31 @@ globalThis.PulseBallEngine = (() => {
     for(const a of pool){const mid=(a[0]+a[1])/2,s=Math.abs(mid-target);if(s<score){score=s;best=a;}}
     return Math.max(best[0]+Math.min(margin,(best[1]-best[0])*.25),Math.min(best[1]-Math.min(margin,(best[1]-best[0])*.25),target));
   }
-  function nearestPlatform(g,f){
-    const target=g.level.width*f,pool=g.platforms.filter(p=>!p.moving);
-    return pool.reduce((best,p)=>!best||Math.abs((p.x+p.w/2)-target)<Math.abs((best.x+best.w/2)-target)?p:best,null);
+  function criticalXs(g){
+    const xs=[150,g.level.checkpoint,g.level.finish];
+    if(g.level.switch>=0)xs.push(g.level.switch,(g.level.plate[0]+g.level.plate[1])/2);
+    for(const p of g.boostPads)xs.push(p.x);
+    for(const r of g.relays)xs.push(r.x);
+    for(const o of g.orbs)xs.push(o.x);
+    for(const t of g.orbTargets)xs.push(t.x);
+    for(const s of g.extraSwitches)xs.push(s.x);
+    return xs.filter(Number.isFinite);
+  }
+  function clearCritical(g,x,margin=125){return criticalXs(g).every(v=>Math.abs(v-x)>=margin);}
+  function safeTrapPlatform(g,f){
+    const target=g.level.width*f;
+    const supported=g.platforms.filter(p=>!p.moving&&g.ground.some(s=>p.x>=s.x+24&&p.x+p.w<=s.x+s.w-24)&&clearCritical(g,p.x+p.w/2,135));
+    if(supported.length)return supported.reduce((best,p)=>!best||Math.abs((p.x+p.w/2)-target)<Math.abs((best.x+best.w/2)-target)?p:best,null);
+    const x=safeGroundSpot(g.level,f,150),p={x:x-80,y:392,w:160,h:22,oneWay:true,syntheticTrap:true};
+    g.platforms.push(p);return p;
+  }
+  function safeHazardSpot(g,f,margin=145){
+    const target=g.level.width*f,candidates=[];
+    for(const seg of g.level.ground){
+      for(let x=seg[0]+margin;x<=seg[1]-margin;x+=55)if(clearCritical(g,x,130))candidates.push(x);
+    }
+    if(!candidates.length)return safeGroundSpot(g.level,f,margin);
+    return candidates.reduce((best,x)=>Math.abs(x-target)<Math.abs(best-target)?x:best,candidates[0]);
   }
   function addCrumbleBridge(g,f){
     const target=g.level.width*f,gaps=[];
@@ -2114,12 +2136,13 @@ globalThis.PulseBallEngine = (() => {
     g.retractSpikes=[];g.saws=[];g.presses=[];g.electricFloors=[];g.mines=[];g.pendulums=[];g.turrets=[];
     g.projectiles=[];g.conveyors=[];g.waves=[];g.waveShots=[];g.worms=[];g.spiders=[];g.webShots=[];
     g.bossNodes=[];g.bossOrbs=[];g.bossReceivers=[];g.boss=null;g.bossCheckpoint=null;g.expansionEnabled=true;
+    if(g.index===5&&!g.bridgeOn&&g.level.bridge[1]>g.level.bridge[0]){g.switchOn=true;g.bridgeOn=true;g.ground.push({x:g.level.bridge[0],y:480,w:g.level.bridge[1]-g.level.bridge[0],h:300,bridge:true,comfortBridge:true});}
     const plan=expansionPlans[g.index]||{};
-    (plan.fall||[]).forEach((f,i)=>{const p=nearestPlatform(g,f);if(p){Object.assign(p,{trapKind:'fall',baseY:p.y,fallTimer:0,fallVy:0,resetTimer:0,trapDisabled:false,trapSeed:i});}});
-    (plan.phase||[]).forEach((f,i)=>{const p=nearestPlatform(g,f);if(p){Object.assign(p,{trapKind:'phase',baseY:p.y,phaseOffset:i*.77,phasePeriod:3.15,phaseOn:2.05,trapDisabled:false});}});
+    (plan.fall||[]).forEach((f,i)=>{const p=safeTrapPlatform(g,f);if(p){Object.assign(p,{trapKind:'fall',baseY:p.y,fallTimer:0,fallVy:0,resetTimer:0,trapDisabled:false,trapSeed:i});}});
+    (plan.phase||[]).forEach((f,i)=>{const p=safeTrapPlatform(g,f);if(p){Object.assign(p,{trapKind:'phase',baseY:p.y,phaseOffset:i*.77,phasePeriod:3.15,phaseOn:2.05,trapDisabled:false});}});
     (plan.crumble||[]).forEach(f=>addCrumbleBridge(g,f));
     (plan.retract||[]).forEach((f,i)=>g.retractSpikes.push({x:safeGroundSpot(g.level,f),w:74,period:2.7,onTime:.72,phase:i*.83}));
-    (plan.saw||[]).forEach((f,i)=>{const x=safeGroundSpot(g.level,f);g.saws.push({baseX:x,x,y:i%2?365:430,r:i%2?23:27,range:i%2?58:92,speed:1.25+i*.18,phase:i*1.17,axis:i%2?'y':'x'});});
+    (plan.saw||[]).forEach((f,i)=>{const x=safeHazardSpot(g,f);g.saws.push({baseX:x,x,y:i%2?365:430,r:i%2?23:27,range:i%2?58:92,speed:1.25+i*.18,phase:i*1.17,axis:i%2?'y':'x'});});
     (plan.press||[]).forEach((f,i)=>g.presses.push({x:safeGroundSpot(g.level,f),w:88,topY:68,groundY:480,phase:i*.91,bossPress:false,manual:false,trigger:0,hitLatch:false}));
     (plan.electric||[]).forEach((f,i)=>g.electricFloors.push({x:safeGroundSpot(g.level,f)-52,w:104,period:2.9,onTime:1.02,phase:i*.86}));
     (plan.mine||[]).forEach((f,i)=>g.mines.push({x:safeGroundSpot(g.level,f),y:456,vx:0,armed:0,exploded:false,pulsed:false,bossMine:false,respawn:0,phase:i}));
@@ -2128,7 +2151,7 @@ globalThis.PulseBallEngine = (() => {
     (plan.conveyor||[]).forEach(([f,dir],i)=>g.conveyors.push({x:safeGroundSpot(g.level,f)-115,w:230,dir,phase:i}));
     (plan.wave||[]).forEach(([f,dir],i)=>g.waves.push({x:safeGroundSpot(g.level,f),dir,cooldown:1+i*.35,period:2.8-i*.15,bossWave:false}));
     (plan.worm||[]).forEach((f,i)=>g.worms.push({x:safeGroundSpot(g.level,f),state:'dormant',timer:0,stunned:0,phase:i*.7,erupt:0}));
-    (plan.spider||[]).forEach(([f,type],i)=>{const x=safeGroundSpot(g.level,f);g.spiders.push({x,baseX:x,y:type==='ambush'?155:450,type,dir:i%2?1:-1,min:x-105,max:x+105,dead:false,stun:0,hits:0,cooldown:1.2+i*.2,dropped:type!=='ambush',phase:i*.8});});
+    (plan.spider||[]).forEach(([f,type],i)=>{const x=safeHazardSpot(g,f);g.spiders.push({x,baseX:x,y:type==='ambush'?155:450,type,dir:i%2?1:-1,min:x-105,max:x+105,dead:false,stun:0,hits:0,cooldown:1.2+i*.2,dropped:type!=='ambush',phase:i*.8});});
     initBoss(g);
   }
   function pulseExpansion(g,p){
@@ -2726,13 +2749,11 @@ globalThis.PulseBallEngine = (() => {
   function terrain(s,t,platform=false){
     const x=s.x-camera;if(x+s.w< -50||x>viewW+50)return;
     if(s.moving){
-      ctx.save();ctx.lineWidth=1.5;
-      const railX=s.base-s.range-camera+12,railW=s.w+2*s.range-24;
-      rounded(railX,s.y+30,railW,3,1.5,'#244d6670');
-      rounded(x,s.y,s.w,22,7,'#264e69','#183b51');
+      ctx.save();ctx.lineWidth=1.2;
+      rounded(x,s.y,s.w,20,7,'#345e73');
       rounded(x+2,s.y-4,s.w-4,8,3,'#8ce9ec','#e6ffff');
-      path([[x+17,s.y+7],[x+12,s.y+12],[x+17,s.y+17]],null,'#d0fbff',1.6);
-      path([[x+s.w-17,s.y+7],[x+s.w-12,s.y+12],[x+s.w-17,s.y+17]],null,'#d0fbff',1.6);
+      path([[x+17,s.y+6],[x+12,s.y+10],[x+17,s.y+14]],null,'#d0fbff',1.4);
+      path([[x+s.w-17,s.y+6],[x+s.w-12,s.y+10],[x+s.w-17,s.y+14]],null,'#d0fbff',1.4);
       ctx.restore();return;
     }
     if(s.bridge){
@@ -2744,7 +2765,7 @@ globalThis.PulseBallEngine = (() => {
       ctx.restore();return;
     }
     const grd=terrainGradient(t,s.y,s.y+130);
-    rounded(x,s.y,s.w,s.h,platform?9:4,grd);
+    if(platform)rounded(x,s.y,s.w,16,8,grd);else rounded(x,s.y,s.w,s.h,4,grd);
     if(!platform){ctx.save();ctx.beginPath();ctx.rect(x,s.y+12,s.w,s.h);ctx.clip();
       for(let row=0;row<6;row++)for(let j=Math.max(0,Math.floor(-x/43)-1);j<Math.min(Math.ceil(s.w/43),Math.ceil((viewW-x)/43)+1);j++){const sx=x+j*43+(row%2)*20,sy=s.y+39+row*27;ellipse(sx,sy,3+(j%3)*2,2+(row%2),j%3===0?'#ffffff12':'#67533720');}
       ctx.restore();
@@ -3422,17 +3443,9 @@ globalThis.PulseBallEngine = (() => {
     for(const s of g.platforms)if(!s.trapDisabled)terrain(s,t,true);
     for(const pad of g.boostPads)boostPad(pad);
     for(const relay of g.relays)relayNode(relay);
-    for(const target of g.orbTargets)if(!target.on&&target.bridgeEnd>target.bridgeStart){
-      const bx=target.bridgeStart-camera,bw=target.bridgeEnd-target.bridgeStart;
-      ctx.save();ctx.globalAlpha=.22+.07*Math.sin(visualTime*3+target.x*.01);
-      for(let px=0;px<bw;px+=48)rounded(bx+px,470,Math.min(36,bw-px),7,3,'#b8fff0','#7ddfce');
-      ctx.restore();
-    }
     for(const orb of g.orbs)orbGuide(orb);
     for(const target of g.orbTargets)orbTarget(target);
     for(const orb of g.orbs)pulseOrb(orb);
-    if(!g.bridgeOn){const bx=g.level.bridge[0]-camera,bw=g.level.bridge[1]-g.level.bridge[0];rounded(bx,476,bw,6,3,'rgba(86,219,242,.16)','rgba(140,245,255,.4)');rounded(bx+4,478,Math.max(0,bw-8),2,1,'rgba(224,252,255,.42)');}
-    for(const mechanism of g.extraSwitches)if(!mechanism.on){const bx=mechanism.bridge[0]-camera,bw=mechanism.bridge[1]-mechanism.bridge[0];rounded(bx,476,bw,6,3,'rgba(86,219,242,.16)','rgba(140,245,255,.4)');rounded(bx+4,478,Math.max(0,bw-8),2,1,'rgba(224,252,255,.42)');}
     const plateX=g.level.plate[0]-camera,plateW=g.level.plate[1]-g.level.plate[0];
     if(plateW>0&&plateX+plateW>=-50&&plateX<=viewW+50){
       ellipse(plateX+plateW/2,482,Math.max(14,plateW*.52),4.4,'rgba(27,52,72,.18)');
