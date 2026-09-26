@@ -2,12 +2,12 @@ const fs=require('fs'),vm=require('vm');
 vm.runInThisContext(fs.readFileSync(__dirname+'/../index.html','utf8').match(/<script id="engine">([\s\S]*?)<\/script>/)[1]);
 const E=PulseBallEngine,results=[];
 for(let i=0;i<18;i++){
- const base=E.createGame(i),l=base.level,row={level:i+1,gaps:[],stars:[],checkpoint:l.checkpoint};
+ const base=E.createGame(i);base.expansionEnabled=false;const l=base.level,row={level:i+1,gaps:[],stars:[],checkpoint:l.checkpoint};
  const bridges=[l.bridge,...(l.extraSwitches||[]).map(s=>s.bridge),...(l.orbTargets||[]).map(t=>t.slice(2))].filter(b=>b[0]>=0&&b[1]>b[0]).map(b=>({x:b[0],y:480,w:b[1]-b[0],h:300,bridge:true}));
  const surfaces=[...base.ground,...base.platforms,...bridges];
  // A kinematic audit: real engine, hazards excluded only for reachability trials.
  function trial(x,y,dir,jump,pulse,phase=0,frames=240,hold=null){
-  const g=E.createGame(i);g.enemies=[];g.spikes=[];g.time=phase;g.checkpoint.active=true;g.ground.push(...bridges);
+  const g=E.createGame(i);g.expansionEnabled=false;g.enemies=[];g.spikes=[];g.time=phase;g.checkpoint.active=true;g.ground.push(...bridges);
   Object.assign(g.player,{x,y:y-22,vx:dir*325,vy:0,grounded:true,coyote:.1});
   let maxX=x,minX=x,minY=y;const taken=new Set();let landed=[];
   for(let f=0;f<frames;f++){
