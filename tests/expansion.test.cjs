@@ -170,3 +170,21 @@ test('late bosses add pressure without spawning hazards on the boss checkpoint',
     assert.ok(g.boss.difficultyTier===i-12,'level '+(i+1)+' boss pressure tier missing');
   }
 });
+
+
+test('boss visual pass keeps all eight late bosses visually distinct',()=>{
+  for(const fn of ['bossSaw','bossMine','bossSky','bossCrusher','bossPendulum','bossEater','bossWave','bossRift'])
+    assert.ok(html.includes('function '+fn+'('),fn+' renderer missing');
+  assert.ok(html.includes('function bossVisualStyle(index)'),'boss palette mapping missing');
+  assert.ok(html.includes('function lateAtmosphere(t)'),'late background atmosphere missing');
+  assert.ok(html.includes("g.index===17"),'final Rift atmosphere missing');
+  assert.ok(html.includes("СЛАБОСТЬ ·"),'polished boss HUD weakness label missing');
+});
+
+test('levels 11-18 use eight different late-game sky palettes',()=>{
+  const ui=html.match(/const themes=\[([\s\S]*?)\];/);
+  assert.ok(ui,'theme array missing');
+  const late=[...ui[1].matchAll(/sky:'(#[0-9a-fA-F]{6})'/g)].map(m=>m[1]).slice(10,18);
+  assert.equal(late.length,8);
+  assert.equal(new Set(late).size,8,'late-game skies should not repeat');
+});
