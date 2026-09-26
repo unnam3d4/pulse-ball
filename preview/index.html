@@ -2251,8 +2251,13 @@ globalThis.PulseBallEngine = (() => {
       const dx=p.x-pd.bx,dy=p.y-pd.by;if(dx*dx+dy*dy<(r+pd.r-4)*(r+pd.r-4))damage(g);
     }
     for(const t of g.turrets){
-      t.cooldown-=dt;
-      if(t.cooldown<=0&&Math.abs(p.x-t.x)<720){const dir=p.x>=t.x?1:-1,dy=Math.max(-110,Math.min(110,p.y-395));g.projectiles.push({x:t.x+dir*24,y:397,vx:dir*390,vy:dy*.72,life:2.4,kind:'energy'});t.cooldown=t.bossTurret?1.35:1.85;}
+      t.cooldown-=dt;t.shotFlash=Math.max(0,(t.shotFlash||0)-dt);
+      if(t.cooldown<=0&&Math.abs(p.x-t.x)<720){
+        const dir=p.x>=t.x?1:-1,dy=Math.max(-110,Math.min(110,p.y-(t.y-20)));
+        g.projectiles.push({x:t.x+dir*48,y:t.y-20,vx:dir*390,vy:dy*.72,life:2.4,kind:'energy'});
+        t.shotFlash=.18;g.events.push({type:'turretShot',x:t.x+dir*48,y:t.y-20,dir});
+        t.cooldown=t.bossTurret?1.35:1.85;
+      }
     }
     let write=0;
     for(let i=0;i<g.projectiles.length;i++){const q=g.projectiles[i];q.life-=dt;q.x+=q.vx*dt;q.y+=q.vy*dt;const dx=p.x-q.x,dy=p.y-q.y;if(dx*dx+dy*dy<(r+9)*(r+9)){damage(g);q.life=0;}if(q.life>0)g.projectiles[write++]=q;}g.projectiles.length=write;
@@ -3329,11 +3334,40 @@ globalThis.PulseBallEngine = (() => {
     ellipse(0,0,pd.r,pd.r,'#27394e','#79b8c8');ellipse(-7,-8,7,5,'#6cebf0');ctx.restore();
   }
   function drawTurret(tu){
-    const x=tu.x-camera,y=tu.y;if(x< -70||x>viewW+70)return;
-    const dir=g.player.x>=tu.x?1:-1;ctx.save();ctx.translate(x,y);
+    const x=tu.x-camera,y=tu.y;if(x< -80||x>viewW+80)return;
+    const dir=g.player.x>=tu.x?1:-1,tracking=Math.abs(g.player.x-tu.x)<720;
+    const charging=tracking&&tu.cooldown>0&&tu.cooldown<.26,flash=(tu.shotFlash||0)/.18;
+    ctx.save();ctx.translate(x,y);
     rounded(-18,-31,36,31,7,'#243c55','#16283c');rounded(-13,-26,26,13,5,'#456b82','#6fb5c5');
-    ctx.save();ctx.translate(dir*5,-20);ctx.rotate(dir>0?0:Math.PI);rounded(0,-5,35,10,4,'#314d64','#182b3e');rounded(25,-3,14,6,3,'#75e9ef');ctx.restore();
-    ellipse(-7,-20,3.5,3.5,'#f2ffff');ellipse(7,-20,3.5,3.5,'#f2ffff');ctx.restore();
+    ctx.save();ctx.translate(dir*5,-20);ctx.rotate(dir>0?0:Math.PI);
+    rounded(0,-5,35,10,4,'#314d64','#182b3e');rounded(25,-3,14,6,3,charging?'#ffd36f':'#75e9ef');
+    ctx.restore();
+    ellipse(-7,-20,3.5,3.5,'#f2ffff');ellipse(7,-20,3.5,3.5,'#f2ffff');
+    const mx=dir*48,my=-20;
+    if(charging){
+      const beat=.65+.35*Math.sin(visualTime*28);
+      ctx.globalAlpha=.35+beat*.42;ellipse(mx,my,9+beat*5,9+beat*5,'rgba(255,176,74,.22)');
+      ellipse(mx,my,4.5+beat*1.5,4.5+beat*1.5,'#ffd66f','#fff5cb');
+    }
+    if(flash>0){
+      ctx.globalAlpha=flash*.72;ellipse(mx,my,21-flash*5,21-flash*5,'rgba(255,121,68,.22)');
+      ctx.globalAlpha=flash;ellipse(mx,my,10,10,'#ff9b55','#fff6cf');
+    }
+    ctx.restore();
+  }
+  function drawEnergyProjectile(q){
+    const x=q.x-camera,y=q.y;if(x< -70||x>viewW+70)return;
+    const speed=Math.hypot(q.vx,q.vy)||1,ux=q.vx/speed,uy=q.vy/speed;
+    const pulse=.88+(reduced?0:.12*Math.sin(visualTime*22+q.x*.025));
+    ctx.save();ctx.lineCap='round';ctx.globalCompositeOperation='source-over';
+    ctx.globalAlpha=.24;ctx.strokeStyle='#ff6f49';ctx.lineWidth=12;
+    ctx.beginPath();ctx.moveTo(x-ux*38,y-uy*38);ctx.lineTo(x-ux*7,y-uy*7);ctx.stroke();
+    ctx.globalAlpha=.66;ctx.strokeStyle='#ffc45f';ctx.lineWidth=5;
+    ctx.beginPath();ctx.moveTo(x-ux*31,y-uy*31);ctx.lineTo(x-ux*5,y-uy*5);ctx.stroke();
+    ctx.globalAlpha=.28;ellipse(x,y,16*pulse,16*pulse,'#ff754d');
+    ctx.globalAlpha=.72;ellipse(x,y,11*pulse,11*pulse,'#ffb65a','#fff1b7');
+    ctx.globalAlpha=1;ellipse(x-ux*1.5,y-uy*1.5,5.5,5.5,'#fff8d7');
+    ctx.restore();
   }
   function drawConveyor(z){
     const x=z.x-camera;if(x+z.w< -50||x>viewW+50)return;ctx.save();ctx.globalAlpha=.52;rounded(x,474,z.w,6,2,'#294b5d');
@@ -3425,7 +3459,7 @@ globalThis.PulseBallEngine = (() => {
     for(const m of g.mines)drawMine(m);
     for(const tu of g.turrets)drawTurret(tu);
     for(const q of g.waveShots)drawWave(q);
-    for(const q of g.projectiles){const x=q.x-camera;if(x>-30&&x<viewW+30){ctx.save();ctx.globalAlpha=.9;ellipse(x,q.y,7,7,'#8bf4ff','#eaffff');ctx.restore();}}
+    for(const q of g.projectiles)drawEnergyProjectile(q);
     for(const q of g.webShots){const x=q.x-camera;if(x>-30&&x<viewW+30){ctx.save();ctx.globalAlpha=.78;ellipse(x,q.y,6,6,'#d6b1e1','#fff1ff');path([[x-7,q.y],[x+7,q.y]],null,'#eee1f2',1);ctx.restore();}}
     for(const w of g.worms)drawWorm(w);
     for(const s of g.spiders)drawSpider(s);
