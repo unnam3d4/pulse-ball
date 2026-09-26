@@ -142,3 +142,31 @@ test('turret shots spawn from the muzzle with a visible flash and readable speed
   assert.ok(html.includes('function drawEnergyProjectile(q)'),'high-visibility projectile renderer missing');
   assert.ok(html.includes("ctx.strokeStyle='#ffc45f'"),'projectile trail highlight missing');
 });
+
+
+test('levels 14-18 escalate in hazard density and timing pressure',()=>{
+  const counts=[];
+  for(let i=13;i<18;i++){
+    const g=E.createGame(i);
+    const count=g.retractSpikes.length+g.saws.length+g.presses.length+g.electricFloors.length+
+      g.mines.length+g.pendulums.length+g.turrets.length+g.conveyors.length+g.waves.length+
+      g.worms.length+g.spiders.length+g.platforms.filter(p=>p.trapKind).length;
+    counts.push(count);
+    assert.ok(g.difficulty&&g.difficulty.tier===i-12,'level '+(i+1)+' late difficulty tier missing');
+    assert.ok(g.difficulty.speed>1,'level '+(i+1)+' late-game timing was not increased');
+  }
+  assert.ok(counts[4]>counts[0],'level 18 should be denser than level 14');
+  assert.ok(counts[2]>=counts[0],'level 16 should not regress below level 14 density');
+});
+
+test('late bosses add pressure without spawning hazards on the boss checkpoint',()=>{
+  for(let i=13;i<18;i++){
+    const g=E.createGame(i),cp=g.bossCheckpoint.x;
+    const xs=[
+      ...g.retractSpikes.map(v=>v.x+v.w/2),...g.saws.map(v=>v.baseX),...g.presses.map(v=>v.x),
+      ...g.turrets.map(v=>v.x),...g.pendulums.map(v=>v.x),...g.waves.map(v=>v.x)
+    ];
+    assert.ok(xs.every(x=>Math.abs(x-cp)>70),'level '+(i+1)+' boss pressure overlaps checkpoint');
+    assert.ok(g.boss.difficultyTier===i-12,'level '+(i+1)+' boss pressure tier missing');
+  }
+});
