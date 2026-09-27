@@ -2029,14 +2029,13 @@ globalThis.YandexPlatform=(()=>{
   let resolveReady;const readyPromise=new Promise(r=>resolveReady=r);
   const localLang=()=>((navigator.language||'ru').slice(0,2).toLowerCase());
   const sdkHost=()=>/(^|\.)(yandex\.(ru|com|net|by|kz|uz)|yandexgames\.com)$/i.test(location.hostname);
-  const forceSdk=/(?:^|[?&])yandex-test=1(?:&|$)/.test(location.search);
   function emitPause(reason='platform'){globalThis.PulseGame?.platformPause?.(reason);}
   function emitResume(reason='platform'){globalThis.PulseGame?.platformResume?.(reason);}
   async function loadScript(){
     if(globalThis.YaGames)return;
-    if(!sdkHost()&&!forceSdk)return;
+    if(!sdkHost())return;
     await new Promise((resolve,reject)=>{
-      const script=document.createElement('script');script.async=true;script.src=sdkHost()?'/sdk.js':'https://sdk.games.s3.yandex.net/sdk.js';
+      const script=document.createElement('script');script.async=true;script.src='/sdk.js';
       const timer=setTimeout(()=>reject(new Error('SDK load timeout')),8000);script.onload=()=>{clearTimeout(timer);resolve();};script.onerror=()=>{clearTimeout(timer);reject(new Error('SDK load failed'));};document.head.appendChild(script);
     });
   }
