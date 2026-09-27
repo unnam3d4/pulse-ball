@@ -2507,8 +2507,21 @@ globalThis.PulseBallEngine = (() => {
   }
   const overlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
   const relayVelocity={up:[0,-860],right:[325,-760],left:[-325,-760],east:[325,-100],west:[-325,-100]};
+  function hasSuperCombatTarget(g,p){
+    const front=(q,reach=285,dy=155)=>q&&Math.abs(q.x-p.x)<reach&&Math.abs(q.y-p.y)<dy&&(q.x-p.x)*p.face>-20;
+    if((g.enemies||[]).some(enemy=>!enemy.dead&&front(enemy,275,120)))return true;
+    if((g.spiders||[]).some(spider=>!spider.dead&&front(spider,285,145)))return true;
+    if((g.worms||[]).some(worm=>worm.state!=='erupt'&&Math.abs(worm.x-p.x)<285))return true;
+    if((g.projectiles||[]).some(q=>front(q))||(g.webShots||[]).some(q=>front(q))||(g.waveShots||[]).some(q=>front(q)))return true;
+    const b=g.boss;
+    if(b&&b.active&&!b.defeated&&bossExpected(b)==='pulse'&&Math.abs(b.x-p.x)<265&&Math.abs(b.y-p.y)<140)return true;
+    return false;
+  }
   function pulse(g){
-    const p=g.player,superPulse=g.expansionEnabled!==false&&(g.superCharge||0)>=100,reach=145,combatReach=superPulse?275:145;
+    const p=g.player,superBanked=g.expansionEnabled!==false&&(g.superCharge||0)>=100;
+    // A full Super charge is banked until there is a real combat target.
+    // Utility Pulse interactions (boost/relay/orb/switch/crate/breakable) never consume it.
+    const superPulse=superBanked&&hasSuperCombatTarget(g,p),reach=145,combatReach=superPulse?275:145;
     g.pulseCooldown=superPulse?.72:.58;g.pulseEffect=.24;
     if(superPulse){g.superCharge=0;g.superPulseEffect=.42;g.events.push({type:'superPulse',x:p.x,y:p.y,dir:p.face});}
     else g.events.push({type:'pulse',x:p.x,y:p.y});
