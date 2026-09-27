@@ -238,7 +238,7 @@ test('Super Pulse is earned and uses the existing Pulse action',()=>{
   assert.equal(g.superCharge,0,'Super Pulse did not consume the earned meter');
   assert.ok(g.events.some(e=>e.type==='superPulse'),'same Pulse input did not trigger Super Pulse');
   assert.equal(g.projectiles.length,0,'Super Pulse did not clear an incoming projectile');
-  if(enemy&&enemy.type!=='heavy')assert.equal(enemy.dead,true,'Super Pulse did not clear a weak enemy');
+  if(enemy){assert.ok(enemy.stun>0,'Super Pulse did not stun the enemy');assert.equal(enemy.dead,false,'Super Pulse should not remove a platforming bounce target');}
 });
 
 test('correct boss mechanics contribute to Super Pulse charge',()=>{
