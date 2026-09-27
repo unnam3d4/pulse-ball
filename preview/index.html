@@ -2580,7 +2580,7 @@ globalThis.PulseBallEngine = (() => {
       if(g.shield>0){g.shield=0;p.invincible=.85;g.events.push({type:'shieldBreak',x:p.x,y:p.y});return;}
     }
     g.health--;g.events.push({type:'hurt',x:p.x,y:p.y});
-    if(g.health<=0){g.superCharge=Math.floor((g.superCharge||0)*.5);g.status='lost';return;}
+    if(g.health<=0){g.status='lost';return;}
     g.superCharge=Math.max(0,(g.superCharge||0)-18);
     Object.assign(p,{x:g.spawn.x,y:g.spawn.y,vx:0,vy:0,grounded:false,invincible:1.8,coyote:0,jumpBuffer:0,boosted:false,boostGlow:0,slopeMomentum:0});
   }
@@ -2728,7 +2728,7 @@ globalThis.PulseBallEngine = (() => {
     {sky:'#3d245f',horizon:'#d96f9a',sun:'#ffe3ba',far:'#724184',mid:'#55326e',near:'#382751',tree:'#34233f',dark:'#1d172c',grass:'#d8d05f',edge:'#8a7650',dirt:'#8e5966',deep:'#442c45',stone:'#6d5278',water:'#3f4b79'}
   ];
   const readLocal=key=>{try{return localStorage.getItem(key);}catch{return null;}};
-  let g=E.createGame(0),mode='menu',input={left:false,right:false,jump:false,pulse:false},pulseQueued=false,heldCodes=new Set(),touchPointers=new Map(),camera=0,viewW=1200,viewH=600,last=0,accumulator=0,visualTime=0,particles=[],feedbackFx=[],toastUntil=0,shake=0,finishCelebration=0,audio=null,audioMaster=null,masterLimiter=null,sfxGain=null,musicGain=null,musicSource=null,musicKey='',musicWanted='menu',musicLoadToken=0,sound=readLocal('pulse-ball-sound')!=='off',dialogKind='',helpPrevious='menu',best=[],unlocked=0,lossesSinceAd=0,tutorialSeen=new Set(),tutorialActive='',tutorialUntil=0,tutorialActed=false,tutorialActionAt=0,tutorialHideTimer=0;
+  let g=E.createGame(0),mode='menu',input={left:false,right:false,jump:false,pulse:false},pulseQueued=false,heldCodes=new Set(),touchPointers=new Map(),camera=0,viewW=1200,viewH=600,last=0,accumulator=0,visualTime=0,particles=[],feedbackFx=[],toastUntil=0,shake=0,finishCelebration=0,audio=null,audioMaster=null,masterLimiter=null,sfxGain=null,musicGain=null,musicSource=null,musicKey='',musicWanted='menu',musicLoadToken=0,sound=readLocal('pulse-ball-sound')!=='off',dialogKind='',helpPrevious='menu',best=[],unlocked=0,tutorialSeen=new Set(),tutorialActive='',tutorialUntil=0,tutorialActed=false,tutorialActionAt=0,tutorialHideTimer=0;
   const musicBuffers=new Map();
   const MUSIC_TRACKS={
     // Music intentionally sits behind gameplay. SFX must stay readable on phone speakers.
