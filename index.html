@@ -2004,11 +2004,11 @@ button:disabled:active { transform: none; }
       <div class="level-label"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><circle cx="10" cy="10" r="4"/><path d="M15.7 4.3 13 7"/></svg><span id="levelBrand">Pulse Ball: Побег · <span id="levelRecord">ТВОЙ РЕКОРД</span></span></div>
     </nav>
     <div class="stage" id="stage">
-      <canvas id="game" tabindex="0" aria-label="Игра. Стрелки или A и D — движение, пробел — прыжок, E — импульс, P — пауза, R — заново."></canvas>
+      <canvas id="game" tabindex="0" aria-label="Игра. Стрелки или A и D — движение, пробел — прыжок, E — импульс, P — пауза."></canvas>
       <div class="hud">
         <!-- Progress is integrated into the status group below. -->
         <div class="hud-group hud-status"><div class="progress-wrap hud-progress-wrap"><span id="progressText">0%</span><div class="level-progress"><i id="progressBar"></i></div><span id="finishGuide">финиш ↗</span></div><div class="hud-level-chip"><span id="hudCurrentNumber">01</span><strong id="hudCurrentName">Первый импульс</strong></div><div class="hud-chip hearts" id="hearts" aria-label="3 жизни"><i class="life-icon" aria-hidden="true"></i><i class="life-icon" aria-hidden="true"></i><i class="life-icon" aria-hidden="true"></i></div><div class="hud-chip hud-stars" aria-label="Собранные звёзды"><span class="star-icon" aria-hidden="true"></span><span id="starCount">0</span><span class="star-divider">/</span><span id="starTotal">15</span></div></div><div class="hud-group hud-energy"><div class="hud-chip pulse-meter" id="pulseMeter" aria-label="Импульс готов"><span class="energy-label" id="energyLabel" aria-hidden="true">PULSE</span><span id="pulseText">READY</span><span class="super-charge" aria-hidden="true"><i id="superFill"></i></span><i id="pulseFill"></i></div><div class="hud-chip time" id="timer">00:00</div></div>
-        <div class="hud-group hud-actions"><button class="icon-btn" id="menuButton" title="Главное меню" aria-label="Главное меню"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="icon-btn" id="restartButton" title="Начать заново (R)" aria-label="Начать заново"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1.5 8M4 4v6h6"/></svg></button><button class="icon-btn" id="pauseButton" title="Пауза (P)" aria-label="Пауза"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button></div>
+        <div class="hud-group hud-actions"><button class="icon-btn" id="menuButton" title="Главное меню" aria-label="Главное меню"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="icon-btn" id="restartButton" title="Начать заново" aria-label="Начать заново"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1.5 8M4 4v6h6"/></svg></button><button class="icon-btn" id="pauseButton" title="Пауза (P)" aria-label="Пауза"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button></div>
       </div>
       <div class="ready-hint" id="readyHint"><p id="readyText">Двигайся, прыгай и используй Pulse!</p><button class="start-btn" id="startButton"><span id="startButtonText">Поехали</span></button></div>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -2020,7 +2020,7 @@ button:disabled:active { transform: none; }
         </div>
       </div>
     </div>
-    <div class="game-bottom"><div class="controls-guide"><div class="key-group"><kbd>←</kbd><kbd>→</kbd><span id="guideMove">двигаться</span></div><div class="key-group"><kbd id="jumpKeyLabel">Пробел</kbd><span id="guideJump">прыгать</span></div><div class="key-group"><kbd>E</kbd><span>Pulse</span></div><div class="key-group desktop-only"><kbd>R</kbd><span id="guideRestart">заново</span></div><div class="key-group desktop-only"><kbd>P</kbd><span id="guidePause">пауза</span></div></div></div>
+    <div class="game-bottom"><div class="controls-guide"><div class="key-group"><kbd>←</kbd><kbd>→</kbd><span id="guideMove">двигаться</span></div><div class="key-group"><kbd id="jumpKeyLabel">Пробел</kbd><span id="guideJump">прыгать</span></div><div class="key-group"><kbd>E</kbd><span>Pulse</span></div><div class="key-group desktop-only"><kbd>P</kbd><span id="guidePause">пауза</span></div></div></div>
   </main>
 </div>
 <script>
@@ -2851,7 +2851,7 @@ globalThis.PulseBallEngine = (() => {
     document.querySelector('#starCount').parentElement.setAttribute('aria-label',tr('starsLabel'));
     document.querySelector('.level-bar').setAttribute('aria-label',tr('nextLevel'));
     $('menuTitle').textContent=tr('menuTitle');$('menuTagline').textContent=tr('menuTagline');$('levelsButtonText').textContent=tr('levels');$('menuProgressText').textContent=tr('progress');$('menuHelpButton').textContent=tr('how');$('pickerEyebrow').textContent=tr('pickerEyebrow');$('pickerTitle').textContent=tr('pickerTitle');$('menuNextKicker').textContent=tr('nextLevel');$('featureLevels').textContent=E.levels.length+' '+(lang==='ru'?'УРОВНЕЙ':'LEVELS');$('featureStars').textContent=tr('featureStars');$('settingsButtonText').textContent=tr('settings');$('settingsButton').setAttribute('aria-label',tr('settings'));$('settingsEyebrow').textContent=tr('settingsEyebrow');$('settingsTitle').textContent=tr('settings');$('languageTitle').textContent=tr('language');$('languageHint').textContent=tr('languageHint');$('soundTitle').textContent=tr('soundTitle');$('soundHint').textContent=tr('soundHint');$('fullscreenTitle').textContent=tr('screenTitle');$('fullscreenHint').textContent=tr('screenHint');$('controlsTitle').textContent=tr('controlsTitle');$('controlsHint').textContent=tr('controlsHint');$('settingsHelpButton').textContent=tr('helpTitle');$('settingsNote').textContent=tr('settingsNote');$('rotateTitle').textContent=tr('rotateTitle');$('rotateText').textContent=tr('rotateText');
-    $('readyText').textContent=tr('ready');$('startButtonText').textContent=tr('go');$('guideMove').textContent=tr('move');$('guideJump').textContent=tr('jump');$('guideRestart').textContent=tr('restart');$('guidePause').textContent=tr('pause');$('finishGuide').textContent=tr('finish');$('jumpKeyLabel').textContent=tr('space');
+    $('readyText').textContent=tr('ready');$('startButtonText').textContent=tr('go');$('guideMove').textContent=tr('move');$('guideJump').textContent=tr('jump');$('guidePause').textContent=tr('pause');$('finishGuide').textContent=tr('finish');$('jumpKeyLabel').textContent=tr('space');
     $('levelBrand').firstChild.nodeValue=tr('title')+' · ';
     $('menuButton').title=tr('mainMenu');$('menuButton').setAttribute('aria-label',tr('mainMenu'));$('restartButton').title=tr('restart');$('restartButton').setAttribute('aria-label',tr('restart'));$('pauseButton').title=tr('pause');$('pauseButton').setAttribute('aria-label',tr('pause'));
     $('currentLevelName').textContent=levelDisplayName(g.index);$('hudCurrentName').textContent=levelDisplayName(g.index);$('hudCurrentNumber').textContent=String(g.index+1).padStart(2,'0');updateSound();updateFullscreen();
@@ -2968,8 +2968,6 @@ globalThis.PulseBallEngine = (() => {
     }else if(g.index===11){ // Mine Keeper: warning sector
       for(let i=-1;i<Math.ceil(viewW/300)+2;i++){
         const x=i*300-(camera*.11%300);
-        ctx.globalAlpha=.16;rounded(x+38,140+(i%2)*35,84,96,10,'#55324a','#9d5f51');
-        ctx.globalAlpha=.38+.10*Math.sin(phase*4+i);ellipse(x+80,154+(i%2)*35,7,7,'#ff8d56');
         ctx.globalAlpha=.12;path([[x+16,320],[x+132,250],[x+248,320]],null,'#ffc06e',5);
       }
     }else if(g.index===12){ // Sky Sentinel: high-altitude tech
@@ -4458,7 +4456,6 @@ globalThis.PulseBallEngine = (() => {
     if(e.ctrlKey||e.metaKey||e.altKey||adPending||pauseReasons.size)return;
     if(e.code==='Tab'&&!$('overlay').hidden){const buttons=[...$('dialog').querySelectorAll('button')].filter(b=>!b.hidden);if(e.shiftKey&&document.activeElement===buttons[0]){e.preventDefault();buttons[buttons.length-1].focus();}else if(!e.shiftKey&&document.activeElement===buttons[buttons.length-1]){e.preventDefault();buttons[0].focus();}return;}
     if(e.code==='Escape'||e.code==='KeyP'){if(!e.repeat){if(mode==='help')$('dialogPrimary').click();else if(mode==='menu'&&(!$('levelPicker').hidden||!$('settingsPanel').hidden))showMenu();else if(mode!=='menu')pause();}e.preventDefault();return;}
-    if(e.code==='KeyR'&&!e.repeat&&mode!=='help'&&mode!=='menu'){e.preventDefault();levelTransitionWithAd(g.index,0,0);return;}
     if(codeMap[e.code]&&(mode==='playing'||mode==='ready')){
       if(e.code==='Space'&&e.target.tagName==='BUTTON'&&e.target!==$('startButton'))return;
       e.preventDefault();if(mode==='ready')start();if(codeMap[e.code]==='pulse'&&!heldCodes.has(e.code))pulseQueued=true;heldCodes.add(e.code);syncInput();unlockAudio();
