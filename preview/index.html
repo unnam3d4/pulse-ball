@@ -4256,19 +4256,34 @@ globalThis.PulseBallEngine = (() => {
     }).join('');
   }
 
+  const gameplayFocusRoots=[canvas,stage.querySelector('.hud'),stage.querySelector('.touch-controls'),$('readyHint'),document.querySelector('.levels')].filter(Boolean);
+  function setGameplayFocusEnabled(enabled){
+    for(const root of gameplayFocusRoots){
+      if('inert' in root)root.inert=!enabled;
+      const nodes=[];if(root.matches&&root.matches('button,[tabindex]'))nodes.push(root);nodes.push(...root.querySelectorAll('button,[tabindex]'));
+      for(const el of nodes){
+        if(!enabled){
+          if(!el.hasAttribute('data-pulse-prev-tabindex'))el.setAttribute('data-pulse-prev-tabindex',el.hasAttribute('tabindex')?el.getAttribute('tabindex'):'__none__');
+          el.setAttribute('tabindex','-1');
+        }else if(el.hasAttribute('data-pulse-prev-tabindex')){
+          const previous=el.getAttribute('data-pulse-prev-tabindex');if(previous==='__none__')el.removeAttribute('tabindex');else el.setAttribute('tabindex',previous);el.removeAttribute('data-pulse-prev-tabindex');
+        }
+      }
+    }
+  }
   function showMenu(){
-    pendingLevel=null;pendingMenu=false;
+    pendingLevel=null;pendingMenu=false;setGameplayFocusEnabled(false);
     clearInput();hideTutorial(true);globalThis.YandexPlatform?.gameplayStop?.();globalThis.YandexPlatform?.showBanner?.();mode='menu';setMusic('menu');$('overlay').hidden=true;$('readyHint').hidden=true;$('menuScreen').hidden=false;$('menuHome').hidden=false;$('levelPicker').hidden=true;$('settingsPanel').hidden=true;renderProgression();refreshSettingsState();
     $('continueButton').focus({preventScroll:true});
   }
   function showLevelPicker(){
-    pendingLevel=null;
+    pendingLevel=null;setGameplayFocusEnabled(false);
     selectedChapter=Math.floor(continueLevel()/LEVELS_PER_CHAPTER);
     clearInput();globalThis.YandexPlatform?.gameplayStop?.();$('overlay').hidden=true;globalThis.YandexPlatform?.showBanner?.();mode='menu';setMusic('menu');$('menuScreen').hidden=false;$('menuHome').hidden=true;$('settingsPanel').hidden=true;$('levelPicker').hidden=false;renderProgression();
     const focusTarget=$('chapterTabs').getClientRects().length?$('chapterTab'+selectedChapter):$('backMenuButton');focusTarget.focus({preventScroll:true});
   }
   function showSettings(){
-    clearInput();globalThis.YandexPlatform?.gameplayStop?.();$('overlay').hidden=true;globalThis.YandexPlatform?.showBanner?.();mode='menu';setMusic('menu');$('menuScreen').hidden=false;$('menuHome').hidden=true;$('levelPicker').hidden=true;$('settingsPanel').hidden=false;refreshSettingsState();
+    setGameplayFocusEnabled(false);clearInput();globalThis.YandexPlatform?.gameplayStop?.();$('overlay').hidden=true;globalThis.YandexPlatform?.showBanner?.();mode='menu';setMusic('menu');$('menuScreen').hidden=false;$('menuHome').hidden=true;$('levelPicker').hidden=true;$('settingsPanel').hidden=false;refreshSettingsState();
     $('backSettingsButton').focus({preventScroll:true});
   }
   function formatTime(seconds){const n=Math.floor(seconds);return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');}
@@ -4290,12 +4305,12 @@ globalThis.PulseBallEngine = (() => {
   }
   function updateRecord(){const r=best[g.index];$('levelRecord').textContent=r&&r.level===g.level.name&&Number.isFinite(r.stars)?tr('record')+': '+r.stars+' / '+g.stars.length+' ★':tr('adventure');}
   function clearInput(){heldCodes.clear();touchPointers.clear();pulseQueued=false;input={left:false,right:false,jump:false,pulse:false};g.pulseHeld=false;document.querySelectorAll('.touch-btn').forEach(b=>b.classList.remove('pressed'));}
-  function start(){if(pauseReasons.size||document.hidden)return;globalThis.YandexPlatform?.hideBanner?.();mode='playing';$('menuScreen').hidden=true;$('readyHint').hidden=true;$('overlay').hidden=true;unlockAudio();globalThis.YandexPlatform?.gameplayStart?.();canvas.focus({preventScroll:true});}
+  function start(){if(pauseReasons.size||document.hidden)return;setGameplayFocusEnabled(true);globalThis.YandexPlatform?.hideBanner?.();mode='playing';$('menuScreen').hidden=true;$('readyHint').hidden=true;$('overlay').hidden=true;unlockAudio();globalThis.YandexPlatform?.gameplayStart?.();canvas.focus({preventScroll:true});}
   function loadLevel(index,autostart=false,carrySuper=0,carryShield=0){
     if(adPending||pauseReasons.size||document.hidden)return;
     if(!Number.isInteger(index)||index<0||index>=E.levels.length)return;
     if(index>unlocked){toast(tr('levelLocked'));return;}
-    clearInput();globalThis.YandexPlatform?.hideBanner?.();g=E.createGame(index);if(carrySuper>0)g.superCharge=Math.min(100,carrySuper);if(carryShield>0)g.shield=1;mode=autostart?'playing':'ready';setMusic(musicForLevel(index));camera=0;particles=[];feedbackFx=[];shake=0;finishCelebration=0;accumulator=0;hudCache={health:-1,shield:-1,stars:-1,total:-1,time:'',pulsePct:-1,pulseText:'',pulseReady:null,superPct:-1,superReady:null,progress:-1};tutorialSeen=new Set();hideTutorial(true);
+    setGameplayFocusEnabled(true);clearInput();globalThis.YandexPlatform?.hideBanner?.();g=E.createGame(index);if(carrySuper>0)g.superCharge=Math.min(100,carrySuper);if(carryShield>0)g.shield=1;mode=autostart?'playing':'ready';setMusic(musicForLevel(index));camera=0;particles=[];feedbackFx=[];shake=0;finishCelebration=0;accumulator=0;hudCache={health:-1,shield:-1,stars:-1,total:-1,time:'',pulsePct:-1,pulseText:'',pulseReady:null,superPct:-1,superReady:null,progress:-1};tutorialSeen=new Set();hideTutorial(true);
     $('menuScreen').hidden=true;$('overlay').hidden=true;$('readyHint').hidden=autostart;$('toast').classList.remove('visible');
     document.querySelectorAll('[data-level]').forEach(b=>{const active=Number(b.dataset.level)===index;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','true');else b.removeAttribute('aria-current');});
     $('currentLevelNumber').textContent=String(index+1).padStart(2,'0');$('currentLevelName').textContent=levelDisplayName(index);$('hudCurrentNumber').textContent=String(index+1).padStart(2,'0');$('hudCurrentName').textContent=levelDisplayName(index);
