@@ -1,0 +1,15 @@
+{
+  "name": "pulse-ball-release-builder",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:yandex": "node scripts/build-yandex.mjs"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
+    "acorn": "^8.0.0",
+    "core-js-bundle": "^3.0.0",
+    "regenerator-runtime": "^0.14.0"
+  }
+}
