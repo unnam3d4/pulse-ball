@@ -2025,7 +2025,7 @@ button:disabled:active { transform: none; }
 </div>
 <script>
 globalThis.YandexPlatform=(()=>{
-  let ysdk=null,player=null,safeStorage=null,gameReady=false,readySent=false,connected=false,cloudLoaded=false;
+  let ysdk=null,player=null,safeStorage=null,gameReady=false,readySent=false,connected=false,cloudLoaded=false,bannerWanted=false,bannerRevision=0;
   let resolveReady;const readyPromise=new Promise(r=>resolveReady=r);
   const localLang=()=>((navigator.language||'ru').slice(0,2).toLowerCase());
   const sdkHost=()=>/(^|\.)(yandex\.(ru|com|net|by|kz|uz)|yandexgames\.com)$/i.test(location.hostname);
@@ -2063,8 +2063,15 @@ globalThis.YandexPlatform=(()=>{
     try{safeStorage?.setItem?.('pulse-ball-progress-v2',JSON.stringify(data));}catch{}
     try{if(cloudLoaded)player?.setData?.({pulseBallSave:data},false)?.catch?.(()=>{});}catch{}
   }
-  function showBanner(){try{ysdk?.adv?.showBannerAdv?.()?.catch?.(()=>{});}catch{}}
-  function hideBanner(){try{ysdk?.adv?.hideBannerAdv?.()?.catch?.(()=>{});}catch{}}
+  function applyBanner(revision){
+    if(!ysdk?.adv)return;
+    const wanted=bannerWanted;let task;
+    try{task=wanted?ysdk.adv.showBannerAdv?.():ysdk.adv.hideBannerAdv?.();}catch{return;}
+    Promise.resolve(task).catch(()=>{}).finally(()=>{if(revision!==bannerRevision)applyBanner(bannerRevision);});
+  }
+  function setBanner(wanted){bannerWanted=!!wanted;const revision=++bannerRevision;applyBanner(revision);}
+  function showBanner(){setBanner(true);}
+  function hideBanner(){setBanner(false);}
   function showInterstitial(){
     return new Promise(resolve=>{
       if(!ysdk?.adv?.showFullscreenAdv){resolve(false);return;}
@@ -2540,7 +2547,7 @@ globalThis.PulseBallEngine = (() => {
     if((g.worms||[]).some(worm=>worm.state!=='erupt'&&Math.abs(worm.x-p.x)<285))return true;
     if((g.projectiles||[]).some(q=>front(q))||(g.webShots||[]).some(q=>front(q))||(g.waveShots||[]).some(q=>front(q)))return true;
     const b=g.boss;
-    if(b&&b.active&&!b.defeated&&bossExpected(b)==='pulse'&&Math.abs(b.x-p.x)<265&&Math.abs(b.y-p.y)<140)return true;
+    if(b&&b.active&&!b.defeated&&(b.invuln||0)<=0&&bossExpected(b)==='pulse'&&Math.abs(b.x-p.x)<265&&Math.abs(b.y-p.y)<140)return true;
     return false;
   }
   function pulse(g){
