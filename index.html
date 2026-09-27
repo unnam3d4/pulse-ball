@@ -2016,7 +2016,7 @@ button:disabled:active { transform: none; }
       <div class="touch-controls" aria-label="Сенсорное управление"><div class="touch-group"><button class="touch-btn move-arrow move-left" data-key="left" aria-label="Двигаться влево"></button><button class="touch-btn move-arrow move-right" data-key="right" aria-label="Двигаться вправо"></button></div><div class="touch-group"><button class="touch-btn pulse" id="pulseButton" data-key="pulse" aria-label="Импульс Pulse">PULSE</button><button class="touch-btn jump move-arrow move-up" data-key="jump" aria-label="Прыгать"></button></div></div>
       <div class="overlay" id="overlay" hidden>
         <div class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
-          <div class="dialog-symbol" id="dialogSymbol" aria-hidden="true"></div><h2 id="dialogTitle">Пауза</h2><p id="dialogText">Приключение подождёт.</p><div id="dialogExtra"></div><button class="start-btn" id="dialogPrimary">Продолжить</button><button class="rewarded-btn" id="dialogRewarded" hidden>▶ Продолжить с 3 жизнями · реклама</button><button class="secondary" id="dialogSecondary">С начала уровня</button><button class="dialog-menu" id="dialogMenu">Главное меню</button>
+          <div class="dialog-symbol" id="dialogSymbol" aria-hidden="true"></div><h2 id="dialogTitle">Пауза</h2><p id="dialogText">Приключение подождёт.</p><div id="dialogExtra"></div><button class="start-btn" id="dialogPrimary">Продолжить</button><button class="rewarded-btn" id="dialogRewarded" hidden>▶ СМОТРЕТЬ РЕКЛАМУ · 2 сердца + щит</button><button class="secondary" id="dialogSecondary">С начала уровня</button><button class="dialog-menu" id="dialogMenu">Главное меню</button>
         </div>
       </div>
     </div>
@@ -2071,8 +2071,8 @@ globalThis.YandexPlatform=(()=>{
       if(!ysdk?.adv?.showFullscreenAdv){resolve(false);return;}
       try{ysdk.adv.showFullscreenAdv({callbacks:{
         onOpen:()=>{hideBanner();gameplayStop();emitPause('ad');},
-        onClose:wasShown=>{showBanner();emitResume('ad');resolve(!!wasShown);},
-        onError:()=>{showBanner();emitResume('ad');resolve(false);}
+        onClose:wasShown=>{emitResume('ad');resolve(!!wasShown);},
+        onError:()=>{emitResume('ad');resolve(false);}
       }});}catch{emitResume('ad');resolve(false);}
     });
   }
@@ -2083,8 +2083,8 @@ globalThis.YandexPlatform=(()=>{
       try{ysdk.adv.showRewardedVideo({callbacks:{
         onOpen:()=>{hideBanner();gameplayStop();emitPause('ad');},
         onRewarded:()=>{if(settled||rewarded)return;rewarded=true;try{onReward?.();}catch{}},
-        onClose:()=>{settled=true;showBanner();emitResume('ad');resolve(rewarded);},
-        onError:()=>{settled=true;showBanner();emitResume('ad');resolve(false);}
+        onClose:()=>{settled=true;emitResume('ad');resolve(rewarded);},
+        onError:()=>{settled=true;emitResume('ad');resolve(false);}
       }});}catch{settled=true;emitResume('ad');resolve(false);}
     });
   }
@@ -2769,7 +2769,7 @@ globalThis.PulseBallEngine = (() => {
       lostTitle:'Ещё один разбег?',lostText:'Без спешки. Попробуй ещё раз, когда будешь готов.',retry:'Попробовать снова',levelSelect:'К выбору уровней',
       wonSuffix:' пройден!',collectedA:'Собрано ',collectedB:' из ',starsWord:' звёзд за ',allStars:'Все звёзды твои!',improve:'Можно вернуться и улучшить результат.',unlocked:'Открыт уровень ',next:'Следующий уровень',replay:'Переиграть этот уровень',
       soundOn:'Выключить звук',soundOff:'Включить звук',fullscreenOn:'Выйти из полноэкранного режима',fullscreenOff:'На весь экран',fullscreenFail:'Полный экран недоступен в этом окне',
-      finishCaps:'ФИНИШ',receiverCaps:'ПРИЁМНИК',rewardContinue:'▶ Продолжить с 3 жизнями · реклама',adUnavailable:'Реклама сейчас недоступна',soundMenu:'♪ Звук',fullscreenMenu:'⛶ Экран',
+      finishCaps:'ФИНИШ',receiverCaps:'ПРИЁМНИК',rewardContinue:'▶ СМОТРЕТЬ РЕКЛАМУ · 2 сердца + щит',adUnavailable:'Реклама сейчас недоступна',soundMenu:'♪ Звук',fullscreenMenu:'⛶ Экран',
       helpMove:'Движение',helpJump:'Прыжок',helpPulse:'Импульс вперёд ломает голубые блоки, двигает ящик, включает переключатель. На телефоне — PULSE.',helpPlate:'Плита',helpPlateText:'Поставь на неё импульсный ящик, чтобы включить мост',helpOrb:'Энерго-сфера',helpOrbText:'Используй Pulse рядом со сферой: она летит по стрелке, сбивает врагов и включает приёмник',helpFlag:'Белый флаг',helpFlagText:'Контрольная точка',helpPR:'Пауза / начать заново'
     },
     en:{
@@ -2782,12 +2782,12 @@ globalThis.PulseBallEngine = (() => {
       lostTitle:'One more run?',lostText:'Take your time. Try again whenever you’re ready.',retry:'Try again',levelSelect:'Level select',
       wonSuffix:' cleared!',collectedA:'Collected ',collectedB:' of ',starsWord:' stars in ',allStars:'All stars collected!',improve:'You can replay and improve your result.',unlocked:'Unlocked level ',next:'Next level',replay:'Replay this level',
       soundOn:'Mute sound',soundOff:'Enable sound',fullscreenOn:'Exit fullscreen',fullscreenOff:'Fullscreen',fullscreenFail:'Fullscreen is unavailable here',
-      finishCaps:'FINISH',receiverCaps:'RECEIVER',rewardContinue:'▶ Continue with 3 hearts · ad',adUnavailable:'Ad is not available right now',soundMenu:'♪ Sound',fullscreenMenu:'⛶ Fullscreen',
+      finishCaps:'FINISH',receiverCaps:'RECEIVER',rewardContinue:'▶ WATCH AD · 2 hearts + shield',adUnavailable:'Ad is not available right now',soundMenu:'♪ Sound',fullscreenMenu:'⛶ Fullscreen',
       helpMove:'Move',helpJump:'Jump',helpPulse:'Forward pulse breaks blue blocks, pushes crates and activates switches. On mobile, tap PULSE.',helpPlate:'Plate',helpPlateText:'Push a pulse crate onto it to activate the bridge',helpOrb:'Energy orb',helpOrbText:'Use Pulse near an orb: it flies along its arrow, defeats enemies and charges a receiver',helpFlag:'White flag',helpFlagText:'Checkpoint',helpPR:'Pause / restart'
     }
   };
-  Object.assign(I18N.ru,{chapter:'ГЛАВА',back:'Назад',forward:'Вперёд',mainMenu:'Главное меню',nextAdventure:'ТВОЙ СЛЕДУЮЩИЙ ШАГ',newRun:'Новый маршрут',bestTime:'Лучшее время',starsLabel:'Звёзды',moveLeft:'Двигаться влево',moveRight:'Двигаться вправо',soundHint:'Игровые звуковые эффекты',rewardContinue:'▶ СМОТРЕТЬ РЕКЛАМУ · +3 жизни',chapterNames:['Зелёная долина','Небесные высоты','Резонанс','Энергия сферы','Солнечные сады','Пик энергии']});
-  Object.assign(I18N.en,{chapter:'CHAPTER',back:'Back',forward:'Next',mainMenu:'Main menu',nextAdventure:'YOUR NEXT ADVENTURE',newRun:'New adventure',bestTime:'Best time',starsLabel:'Stars',moveLeft:'Move left',moveRight:'Move right',soundHint:'Game sound effects',rewardContinue:'▶ WATCH AD · +3 lives',chapterNames:['Green Valley','Sky Heights','Resonance','Orb Energy','Sunlit Gardens','Energy Peak']});
+  Object.assign(I18N.ru,{chapter:'ГЛАВА',back:'Назад',forward:'Вперёд',mainMenu:'Главное меню',nextAdventure:'ТВОЙ СЛЕДУЮЩИЙ ШАГ',newRun:'Новый маршрут',bestTime:'Лучшее время',starsLabel:'Звёзды',moveLeft:'Двигаться влево',moveRight:'Двигаться вправо',soundHint:'Игровые звуковые эффекты',rewardContinue:'▶ СМОТРЕТЬ РЕКЛАМУ · 2 сердца + щит',chapterNames:['Зелёная долина','Небесные высоты','Резонанс','Энергия сферы','Солнечные сады','Пик энергии']});
+  Object.assign(I18N.en,{chapter:'CHAPTER',back:'Back',forward:'Next',mainMenu:'Main menu',nextAdventure:'YOUR NEXT ADVENTURE',newRun:'New adventure',bestTime:'Best time',starsLabel:'Stars',moveLeft:'Move left',moveRight:'Move right',soundHint:'Game sound effects',rewardContinue:'▶ WATCH AD · 2 hearts + shield',chapterNames:['Green Valley','Sky Heights','Resonance','Orb Energy','Sunlit Gardens','Energy Peak']});
   // Labels used only by the result and optional-ad presentation.
   Object.assign(I18N.ru,{campaignTitle:'Побег удался!',campaignText:'Все 18 уровней пройдены. Спасибо за игру!',completeTitle:'Уровень пройден!',resultTime:'Время',resultRating:'Рейтинг',watchAd:'Смотреть рекламу',rewardHint:'Продолжить с чекпоинта',rewardGain:'2 сердца + щит',rewardShieldHint:'Щит на следующий уровень',rewardShieldGain:'ЩИТ',replay:'Переиграть'});
   Object.assign(I18N.en,{campaignTitle:'You escaped!',campaignText:'All 18 levels cleared. Thanks for playing!',completeTitle:'Level complete!',resultTime:'Time',resultRating:'Rating',watchAd:'Watch ad',rewardHint:'Continue from checkpoint',rewardGain:'2 hearts + shield',rewardShieldHint:'Shield for next level',rewardShieldGain:'SHIELD',replay:'Replay'});
@@ -2871,7 +2871,18 @@ globalThis.PulseBallEngine = (() => {
     ctx.setTransform(canvas.width/viewW,0,0,canvas.height/viewH,0,0);
   }
   new ResizeObserver(fit).observe(stage);addEventListener('resize',fit,{passive:true});addEventListener('orientationchange',()=>requestAnimationFrame(fit),{passive:true});if(window.visualViewport)visualViewport.addEventListener('resize',fit,{passive:true});fit();
-  function rounded(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.stroke();}}
+  function rounded(x,y,w,h,r,fill,stroke){
+    ctx.beginPath();
+    if(typeof ctx.roundRect==='function')ctx.roundRect(x,y,w,h,r);
+    else{
+      const rr=Math.max(0,Math.min(Number(r)||0,Math.abs(w)/2,Math.abs(h)/2));
+      ctx.moveTo(x+rr,y);ctx.lineTo(x+w-rr,y);ctx.quadraticCurveTo(x+w,y,x+w,y+rr);
+      ctx.lineTo(x+w,y+h-rr);ctx.quadraticCurveTo(x+w,y+h,x+w-rr,y+h);
+      ctx.lineTo(x+rr,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-rr);
+      ctx.lineTo(x,y+rr);ctx.quadraticCurveTo(x,y,x+rr,y);ctx.closePath();
+    }
+    if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.stroke();}
+  }
   function ellipse(x,y,rx,ry,color){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
   function path(points,fill,stroke,width=1){ctx.beginPath();for(let i=0;i<points.length;i++){const p=points[i];if(i)ctx.lineTo(p[0],p[1]);else ctx.moveTo(p[0],p[1]);}if(fill){ctx.closePath();ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.lineWidth=width;ctx.strokeStyle=stroke;ctx.stroke();}}
   function star(x,y,r,fill,stroke,rotation=0){
@@ -4360,7 +4371,7 @@ globalThis.PulseBallEngine = (() => {
         }
       });
     }finally{setAdPending(false);}
-    if(!granted){toast(tr('adUnavailable'));return;}
+    if(!granted){globalThis.YandexPlatform?.showBanner?.();toast(tr('adUnavailable'));return;}
     if(kind==='won'){loadLevel(index+1,true,0,1);return;}
     clearInput();$('overlay').hidden=true;
     if(pauseReasons.size||document.hidden){mode='platformPaused';return;}
@@ -4392,7 +4403,7 @@ globalThis.PulseBallEngine = (() => {
   function syncInput(){for(const key of ['left','right','jump','pulse'])input[key]=[...heldCodes].some(c=>codeMap[c]===key)||[...touchPointers.values()].some(v=>v===key);}
   addEventListener('keydown',e=>{
     if(e.ctrlKey||e.metaKey||e.altKey||adPending||pauseReasons.size)return;
-    if(e.code==='Tab'&&!$('overlay').hidden){const buttons=[...$('dialog').querySelectorAll('button')].filter(b=>!b.hidden);if(e.shiftKey&&document.activeElement===buttons[0]){e.preventDefault();buttons.at(-1).focus();}else if(!e.shiftKey&&document.activeElement===buttons.at(-1)){e.preventDefault();buttons[0].focus();}return;}
+    if(e.code==='Tab'&&!$('overlay').hidden){const buttons=[...$('dialog').querySelectorAll('button')].filter(b=>!b.hidden);if(e.shiftKey&&document.activeElement===buttons[0]){e.preventDefault();buttons[buttons.length-1].focus();}else if(!e.shiftKey&&document.activeElement===buttons[buttons.length-1]){e.preventDefault();buttons[0].focus();}return;}
     if(e.code==='Escape'||e.code==='KeyP'){if(!e.repeat){if(mode==='help')$('dialogPrimary').click();else if(mode==='menu'&&(!$('levelPicker').hidden||!$('settingsPanel').hidden))showMenu();else if(mode!=='menu')pause();}e.preventDefault();return;}
     if(e.code==='KeyR'&&!e.repeat&&mode!=='help'&&mode!=='menu'){e.preventDefault();levelTransitionWithAd(g.index,0,0);return;}
     if(codeMap[e.code]&&(mode==='playing'||mode==='ready')){
