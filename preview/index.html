@@ -3438,7 +3438,7 @@ globalThis.PulseBallEngine = (() => {
     if(!o.active&&!near&&!teach)return;
     const x1=o.x-camera,y1=o.y,x2=target.x-camera,y2=target.y;
     if(Math.max(x1,x2)<-80||Math.min(x1,x2)>viewW+80)return;
-    const dist=Math.hypot(x2-x1,y2-y1),steps=Math.max(2,Math.floor(dist/55));
+    const dist=Math.hypot(x2-x1,y2-y1),steps=Math.max(2,Math.min(coarsePointer?8:14,Math.floor(dist/(coarsePointer?85:70))));
     ctx.save();ctx.globalAlpha=o.active?.36:.2;
     for(let i=1;i<steps;i++){
       const k=i/steps,wobble=reduced?0:Math.sin(visualTime*4+i*.9)*4;
@@ -4145,9 +4145,10 @@ globalThis.PulseBallEngine = (() => {
     }
   }
   function handleEvents(){
+    const utilityPulse=g.events.some(e=>e.type==='orbLaunch'||e.type==='boost'||e.type==='relay');
     for(const e of g.events){
       if(e.type==='relay'){burst(e.x,e.y,'#b0faff',5);feedback('switch',e.x,e.y,'#b0faff');tone(430,.07,'triangle',0,.022);tone(860,.14,'sine',.035,.026);}
-      if(e.type==='orbLaunch'){burst(e.x,e.y,'#8cf7ff',7);feedback('switch',e.x,e.y,'#8cf7ff');if(g.index===9&&!g.orbTargets.some(t=>t.on))toast(tr('orbLaunch'));tone(360,.08,'triangle',0,.022);tone(720,.14,'sine',.035,.023);noiseBurst(.055,.006,.01,800,6500);}
+      if(e.type==='orbLaunch'){burst(e.x,e.y,'#8cf7ff',coarsePointer?3:5);feedback('switch',e.x,e.y,'#8cf7ff');if(g.index===9&&!g.orbTargets.some(t=>t.on))toast(tr('orbLaunch'));tone(380,.075,'triangle',0,.020);tone(760,.12,'sine',.035,.020);}
       if(e.type==='orbEnemy'){burst(e.x,e.y,'#a6f7ff',9);feedback('enemy',e.x,e.y-5,'#c8fbff',1);impactSound(.8,210);tone(720,.09,'sine',.035,.016);}
       if(e.type==='orbHit'){burst(e.x,e.y,'#c5ffff',13,true);feedback('switch',e.x,e.y,'#d8ffff');toast(tr('orbHit'));impactSound(1.05,190);tone(620,.13,'sine',.025,.025);tone(980,.18,'sine',.065,.022);}
       if(e.type==='boost'){burst(e.x,e.y,'#8cf0ff',6);tone(240,.075,'sine',0,.025);tone(520,.12,'triangle',.025,.022);tone(900,.15,'sine',.065,.016);noiseBurst(.07,.007,0,600,5200);}
@@ -4160,7 +4161,7 @@ globalThis.PulseBallEngine = (() => {
       else if(e.type==='heartPickup'){burst(e.x,e.y,'#e0a8ff',10,true);tone(620,.10,'sine',0,.026);tone(880,.16,'sine',.055,.022);toast(lang==='ru'?'+1 СЕРДЦЕ':'+1 HEART');}
       else if(e.type==='shieldPickup'){burst(e.x,e.y,'#9df8ff',12,true);tone(520,.10,'triangle',0,.025);tone(930,.19,'sine',.05,.025);toast(lang==='ru'?'ЩИТ АКТИВЕН':'SHIELD ACTIVE');}
       else if(e.type==='checkpoint'){toast(tr('checkpoint'));burst(e.x,e.y+28,'#9cf6ff',8,true);feedback('checkpoint',e.x,458,'#91f4ff');tone(520,.12,'sine',0,.030);tone(690,.14,'sine',.08,.028);tone(920,.19,'sine',.16,.024);}
-      else if(e.type==='pulse'){pulseSound(1);}
+      else if(e.type==='pulse'&&!utilityPulse){pulseSound(1);}
       else if(e.type==='superReady'){toast(lang==='ru'?'СУПЕР-ИМПУЛЬС ГОТОВ':'SUPER PULSE READY');tone(420,.12,'sine',0,.030);tone(720,.18,'triangle',.07,.030);tone(1080,.24,'sine',.14,.026);}
       else if(e.type==='superPulse'){pulseSound(1.55);tone(95,.22,'sine',0,.050);tone(760,.24,'sawtooth',.035,.022);noiseBurst(.18,.026,0,100,5600);duckMusic(.20,.38);shake=Math.max(shake,7);burst(e.x+e.dir*60,e.y,'#bffcff',coarsePointer?10:14,true);}
       else if(e.type==='superClear'){tone(980,.07,'sine',0,.014);}
