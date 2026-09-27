@@ -745,6 +745,51 @@ img{-webkit-user-drag:none}button{transition:transform .15s,filter .15s}button:f
   }
 }
 
+/* ===== Super Pulse HUD spacing ===== */
+.hud .pulse-meter{
+  min-width:104px!important;
+  height:38px!important;
+  padding:7px 12px 3px!important;
+  gap:1px!important;
+}
+.hud .pulse-meter .energy-label{
+  line-height:10px!important;
+  letter-spacing:1.35px!important;
+}
+.hud .pulse-meter #pulseText{
+  line-height:13px!important;
+}
+.hud .pulse-meter .super-charge{
+  position:absolute!important;
+  z-index:3!important;
+  left:11px!important;
+  right:11px!important;
+  top:4px!important;
+  height:2px!important;
+  overflow:hidden!important;
+  border-radius:3px!important;
+  background:#d9e0eb66!important;
+}
+.hud .pulse-meter .super-charge i{
+  position:static!important;
+  display:block!important;
+  height:100%!important;
+  opacity:1!important;
+  border-radius:3px!important;
+  background:linear-gradient(90deg,#7a75ff,#60e8ff,#fff2a2)!important;
+  box-shadow:0 0 7px #6ceeff!important;
+}
+@media(max-width:680px){
+  .hud .pulse-meter{min-width:94px!important;padding-inline:10px!important}
+}
+@media(pointer:coarse) and (orientation:landscape){
+  .hud .pulse-meter{min-width:100px!important;height:38px!important}
+}
+@media(pointer:coarse) and (orientation:landscape) and (max-height:430px){
+  .hud .pulse-meter{min-width:88px!important;height:36px!important;padding:6px 9px 2px!important}
+  .hud .pulse-meter .super-charge{left:9px!important;right:9px!important;top:3px!important}
+}
+
 /* ===== Star art polish ===== */
 .star-icon{
   display:inline-block!important;
