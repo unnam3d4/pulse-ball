@@ -1803,6 +1803,96 @@ button:disabled:active { transform: none; }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 
 </style>
+<style id="super-pulse-hud-final">
+/* Final authority for the Super Pulse HUD card. Keep this after all HUD polish. */
+.hud .hud-energy{
+  min-height:46px!important;
+}
+.hud #pulseMeter{
+  box-sizing:border-box!important;
+  min-width:96px!important;
+  height:38px!important;
+  min-height:38px!important;
+  padding:8px 10px 4px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:3px!important;
+  overflow:hidden!important;
+}
+.hud #pulseMeter .energy-label{
+  position:relative!important;
+  z-index:4!important;
+  margin:0!important;
+  padding:0!important;
+  font-size:7px!important;
+  font-weight:800!important;
+  line-height:8px!important;
+  letter-spacing:1.35px!important;
+  opacity:.82!important;
+  white-space:nowrap!important;
+}
+.hud #pulseMeter #pulseText{
+  position:relative!important;
+  z-index:4!important;
+  margin:0!important;
+  padding:0!important;
+  font-size:10px!important;
+  font-weight:800!important;
+  line-height:11px!important;
+  letter-spacing:.65px!important;
+  white-space:nowrap!important;
+}
+.hud #pulseMeter .super-charge{
+  position:absolute!important;
+  z-index:5!important;
+  left:10px!important;
+  right:10px!important;
+  top:3px!important;
+  height:2px!important;
+  border-radius:3px!important;
+  overflow:hidden!important;
+  pointer-events:none!important;
+}
+.hud #pulseMeter.super-ready{
+  border-color:#8cecff!important;
+}
+.hud #pulseMeter.super-ready .energy-label{
+  color:#cfc9ff!important;
+  opacity:1!important;
+}
+.hud #pulseMeter.super-ready #pulseText{
+  color:#f1ffff!important;
+}
+@media (max-width:700px){
+  .hud #pulseMeter{
+    min-width:78px!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+  .hud #pulseMeter .super-charge{left:8px!important;right:8px!important;}
+}
+@media (max-width:540px){
+  .hud #pulseMeter{
+    min-width:64px!important;
+    height:38px!important;
+    padding-top:8px!important;
+    padding-bottom:4px!important;
+    gap:3px!important;
+  }
+  .hud #pulseMeter .energy-label{font-size:6.5px!important;letter-spacing:1.05px!important;}
+  .hud #pulseMeter #pulseText{font-size:9px!important;}
+}
+@media (pointer:coarse) and (orientation:landscape) and (max-height:430px){
+  .hud #pulseMeter{
+    min-width:82px!important;
+    height:38px!important;
+    padding-top:8px!important;
+    padding-bottom:4px!important;
+  }
+}
+</style>
 </head>
 <body>
 <svg class="ui-symbols" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
