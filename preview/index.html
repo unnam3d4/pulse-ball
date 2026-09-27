@@ -2728,7 +2728,7 @@ globalThis.PulseBallEngine = (() => {
     {sky:'#3d245f',horizon:'#d96f9a',sun:'#ffe3ba',far:'#724184',mid:'#55326e',near:'#382751',tree:'#34233f',dark:'#1d172c',grass:'#d8d05f',edge:'#8a7650',dirt:'#8e5966',deep:'#442c45',stone:'#6d5278',water:'#3f4b79'}
   ];
   const readLocal=key=>{try{return localStorage.getItem(key);}catch{return null;}};
-  let g=E.createGame(0),mode='menu',input={left:false,right:false,jump:false,pulse:false},pulseQueued=false,heldCodes=new Set(),touchPointers=new Map(),camera=0,viewW=1200,viewH=600,last=0,accumulator=0,visualTime=0,particles=[],feedbackFx=[],toastUntil=0,shake=0,finishCelebration=0,audio=null,audioMaster=null,masterLimiter=null,sfxGain=null,musicGain=null,musicSource=null,musicKey='',musicWanted='menu',musicLoadToken=0,sound=readLocal('pulse-ball-sound')!=='off',dialogKind='',helpPrevious='menu',best=[],unlocked=0,tutorialSeen=new Set(),tutorialActive='',tutorialUntil=0,tutorialActed=false,tutorialActionAt=0,tutorialHideTimer=0;
+  let g=E.createGame(0),mode='menu',input={left:false,right:false,jump:false,pulse:false},pulseQueued=false,heldCodes=new Set(),touchPointers=new Map(),camera=0,viewW=1200,viewH=600,last=0,accumulator=0,visualTime=0,particles=[],feedbackFx=[],toastUntil=0,shake=0,finishCelebration=0,audio=null,audioMaster=null,masterLimiter=null,sfxGain=null,musicGain=null,noiseBuffer=null,musicSource=null,musicKey='',musicWanted='menu',musicLoadToken=0,sound=readLocal('pulse-ball-sound')!=='off',dialogKind='',helpPrevious='menu',best=[],unlocked=0,tutorialSeen=new Set(),tutorialActive='',tutorialUntil=0,tutorialActed=false,tutorialActionAt=0,tutorialHideTimer=0;
   const musicBuffers=new Map();
   const MUSIC_TRACKS={
     // Music intentionally sits behind gameplay. SFX must stay readable on phone speakers.
@@ -3977,9 +3977,11 @@ globalThis.PulseBallEngine = (() => {
     if(g.superPulseEffect>0){
       const age=1-g.superPulseEffect/.42,fade=1-age,px=g.player.x-camera,py=g.player.y,dir=g.player.face<0?Math.PI:0;
       ctx.save();ctx.globalCompositeOperation='screen';
-      ctx.globalAlpha=fade*.22;ellipse(px,py,42+age*20,42+age*20,'#776dff');
-      for(let ring=0;ring<3;ring++){ctx.globalAlpha=fade*(.82-ring*.18);ctx.strokeStyle=ring===0?'#efffff':ring===1?'#77f3ff':'#967cff';ctx.lineWidth=5-ring*1.2;ctx.shadowColor='#66eaff';ctx.shadowBlur=13;ctx.beginPath();ctx.arc(px,py,55+age*(105+ring*24),dir-.72-ring*.10,dir+.72+ring*.10);ctx.stroke();}
-      ctx.globalAlpha=fade*.60;for(let i=-4;i<=4;i++){const a=dir+i*.15,r=70+age*(115+Math.abs(i)*7);ellipse(px+Math.cos(a)*r,py+Math.sin(a)*r,2.2,2.2,i%2?'#fff0a8':'#dfffff');}
+      ctx.globalAlpha=fade*.20;ellipse(px,py,42+age*20,42+age*20,'#776dff');
+      const rings=coarsePointer?2:3;ctx.shadowColor='#66eaff';ctx.shadowBlur=coarsePointer?0:9;
+      for(let ring=0;ring<rings;ring++){ctx.globalAlpha=fade*(.82-ring*.20);ctx.strokeStyle=ring===0?'#efffff':ring===1?'#77f3ff':'#967cff';ctx.lineWidth=4.5-ring*1.1;ctx.beginPath();ctx.arc(px,py,55+age*(105+ring*24),dir-.72-ring*.10,dir+.72+ring*.10);ctx.stroke();}
+      ctx.shadowBlur=0;ctx.globalAlpha=fade*.58;const sparks=coarsePointer?5:9;
+      for(let i=0;i<sparks;i++){const k=i-(sparks-1)/2,a=dir+k*.15,r=70+age*(115+Math.abs(k)*7);ellipse(px+Math.cos(a)*r,py+Math.sin(a)*r,2.1,2.1,i%2?'#fff0a8':'#dfffff');}
       ctx.restore();
     }
     drawFeedback();
@@ -4040,6 +4042,9 @@ globalThis.PulseBallEngine = (() => {
       audioMaster.connect(masterLimiter);masterLimiter.connect(audio.destination);
       sfxGain=audio.createGain();sfxGain.gain.value=1.65;sfxGain.connect(audioMaster);
       musicGain=audio.createGain();musicGain.gain.value=0;musicGain.connect(audioMaster);
+      // One reusable white-noise buffer. Creating/filling AudioBuffers during Super Pulse caused frame spikes on phones.
+      const noiseFrames=Math.max(1,Math.floor(audio.sampleRate*1.25));noiseBuffer=audio.createBuffer(1,noiseFrames,audio.sampleRate);
+      const noiseData=noiseBuffer.getChannelData(0);for(let i=0;i<noiseFrames;i++)noiseData[i]=Math.random()*2-1;
       return true;
     }catch{return false;}
   }
@@ -4052,13 +4057,13 @@ globalThis.PulseBallEngine = (() => {
     osc.connect(gain);gain.connect(sfxGain);osc.start(now);osc.stop(now+duration+.015);
   }
   function noiseBurst(duration=.08,volume=.018,delay=0,highpass=180,lowpass=5000){
-    if(!sound||!audio||!sfxGain)return;
-    const frames=Math.max(1,Math.floor(audio.sampleRate*duration)),buffer=audio.createBuffer(1,frames,audio.sampleRate),data=buffer.getChannelData(0);
-    for(let i=0;i<frames;i++)data[i]=(Math.random()*2-1)*(1-i/frames);
+    if(!sound||!audio||!sfxGain||!noiseBuffer)return;
     const src=audio.createBufferSource(),hp=audio.createBiquadFilter(),lp=audio.createBiquadFilter(),gain=audio.createGain(),now=audio.currentTime+delay;
-    src.buffer=buffer;hp.type='highpass';hp.frequency.value=highpass;lp.type='lowpass';lp.frequency.value=lowpass;
+    src.buffer=noiseBuffer;hp.type='highpass';hp.frequency.value=highpass;lp.type='lowpass';lp.frequency.value=lowpass;
     gain.gain.setValueAtTime(volume,now);gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
-    src.connect(hp);hp.connect(lp);lp.connect(gain);gain.connect(sfxGain);src.start(now);
+    src.connect(hp);hp.connect(lp);lp.connect(gain);gain.connect(sfxGain);
+    const maxOffset=Math.max(0,noiseBuffer.duration-duration-.01),offset=maxOffset?Math.random()*maxOffset:0;
+    src.start(now,offset,Math.min(duration,noiseBuffer.duration-offset));
   }
   function impactSound(weight=1,pitch=170){
     tone(pitch,.085,'triangle',0,.025*weight,-35+Math.random()*70);
@@ -4157,9 +4162,9 @@ globalThis.PulseBallEngine = (() => {
       else if(e.type==='checkpoint'){toast(tr('checkpoint'));burst(e.x,e.y+28,'#9cf6ff',8,true);feedback('checkpoint',e.x,458,'#91f4ff');tone(520,.12,'sine',0,.030);tone(690,.14,'sine',.08,.028);tone(920,.19,'sine',.16,.024);}
       else if(e.type==='pulse'){pulseSound(1);}
       else if(e.type==='superReady'){toast(lang==='ru'?'СУПЕР-ИМПУЛЬС ГОТОВ':'SUPER PULSE READY');tone(420,.12,'sine',0,.030);tone(720,.18,'triangle',.07,.030);tone(1080,.24,'sine',.14,.026);}
-      else if(e.type==='superPulse'){pulseSound(1.7);tone(95,.24,'sine',0,.055);tone(760,.28,'sawtooth',.035,.025);noiseBurst(.24,.032,0,100,6200);duckMusic(.20,.40);shake=Math.max(shake,8);burst(e.x+e.dir*60,e.y,'#bffcff',20,true);}
-      else if(e.type==='superClear'){tone(980,.08,'sine',0,.018);noiseBurst(.08,.012,0,1200,7600);}
-      else if(e.type==='superEnemy'){burst(e.x,e.y,'#9df7ff',10);impactSound(.75,180);}
+      else if(e.type==='superPulse'){pulseSound(1.55);tone(95,.22,'sine',0,.050);tone(760,.24,'sawtooth',.035,.022);noiseBurst(.18,.026,0,100,5600);duckMusic(.20,.38);shake=Math.max(shake,7);burst(e.x+e.dir*60,e.y,'#bffcff',coarsePointer?10:14,true);}
+      else if(e.type==='superClear'){tone(980,.07,'sine',0,.014);}
+      else if(e.type==='superEnemy'){burst(e.x,e.y,'#9df7ff',coarsePointer?4:7);feedback('enemy',e.x,e.y-4,'#d8ffff',g.player.face||1);}
       else if(e.type==='shatter'){burst(e.x,e.y,'#8befff',9);feedback('shatter',e.x,e.y,'#b9f8ff');toast(tr('shatter'));impactSound(.9,185);noiseBurst(.10,.016,0,500,6200);}
       else if(e.type==='push'){const enemyHit=g.enemies.some(enemy=>!enemy.dead&&Math.abs(enemy.x-e.x)<34&&Math.abs(enemy.y-e.y)<48);burst(e.x,e.y,enemyHit?'#a8f7ef':'#62e8ff',enemyHit?5:6);if(enemyHit){feedback('enemy',e.x,e.y-4,'#d8fff9',g.player.face||1);impactSound(.55,220);}}
       else if(e.type==='switch'){toast(tr('switchOn'));burst(e.x,e.y-12,'#91f4ff',5);feedback('switch',e.x,e.y-19,'#b9ffff');tone(410,.07,'square',0,.012);tone(760,.16,'sine',.035,.021);}
