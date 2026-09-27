@@ -2871,7 +2871,18 @@ globalThis.PulseBallEngine = (() => {
     ctx.setTransform(canvas.width/viewW,0,0,canvas.height/viewH,0,0);
   }
   new ResizeObserver(fit).observe(stage);addEventListener('resize',fit,{passive:true});addEventListener('orientationchange',()=>requestAnimationFrame(fit),{passive:true});if(window.visualViewport)visualViewport.addEventListener('resize',fit,{passive:true});fit();
-  function rounded(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.stroke();}}
+  function rounded(x,y,w,h,r,fill,stroke){
+    ctx.beginPath();
+    if(typeof ctx.roundRect==='function')ctx.roundRect(x,y,w,h,r);
+    else{
+      const rr=Math.max(0,Math.min(Number(r)||0,Math.abs(w)/2,Math.abs(h)/2));
+      ctx.moveTo(x+rr,y);ctx.lineTo(x+w-rr,y);ctx.quadraticCurveTo(x+w,y,x+w,y+rr);
+      ctx.lineTo(x+w,y+h-rr);ctx.quadraticCurveTo(x+w,y+h,x+w-rr,y+h);
+      ctx.lineTo(x+rr,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-rr);
+      ctx.lineTo(x,y+rr);ctx.quadraticCurveTo(x,y,x+rr,y);ctx.closePath();
+    }
+    if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.stroke();}
+  }
   function ellipse(x,y,rx,ry,color){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
   function path(points,fill,stroke,width=1){ctx.beginPath();for(let i=0;i<points.length;i++){const p=points[i];if(i)ctx.lineTo(p[0],p[1]);else ctx.moveTo(p[0],p[1]);}if(fill){ctx.closePath();ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.lineWidth=width;ctx.strokeStyle=stroke;ctx.stroke();}}
   function star(x,y,r,fill,stroke,rotation=0){
