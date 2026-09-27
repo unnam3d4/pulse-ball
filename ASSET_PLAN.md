@@ -39,7 +39,7 @@ Target composition: Pulse Ball on the left/center, bright multi-biome landscape 
 
 ### Screenshots
 For every selected platform:
-- At least 2 screenshots
+- Capture target: at least 2 screenshots
 - Landscape 16:9 for our build
 - Long side 1280–2560 px
 - JPEG or 24-bit PNG
@@ -73,66 +73,11 @@ Recommended edit:
 
 ---
 
-## 2. Internal menu/game assets
+## 2. Internal menu/game assets — current implementation
 
-These are not mandatory Yandex catalog fields, but they are needed to make the game menu look like a polished product instead of a generic HTML UI.
+The approved menu background, hero illustration and six chapter thumbnails are already embedded in `index.html` as WebP data URLs. Gameplay objects use Canvas drawing; the existing hero drawing is cached as two facing sprites. UI symbols are inline SVG/CSS. No external `assets/` tree is required or planned for this release.
 
-### Hero render
-Path target: `assets/menu/pulse-ball-hero.webp`
-- Source master: 1024 × 1024 transparent PNG
-- Runtime export: WebP with transparency
-- Same approved hero as gameplay
-- Full readable face
-- Cyan energy trail/turbine accent
-- No text
-
-Use:
-- Main menu hero
-- Win/lose screens
-- Catalog icon source
-- Cover source
-
-### Main menu background
-Path target: `assets/menu/menu-world.webp`
-- 1920 × 1080 or 2560 × 1440
-- Bright positive world
-- No UI/text baked into image
-- Empty right-side area reserved for Play / Levels / Settings buttons
-- Visual language taken from actual game biomes
-
-### Chapter thumbnails
-Paths:
-- `assets/chapters/chapter-01.webp`
-- `assets/chapters/chapter-02.webp`
-- `assets/chapters/chapter-03.webp`
-- `assets/chapters/chapter-04.webp`
-- `assets/chapters/chapter-05.webp`
-- `assets/chapters/chapter-06.webp`
-
-Recommended runtime size: 640 × 360 WebP.
-
-Each thumbnail should visually correspond to its real chapter:
-1. Green valley / first Pulse
-2. Sky / Boost
-3. Resonance / Relay
-4. Light / Energy Orbs
-5. Sunny gardens / mixed mechanics
-6. Energy peak / final challenge
-
-Use these as visual chapter headers behind level buttons, not as fake screenshots.
-
-### UI icons
-Path target: `assets/ui/`
-Needed only if we stop using SVG/CSS icons:
-- settings
-- sound on/off
-- fullscreen
-- language/globe
-- pause
-- restart
-- level select
-
-Prefer simple single-color SVGs. Do not rasterize basic UI icons.
+Preserve the current art and menu hierarchy. The release ZIP contains only `index.html`. Catalog exports are separate deliverables, not replacements for the working embedded assets.
 
 ---
 
@@ -180,11 +125,7 @@ Primary placement:
 
 The reward is granted only after the SDK rewarded callback.
 
-Possible later placements only after we add a real meta-economy:
-- cosmetic currency
-- optional skin unlock progress
-
-Do not bolt a fake currency onto the game only to create more rewarded placements.
+Keep the existing voluntary continue placement. No additional reward placements or economy are part of this release.
 
 ### Sticky banner
 - Use the Yandex API-controlled sticky banner; do not draw or reserve a fake ad slot inside the game
@@ -194,13 +135,22 @@ Do not bolt a fake currency onto the game only to create more rewarded placement
 
 ---
 
-## 5. Production order
+## 5. Final capture plan
 
-1. Finish menu/settings UX and full RU/EN text coverage.
-2. Generate the hero render and menu background.
-3. Create 6 chapter thumbnails.
-4. Replace CSS-only menu art with real assets while keeping responsive fallbacks.
-5. Capture real 16:9 gameplay screenshots from the finished build.
-6. Produce Yandex icon, maskable icon, cover, hero image.
-7. Record the 16:9 gameplay video.
-8. Test ads, language switching, gameplay markup, saves and focus/audio in Yandex Draft mode.
+Capture from the final release candidate at 1280 × 720 or 1920 × 1080. Use real play, original object positions and the normal HUD. Do not composite extra enemies, pickups or mechanics into gameplay screenshots/video. Desktop and mobile captures must show their respective real controls. Keep browser chrome and test tools out of exports.
+
+| Asset / shot | Existing moment to use |
+| --- | --- |
+| Icon | Existing blue hero identity, large readable face, simple cyan/yellow field; no HUD or tiny text. Export the approved artwork, do not invent a different character. |
+| Cover | Composition based on the real level 7 Boost/Relay section at x≈6990–7790; hero, stars and existing terrain. Use approved game art rather than a raw HUD screenshot. |
+| Early screenshot | Level 1 x≈1180–1500: bright landscape, jump and two platform stars. |
+| Movement screenshot | Level 6 x≈19900–20920: Boost, elevated landing and moving-platform continuation. |
+| Orb screenshot | Level 12 x≈12550–13900: final orb, patrol/heavy lane, receiver and the bridge it activates. |
+| Final screenshot | Level 18 x≈17500–18350: Boost, Drone, moving platform, Relay and breakable obstacle. |
+| Ending shot | Actual level 18 finish and localized campaign-complete result. |
+
+Horizontal video, up to 28 seconds: 0–5 s level 1 movement; 5–10 s Pulse/crate/switch; 10–16 s level 6 or 7 Boost/Relay; 16–22 s level 12 Orb lane; 22–28 s level 18 traversal and finish. These are recommended capture moments, not finished media. Record successful, readable gameplay; avoid frantic cutting or fake camera moves that imply unavailable gameplay.
+
+Required before moderation: export and inspect the 512 × 512 PNG icon, 800 × 470 PNG cover, real landscape screenshots and 16:9 MP4 gameplay video. Maskable icon, showcase cover and vertical video are additional supported fields. Target at least two strong screenshots for each selected platform; the current documentation specifies dimensions/formats rather than a universal minimum count. Confirm mandatory fields in the actual Console draft.
+
+Official specifications checked on 2026-09-26: [Draft media fields](https://yandex.ru/dev/games/doc/ru/console/add-new-game/draft), [truthful gameplay materials](https://yandex.ru/dev/games/doc/ru/concepts/requirements). Catalog exports/upload and real-device capture remain human release gates. No promo video or artwork was generated during this code pass.
