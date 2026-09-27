@@ -2534,7 +2534,7 @@ globalThis.PulseBallEngine = (() => {
   }
   const relayVelocity={up:[0,-860],right:[325,-760],left:[-325,-760],east:[325,-100],west:[-325,-100]};
   function hasSuperCombatTarget(g,p){
-    const front=(q,reach=285,dy=155)=>q&&Math.abs(q.x-p.x)<reach&&Math.abs(q.y-p.y)<dy&&(q.x-p.x)*p.face>-20;
+    const front=(q,reach=285,dy=155)=>q&&Math.abs(q.x-p.x)<reach&&Math.abs(q.y-p.y)<dy&&(q.x-p.x)*p.face>0;
     if((g.enemies||[]).some(enemy=>!enemy.dead&&front(enemy,275,120)))return true;
     if((g.spiders||[]).some(spider=>!spider.dead&&front(spider,285,145)))return true;
     if((g.worms||[]).some(worm=>worm.state!=='erupt'&&Math.abs(worm.x-p.x)<285))return true;
@@ -2571,6 +2571,7 @@ globalThis.PulseBallEngine = (() => {
     if(relay){const v=relayVelocity[relay.dir];p.vx=v[0];p.vy=v[1];p.coyote=0;p.jumpBuffer=0;p.boosted=true;p.boostGlow=.22;relay.cooldown=1.1;relay.flash=.22;relay.uses++;g.events.push({type:'relay',x:relay.x,y:relay.y,dir:relay.dir});}
   }
   function damage(g,fall=false) {
+    if(g.status!=='playing')return;
     const p=g.player;
     if(!fall){
       const regularSafe=g.checkpoint&&Math.abs(p.x-g.checkpoint.x)<78&&Math.abs(p.y-440)<82;
@@ -2578,7 +2579,7 @@ globalThis.PulseBallEngine = (() => {
       if(regularSafe||bossSafe||p.invincible>0)return;
       if(g.shield>0){g.shield=0;p.invincible=.85;g.events.push({type:'shieldBreak',x:p.x,y:p.y});return;}
     }
-    g.health--;g.events.push({type:'hurt',x:p.x,y:p.y});
+    g.health=Math.max(0,g.health-1);g.events.push({type:'hurt',x:p.x,y:p.y});
     if(g.health<=0){g.status='lost';return;}
     g.superCharge=Math.max(0,(g.superCharge||0)-18);
     Object.assign(p,{x:g.spawn.x,y:g.spawn.y,vx:0,vy:0,grounded:false,invincible:1.8,coyote:0,jumpBuffer:0,boosted:false,boostGlow:0,slopeMomentum:0});
@@ -2686,7 +2687,7 @@ globalThis.PulseBallEngine = (() => {
       }
     }
     const phx=p.x-r+8,phy=p.y-r+3,phw=2*r-16,phh=2*r-9;
-    for(const spike of g.spikes)if(phx<spike.hitX+spike.hitW&&phx+phw>spike.hitX&&phy<spike.hitY+spike.hitH&&phy+phh>spike.hitY)damage(g);
+    for(const spike of g.spikes)if(phx<spike.hitX+spike.hitW&&phx+phw>spike.hitX&&phy<spike.hitY+spike.hitH&&phy+phh>spike.hitY){damage(g);if(g.status!=='playing')return;}
     if(p.y>720){damage(g,true);if(g.status!=='playing')return;}
     const starReach=r+17,starReach2=starReach*starReach;
     for(const star of g.stars)if(!star.taken){const dx=p.x-star.x,dy=p.y-star.y;if(dx*dx+dy*dy<starReach2){star.taken=true;g.collected++;addSuperCharge(g,20);g.events.push({type:'star',x:star.x,y:star.y});}}
@@ -2730,7 +2731,7 @@ globalThis.PulseBallEngine = (() => {
   ];
   const readLocal=key=>{try{return localStorage.getItem(key);}catch{return null;}};
   let g=E.createGame(0),mode='menu',input={left:false,right:false,jump:false,pulse:false},pulseQueued=false,heldCodes=new Set(),touchPointers=new Map(),camera=0,viewW=1200,viewH=600,last=0,accumulator=0,visualTime=0,particles=[],feedbackFx=[],toastUntil=0,shake=0,finishCelebration=0,audio=null,audioMaster=null,masterLimiter=null,sfxGain=null,musicGain=null,noiseBuffer=null,musicSource=null,musicKey='',musicWanted='menu',musicLoadToken=0,sound=readLocal('pulse-ball-sound')!=='off',dialogKind='',helpPrevious='menu',best=[],unlocked=0,tutorialSeen=new Set(),tutorialActive='',tutorialUntil=0,tutorialActed=false,tutorialActionAt=0,tutorialHideTimer=0;
-  const musicBuffers=new Map();
+  const musicBuffers=new Map(),musicLoads=new Map();
   const MUSIC_TRACKS={
     // Music intentionally sits behind gameplay. SFX must stay readable on phone speakers.
     menu:{file:'before_the_jump.mp3',loopStart:10.2284,loopEnd:40.2286,volume:.052},
@@ -2745,10 +2746,18 @@ globalThis.PulseBallEngine = (() => {
   mergeExternalProgress(readLocal('pulse-ball-save-v1'));
   mergeExternalProgress(readLocal(SAVE_KEY));
   function saveProgress(){
+    // Merge the latest storage snapshot before writing so a stale second tab cannot regress progress.
+    mergeExternalProgress(readLocal('pulse-ball-save-v1'));
+    mergeExternalProgress(readLocal(SAVE_KEY));
     const payload={version:2,unlocked,best};
     try{localStorage.setItem(SAVE_KEY,JSON.stringify(payload));localStorage.setItem('pulse-ball-save-v1',JSON.stringify(best));}catch{}
     globalThis.YandexPlatform?.saveProgress?.(payload);
   }
+  addEventListener('storage',e=>{
+    if(e.key!==SAVE_KEY&&e.key!=='pulse-ball-save-v1')return;
+    mergeExternalProgress(e.newValue);
+    renderProgression();updateRecord();updateHud();
+  });
   function recordFor(index){const r=best[index];return r&&r.level===E.levels[index]?.name&&Number.isFinite(r.stars)?r:null;}
   function ratingFor(index){const r=recordFor(index);if(!r)return 0;const total=E.levels[index].stars.length;return r.stars>=total?3:r.stars>=Math.ceil(total/2)?2:1;}
   function ratingStarsHtml(rating,size='menu'){return '<span class="rating-stars '+size+'" aria-hidden="true">'+Array.from({length:3},(_,i)=>'<i class="rating-star '+(i<rating?'on':'off')+'"></i>').join('')+'</span>';}
@@ -4112,11 +4121,16 @@ globalThis.PulseBallEngine = (() => {
   }
   async function loadMusicBuffer(key){
     if(musicBuffers.has(key))return musicBuffers.get(key);
+    if(musicLoads.has(key))return musicLoads.get(key);
     const track=MUSIC_TRACKS[key];if(!track||!audio)return null;
-    try{
-      const raw=await loadArrayBuffer(musicAsset(track.file));
-      const buffer=await audio.decodeAudioData(raw);musicBuffers.set(key,buffer);return buffer;
-    }catch{return null;}
+    const pending=(async()=>{
+      try{
+        const raw=await loadArrayBuffer(musicAsset(track.file));
+        const buffer=await audio.decodeAudioData(raw);musicBuffers.set(key,buffer);return buffer;
+      }catch{return null;}
+      finally{musicLoads.delete(key);}
+    })();
+    musicLoads.set(key,pending);return pending;
   }
   async function syncMusic(key=musicWanted){
     musicWanted=key;if(!sound||pauseReasons.size||adPending||document.hidden||!ensureAudioGraph())return;
@@ -4242,25 +4256,41 @@ globalThis.PulseBallEngine = (() => {
     }).join('');
   }
 
+  const gameplayFocusRoots=[canvas,stage.querySelector('.hud'),stage.querySelector('.touch-controls'),$('readyHint'),document.querySelector('.levels')].filter(Boolean);
+  function setGameplayFocusEnabled(enabled){
+    for(const root of gameplayFocusRoots){
+      if('inert' in root)root.inert=!enabled;
+      const nodes=[];if(root.matches&&root.matches('button,[tabindex]'))nodes.push(root);nodes.push(...root.querySelectorAll('button,[tabindex]'));
+      for(const el of nodes){
+        if(!enabled){
+          if(!el.hasAttribute('data-pulse-prev-tabindex'))el.setAttribute('data-pulse-prev-tabindex',el.hasAttribute('tabindex')?el.getAttribute('tabindex'):'__none__');
+          el.setAttribute('tabindex','-1');
+        }else if(el.hasAttribute('data-pulse-prev-tabindex')){
+          const previous=el.getAttribute('data-pulse-prev-tabindex');if(previous==='__none__')el.removeAttribute('tabindex');else el.setAttribute('tabindex',previous);el.removeAttribute('data-pulse-prev-tabindex');
+        }
+      }
+    }
+  }
   function showMenu(){
-    pendingLevel=null;
+    pendingLevel=null;pendingMenu=false;setGameplayFocusEnabled(false);
     clearInput();hideTutorial(true);globalThis.YandexPlatform?.gameplayStop?.();globalThis.YandexPlatform?.showBanner?.();mode='menu';setMusic('menu');$('overlay').hidden=true;$('readyHint').hidden=true;$('menuScreen').hidden=false;$('menuHome').hidden=false;$('levelPicker').hidden=true;$('settingsPanel').hidden=true;renderProgression();refreshSettingsState();
     $('continueButton').focus({preventScroll:true});
   }
   function showLevelPicker(){
-    pendingLevel=null;
+    pendingLevel=null;setGameplayFocusEnabled(false);
     selectedChapter=Math.floor(continueLevel()/LEVELS_PER_CHAPTER);
     clearInput();globalThis.YandexPlatform?.gameplayStop?.();$('overlay').hidden=true;globalThis.YandexPlatform?.showBanner?.();mode='menu';setMusic('menu');$('menuScreen').hidden=false;$('menuHome').hidden=true;$('settingsPanel').hidden=true;$('levelPicker').hidden=false;renderProgression();
     const focusTarget=$('chapterTabs').getClientRects().length?$('chapterTab'+selectedChapter):$('backMenuButton');focusTarget.focus({preventScroll:true});
   }
   function showSettings(){
-    clearInput();globalThis.YandexPlatform?.gameplayStop?.();$('overlay').hidden=true;globalThis.YandexPlatform?.showBanner?.();mode='menu';setMusic('menu');$('menuScreen').hidden=false;$('menuHome').hidden=true;$('levelPicker').hidden=true;$('settingsPanel').hidden=false;refreshSettingsState();
+    setGameplayFocusEnabled(false);clearInput();globalThis.YandexPlatform?.gameplayStop?.();$('overlay').hidden=true;globalThis.YandexPlatform?.showBanner?.();mode='menu';setMusic('menu');$('menuScreen').hidden=false;$('menuHome').hidden=true;$('levelPicker').hidden=true;$('settingsPanel').hidden=false;refreshSettingsState();
     $('backSettingsButton').focus({preventScroll:true});
   }
   function formatTime(seconds){const n=Math.floor(seconds);return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');}
   let hudCache={health:-1,shield:-1,stars:-1,total:-1,time:'',pulsePct:-1,pulseText:'',pulseReady:null,superPct:-1,superReady:null,progress:-1};
   function updateHud(){
-    if(hudCache.health!==g.health||hudCache.shield!==g.shield){hudCache.health=g.health;hudCache.shield=g.shield;$('hearts').innerHTML='<i class="life-icon" aria-hidden="true"></i>'.repeat(g.health)+'<i class="life-icon empty-heart" aria-hidden="true"></i>'.repeat(3-g.health)+(g.shield?'<i class="shield-mini" aria-hidden="true"></i>':'');$('hearts').setAttribute('aria-label',g.health+' '+tr('lives')+(g.shield?' + '+tr('shieldWord'):''));}
+    const health=Math.max(0,Math.min(3,Number(g.health)||0));
+    if(hudCache.health!==health||hudCache.shield!==g.shield){hudCache.health=health;hudCache.shield=g.shield;$('hearts').innerHTML='<i class="life-icon" aria-hidden="true"></i>'.repeat(health)+'<i class="life-icon empty-heart" aria-hidden="true"></i>'.repeat(3-health)+(g.shield?'<i class="shield-mini" aria-hidden="true"></i>':'');$('hearts').setAttribute('aria-label',health+' '+tr('lives')+(g.shield?' + '+tr('shieldWord'):''));}
     if(hudCache.stars!==g.collected){hudCache.stars=g.collected;$('starCount').textContent=g.collected;}
     if(hudCache.total!==g.stars.length){hudCache.total=g.stars.length;$('starTotal').textContent=g.stars.length;}
     const time=formatTime(g.time);if(hudCache.time!==time){hudCache.time=time;$('timer').textContent=time;}
@@ -4275,12 +4305,12 @@ globalThis.PulseBallEngine = (() => {
   }
   function updateRecord(){const r=best[g.index];$('levelRecord').textContent=r&&r.level===g.level.name&&Number.isFinite(r.stars)?tr('record')+': '+r.stars+' / '+g.stars.length+' ★':tr('adventure');}
   function clearInput(){heldCodes.clear();touchPointers.clear();pulseQueued=false;input={left:false,right:false,jump:false,pulse:false};g.pulseHeld=false;document.querySelectorAll('.touch-btn').forEach(b=>b.classList.remove('pressed'));}
-  function start(){if(pauseReasons.size||document.hidden)return;globalThis.YandexPlatform?.hideBanner?.();mode='playing';$('menuScreen').hidden=true;$('readyHint').hidden=true;$('overlay').hidden=true;unlockAudio();globalThis.YandexPlatform?.gameplayStart?.();canvas.focus({preventScroll:true});}
+  function start(){if(pauseReasons.size||document.hidden)return;setGameplayFocusEnabled(true);globalThis.YandexPlatform?.hideBanner?.();mode='playing';$('menuScreen').hidden=true;$('readyHint').hidden=true;$('overlay').hidden=true;unlockAudio();globalThis.YandexPlatform?.gameplayStart?.();canvas.focus({preventScroll:true});}
   function loadLevel(index,autostart=false,carrySuper=0,carryShield=0){
     if(adPending||pauseReasons.size||document.hidden)return;
     if(!Number.isInteger(index)||index<0||index>=E.levels.length)return;
     if(index>unlocked){toast(tr('levelLocked'));return;}
-    clearInput();globalThis.YandexPlatform?.hideBanner?.();g=E.createGame(index);if(carrySuper>0)g.superCharge=Math.min(100,carrySuper);if(carryShield>0)g.shield=1;mode=autostart?'playing':'ready';setMusic(musicForLevel(index));camera=0;particles=[];feedbackFx=[];shake=0;finishCelebration=0;accumulator=0;hudCache={health:-1,shield:-1,stars:-1,total:-1,time:'',pulsePct:-1,pulseText:'',pulseReady:null,superPct:-1,superReady:null,progress:-1};tutorialSeen=new Set();hideTutorial(true);
+    setGameplayFocusEnabled(true);clearInput();globalThis.YandexPlatform?.hideBanner?.();g=E.createGame(index);if(carrySuper>0)g.superCharge=Math.min(100,carrySuper);if(carryShield>0)g.shield=1;mode=autostart?'playing':'ready';setMusic(musicForLevel(index));camera=0;particles=[];feedbackFx=[];shake=0;finishCelebration=0;accumulator=0;hudCache={health:-1,shield:-1,stars:-1,total:-1,time:'',pulsePct:-1,pulseText:'',pulseReady:null,superPct:-1,superReady:null,progress:-1};tutorialSeen=new Set();hideTutorial(true);
     $('menuScreen').hidden=true;$('overlay').hidden=true;$('readyHint').hidden=autostart;$('toast').classList.remove('visible');
     document.querySelectorAll('[data-level]').forEach(b=>{const active=Number(b.dataset.level)===index;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','true');else b.removeAttribute('aria-current');});
     $('currentLevelNumber').textContent=String(index+1).padStart(2,'0');$('currentLevelName').textContent=levelDisplayName(index);$('hudCurrentNumber').textContent=String(index+1).padStart(2,'0');$('hudCurrentName').textContent=levelDisplayName(index);
@@ -4312,20 +4342,22 @@ globalThis.PulseBallEngine = (() => {
   function pause(){if(mode==='playing')openDialog('paused');else if(mode==='paused')start();}
   function suspendAudio(){try{if(audio&&audio.state==='running')audio.suspend().catch(()=>{});}catch{}}
   function resumeAudio(){try{if(sound&&!pauseReasons.size&&!adPending&&!document.hidden&&audio&&audio.state==='suspended')audio.resume().catch(()=>{});}catch{}}
-  const pauseReasons=new Set();let adPending=false,pendingLevel=null,pendingSuperCharge=0,pendingShield=0;
+  const pauseReasons=new Set();let adPending=false,pendingLevel=null,pendingSuperCharge=0,pendingShield=0,pendingMenu=false;
   function advancePendingLevel(){if(pendingLevel===null||adPending||pauseReasons.size||document.hidden)return;const index=pendingLevel,carry=pendingSuperCharge,shield=pendingShield;pendingLevel=null;pendingSuperCharge=0;pendingShield=0;loadLevel(index,true,carry,shield);}
+  function queuePendingLevel(index,carrySuper=0,carryShield=0){pendingSuperCharge=carrySuper;pendingShield=carryShield;pendingLevel=index;advancePendingLevel();}
+  function advancePendingMenu(){if(!pendingMenu||adPending||pauseReasons.size||document.hidden)return;pendingMenu=false;showMenu();}
   function setAdPending(value){adPending=value;if(value)suspendAudio();else resumeAudio();for(const id of ['dialogPrimary','dialogSecondary','dialogRewarded','dialogMenu','menuButton','restartButton','pauseButton'])$(id).disabled=value;}
   async function levelTransitionWithAd(index,carrySuper=0,carryShield=0){
     if(adPending||pendingLevel!==null)return;
     clearInput();hideTutorial(true);globalThis.YandexPlatform?.gameplayStop?.();mode='transition';
     setAdPending(true);try{await globalThis.YandexPlatform?.showInterstitial?.();}finally{setAdPending(false);}
-    pendingSuperCharge=carrySuper;pendingShield=carryShield;pendingLevel=index;advancePendingLevel();
+    queuePendingLevel(index,carrySuper,carryShield);
   }
   async function menuTransitionWithAd(){
-    if(adPending)return;
-    clearInput();globalThis.YandexPlatform?.gameplayStop?.();mode='transition';setAdPending(true);
+    if(adPending||pendingMenu)return;
+    clearInput();globalThis.YandexPlatform?.gameplayStop?.();mode='transition';pendingMenu=true;setAdPending(true);
     try{await globalThis.YandexPlatform?.showInterstitial?.();}finally{setAdPending(false);}
-    if(!document.hidden&&!pauseReasons.size)showMenu();
+    advancePendingMenu();
   }
   globalThis.PulseGame={
     platformPause(reason='platform'){
@@ -4335,8 +4367,10 @@ globalThis.PulseBallEngine = (() => {
     platformResume(reason='platform'){
       pauseReasons.delete(reason);
       if(pauseReasons.size||document.hidden)return;
+      resumeAudio();
       if(pendingLevel!==null){advancePendingLevel();return;}
-      if(mode==='platformPaused'){mode='playing';globalThis.YandexPlatform?.gameplayStart?.();resumeAudio();canvas.focus({preventScroll:true});}
+      if(pendingMenu){advancePendingMenu();return;}
+      if(mode==='platformPaused'){mode='playing';globalThis.YandexPlatform?.gameplayStart?.();canvas.focus({preventScroll:true});}
     }
   };
   const mobilePortrait=()=>matchMedia('(pointer:coarse) and (orientation:portrait)').matches;
@@ -4384,7 +4418,7 @@ globalThis.PulseBallEngine = (() => {
       });
     }finally{setAdPending(false);}
     if(!granted){globalThis.YandexPlatform?.showBanner?.();toast(tr('adUnavailable'));return;}
-    if(kind==='won'){loadLevel(index+1,true,0,1);return;}
+    if(kind==='won'){clearInput();globalThis.YandexPlatform?.gameplayStop?.();mode='transition';queuePendingLevel(index+1,0,1);return;}
     clearInput();$('overlay').hidden=true;
     if(pauseReasons.size||document.hidden){mode='platformPaused';return;}
     start();
