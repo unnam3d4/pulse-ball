@@ -2179,7 +2179,7 @@ globalThis.PulseBallEngine = (() => {
     initBoss(g);
   }
   function pulseExpansion(g,p,power=1){
-    const superPulse=power>1,reach=superPulse?285:155;
+    const superPulse=power>1,reach=superPulse?285:155,mechanicReach=155;
     if(superPulse){
       const blocked=q=>Math.abs(q.x-p.x)<reach&&Math.abs(q.y-p.y)<155&&(q.x-p.x)*p.face>-20;
       const cleared=g.projectiles.filter(blocked).length+g.webShots.filter(blocked).length+g.waveShots.filter(blocked).length;
@@ -2200,7 +2200,7 @@ globalThis.PulseBallEngine = (() => {
     }
     if(g.boss&&g.boss.active&&!g.boss.defeated&&bossExpected(g.boss)==='pulse'&&Math.abs(g.boss.x-p.x)<(superPulse?265:185)&&Math.abs(g.boss.y-p.y)<140)damageBoss(g,'pulse');
     for(const node of g.bossNodes){
-      if(node.active||node.cooldown>0||Math.abs(node.x-p.x)>reach||Math.abs(node.y-p.y)>125||(node.x-p.x)*p.face<=0)continue;
+      if(node.active||node.cooldown>0||Math.abs(node.x-p.x)>mechanicReach||Math.abs(node.y-p.y)>125||(node.x-p.x)*p.face<=0)continue;
       node.cooldown=1.2;
       if(node.type==='switch'){
         node.active=true;const press=g.presses.find(v=>v.bossPress);if(press)press.trigger=1;
@@ -2209,8 +2209,8 @@ globalThis.PulseBallEngine = (() => {
         node.active=true;g.events.push({type:'bossNode',x:node.x,y:node.y});
       }
     }
-    for(const o of g.bossOrbs)if(!o.active&&!o.spent&&Math.abs(o.x-p.x)<reach&&Math.abs(o.y-p.y)<125&&(o.x-p.x)*p.face>0){
-      o.active=true;o.vx=superPulse?650:540;o.reset=0;g.events.push({type:'orbLaunch',x:o.x,y:o.y,dir:1});
+    for(const o of g.bossOrbs)if(!o.active&&!o.spent&&Math.abs(o.x-p.x)<mechanicReach&&Math.abs(o.y-p.y)<125&&(o.x-p.x)*p.face>0){
+      o.active=true;o.vx=540;o.reset=0;g.events.push({type:'orbLaunch',x:o.x,y:o.y,dir:1});
     }
   }
   function updateTrapPlatforms(g,dt){
@@ -2365,7 +2365,7 @@ globalThis.PulseBallEngine = (() => {
       crates:level.crates.map((a,i)=>({x:a[0],y:a[1],w:44,h:44,vy:0,pulse:a[2]==='pulse',bounds:level.crateBounds?.[i]})),
       breakables:level.breakables.map(a=>({x:a[0],y:a[1],w:a[2],h:a[3],broken:false})),
       extraSwitches:(level.extraSwitches||[]).map(a=>({x:a.x,bridge:a.bridge,on:false})),
-      enemies:level.enemies.map(a=>{const type=a[4]||'patrol',drone=type==='drone',y=drone?340:460;return {x:a[0],y,baseY:y,w:type==='heavy'?46:drone?40:38,h:type==='heavy'?46:drone?34:40,min:a[1],max:a[2],speed:a[3],type,dir:-1,dead:false,alert:0,phase:(a[0]%997)/997*Math.PI*2,vx:0};}),
+      enemies:level.enemies.map(a=>{const type=a[4]||'patrol',drone=type==='drone',y=drone?340:460;return {x:a[0],y,baseY:y,w:type==='heavy'?46:drone?40:38,h:type==='heavy'?46:drone?34:40,min:a[1],max:a[2],speed:a[3],type,dir:-1,dead:false,stun:0,alert:0,phase:(a[0]%997)/997*Math.PI*2,vx:0};}),
       stars:level.stars.map(a=>{const rr=(level.ramps||[]).find(r=>a[0]>=Math.min(r[0],r[2])&&a[0]<=Math.max(r[0],r[2]));if(!rr)return {x:a[0],y:a[1],taken:false};const tt=(a[0]-rr[0])/(rr[2]-rr[0]),surface=rr[1]+(rr[3]-rr[1])*tt;return {x:a[0],y:Math.min(a[1],surface-52),taken:false};}),
       spikes:level.spikes.map(a=>({x:a[0],y:438,w:a[1],h:42,hitX:a[0]+6,hitY:458,hitW:Math.max(6,a[1]-12),hitH:18}))};
     initExpansion(g);return g;
@@ -2373,24 +2373,24 @@ globalThis.PulseBallEngine = (() => {
   const overlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
   const relayVelocity={up:[0,-860],right:[325,-760],left:[-325,-760],east:[325,-100],west:[-325,-100]};
   function pulse(g){
-    const p=g.player,superPulse=g.expansionEnabled!==false&&(g.superCharge||0)>=100,reach=superPulse?275:145;
+    const p=g.player,superPulse=g.expansionEnabled!==false&&(g.superCharge||0)>=100,reach=145,combatReach=superPulse?275:145;
     g.pulseCooldown=superPulse?.72:.58;g.pulseEffect=.24;
     if(superPulse){g.superCharge=0;g.superPulseEffect=.42;g.events.push({type:'superPulse',x:p.x,y:p.y,dir:p.face});}
     else g.events.push({type:'pulse',x:p.x,y:p.y});
     if(g.expansionEnabled!==false)pulseExpansion(g,p,superPulse?2:1);
     for(const block of g.breakables)if(!block.broken&&Math.abs(block.x+block.w/2-p.x)<reach&&Math.abs(block.y+block.h/2-p.y)<125&&(block.x+block.w/2-p.x)*p.face>0){block.broken=true;g.events.push({type:'shatter',x:block.x+block.w/2,y:block.y+block.h/2});}
     for(const c of g.crates)if(c.pulse&&Math.abs(c.x+c.w/2-p.x)<reach&&Math.abs(c.y+c.h/2-p.y)<125&&(c.x+c.w/2-p.x)*p.face>0){
-      const next={x:c.x+p.face*(superPulse?135:95),y:c.y,w:c.w,h:c.h};
+      const next={x:c.x+p.face*95,y:c.y,w:c.w,h:c.h};
       if(next.x>=0&&next.x+next.w<=g.level.width&&(!c.bounds||next.x>=c.bounds[0]&&next.x<=c.bounds[1])&&!g.ground.concat(g.platforms,g.breakables.filter(b=>!b.broken),g.crates.filter(b=>b!==c)).some(s=>overlap(next,s))){c.x=next.x;g.events.push({type:'push',x:c.x+c.w/2,y:c.y+c.h/2});}
     }
     if(!g.switchOn&&Math.abs(g.level.switch-p.x)<reach&&Math.abs(420-p.y)<125&&(g.level.switch-p.x)*p.face>0){g.switchOn=true;g.events.push({type:'switch',x:g.level.switch,y:420});}
     for(const mechanism of g.extraSwitches)if(!mechanism.on&&Math.abs(mechanism.x-p.x)<reach&&Math.abs(420-p.y)<125&&(mechanism.x-p.x)*p.face>0){mechanism.on=true;g.ground.push({x:mechanism.bridge[0],y:480,w:mechanism.bridge[1]-mechanism.bridge[0],h:300,bridge:true});g.events.push({type:'bridge',x:(mechanism.bridge[0]+mechanism.bridge[1])/2,y:480});}
-    for(const enemy of g.enemies)if(!enemy.dead&&Math.abs(enemy.x-p.x)<reach&&Math.abs(enemy.y-p.y)<120&&(enemy.x-p.x)*p.face>0){
-      if(superPulse&&enemy.type!=='heavy'){enemy.dead=true;g.events.push({type:'superEnemy',x:enemy.x,y:enemy.y});continue;}
-      const push=superPulse?115:enemy.type==='heavy'?34:enemy.type==='charger'?78:enemy.type==='drone'?92:65;enemy.x=Math.max(enemy.min,Math.min(enemy.max,enemy.x+p.face*push));enemy.dir=p.face;g.events.push({type:'push',x:enemy.x,y:enemy.y});
+    for(const enemy of g.enemies)if(!enemy.dead&&Math.abs(enemy.x-p.x)<combatReach&&Math.abs(enemy.y-p.y)<120&&(enemy.x-p.x)*p.face>0){
+      if(superPulse){enemy.stun=enemy.type==='heavy'?1.25:1.85;enemy.vx=0;enemy.alert=0;g.events.push({type:'superEnemy',x:enemy.x,y:enemy.y});continue;}
+      const push=enemy.type==='heavy'?34:enemy.type==='charger'?78:enemy.type==='drone'?92:65;enemy.x=Math.max(enemy.min,Math.min(enemy.max,enemy.x+p.face*push));enemy.dir=p.face;g.events.push({type:'push',x:enemy.x,y:enemy.y});
     }
     const orb=g.orbs.filter(o=>!o.active&&!o.spent&&Math.abs(o.x-p.x)<reach&&Math.abs(o.y-p.y)<125&&(o.x-p.x)*o.dir>0).sort((a,b)=>Math.abs(a.x-p.x)-Math.abs(b.x-p.x))[0];
-    if(orb){orb.active=true;orb.vx=orb.dir*(superPulse?650:540);orb.life=0;orb.flash=.22;orb.launches++;g.events.push({type:'orbLaunch',x:orb.x,y:orb.y,dir:orb.dir});}
+    if(orb){orb.active=true;orb.vx=orb.dir*540;orb.life=0;orb.flash=.22;orb.launches++;g.events.push({type:'orbLaunch',x:orb.x,y:orb.y,dir:orb.dir});}
     const pad=!orb&&g.boostPads.filter(b=>Math.abs(b.x-p.x)<=62&&Math.abs(b.y-(p.y+p.r))<=48).sort((a,b)=>Math.abs(a.x-p.x)-Math.abs(b.x-p.x))[0];
     if(pad){p.vx=pad.dir*325;p.vy=-1040;p.grounded=false;p.coyote=0;p.jumpBuffer=0;p.boosted=true;p.boostGlow=.22;pad.flash=.24;pad.uses++;g.pulseCooldown=Math.min(g.pulseCooldown,.22);g.events.push({type:'boost',x:pad.x,y:pad.y-10,dir:pad.dir});}
     const relay=!orb&&!pad&&!p.grounded&&g.relays.filter(n=>n.cooldown<=0&&Math.hypot(n.x-p.x,n.y-p.y)<=138).sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y))[0];
@@ -2498,16 +2498,16 @@ globalThis.PulseBallEngine = (() => {
     p.angle+=(p.x-oldX)/r;
     for(const enemy of g.enemies){
       if(enemy.dead)continue;
-      enemy.alert=Math.max(0,(enemy.alert||0)-dt);let speed=enemy.speed;
+      enemy.stun=Math.max(0,(enemy.stun||0)-dt);enemy.alert=Math.max(0,(enemy.alert||0)-dt);let speed=enemy.stun>0?0:enemy.speed;
       if(enemy.type==='heavy')speed*=.68;
-      if(enemy.type==='drone'){speed*=.9;enemy.y=enemy.baseY+Math.sin(g.time*2.8+enemy.phase)*28;}
-      if(enemy.type==='charger'&&Math.abs(p.x-enemy.x)<320&&Math.abs(p.y-enemy.y)<95){enemy.dir=p.x>=enemy.x?1:-1;speed*=1.85;enemy.alert=.18;}
+      if(enemy.type==='drone'){speed*=.9;if(enemy.stun<=0)enemy.y=enemy.baseY+Math.sin(g.time*2.8+enemy.phase)*28;}
+      if(enemy.stun<=0&&enemy.type==='charger'&&Math.abs(p.x-enemy.x)<320&&Math.abs(p.y-enemy.y)<95){enemy.dir=p.x>=enemy.x?1:-1;speed*=1.85;enemy.alert=.18;}
       enemy.vx=enemy.dir*speed;enemy.x+=enemy.vx*dt;
       if(enemy.x<enemy.min){enemy.x=enemy.min;enemy.dir=1;}if(enemy.x>enemy.max){enemy.x=enemy.max;enemy.dir=-1;}enemy.vx=enemy.dir*speed;
       const hitX=r+(enemy.type==='heavy'?21:enemy.type==='drone'?18:17),hitY=r+(enemy.type==='heavy'?23:enemy.type==='drone'?17:19),stompTop=enemy.y-(enemy.type==='heavy'?17:enemy.type==='drone'?15:12);
       if(Math.abs(p.x-enemy.x)<hitX&&Math.abs(p.y-enemy.y)<hitY) {
         if(p.vy>40&&oldY+r<=stompTop) {enemy.dead=true;p.vy=enemy.type==='drone'?-520:-475;p.squash=.2;addSuperCharge(g,10);g.events.push({type:'stomp',x:enemy.x,y:enemy.y});}
-        else {damage(g);if(g.status!=='playing')return;}
+        else if(enemy.stun<=0){damage(g);if(g.status!=='playing')return;}
       }
     }
     const phx=p.x-r+8,phy=p.y-r+3,phw=2*r-16,phh=2*r-9;
