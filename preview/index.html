@@ -3073,7 +3073,7 @@ globalThis.PulseBallEngine = (() => {
     for(let i=Math.floor(camera*.18/420)-1;i<Math.ceil((viewW+camera*.18)/420)+2;i++)hill(i*420-camera*.18,480,330,170+(Math.sin(i*12)+1)*45,t.far);
     for(let i=Math.floor(camera*.32/370)-1;i<Math.ceil((viewW+camera*.32)/370)+2;i++)hill(i*370+100-camera*.32,500,250,110+(Math.sin(i*5)+1)*55,t.mid);
     // Roots follow the same hill and parallax transform as their supporting land.
-    const backTreeStep=coarsePointer?2:1;for(let i=Math.max(0,Math.floor(camera*.32/370)-1);i<Math.ceil((viewW+camera*.32)/370)+2;i+=backTreeStep){const x=i*370+100-camera*.32,h=110+(Math.sin(i*5)+1)*55;if(x> -90&&x<viewW+90)tree(x,500-h+8,.32+(i%3)*.045,t,true);}
+    for(let i=Math.max(0,Math.floor(camera*.32/370)-1);i<Math.ceil((viewW+camera*.32)/370)+2;i++){if(coarsePointer&&i%2)continue;const x=i*370+100-camera*.32,h=110+(Math.sin(i*5)+1)*55;if(x> -90&&x<viewW+90)tree(x,500-h+8,.32+(i%3)*.045,t,true);}
     for(let i=Math.floor(camera*.52/440)-1;i<Math.ceil((viewW+camera*.52)/440)+2;i++)hill(i*440+240-camera*.52,545,310,125+(Math.cos(i*3)+1)*22,t.near);
     const birdCount=coarsePointer?3:5;for(let i=0;i<birdCount;i++){const bx=(i*270+370-camera*.22)%(viewW+100);const by=105+(i%3)*35;ctx.strokeStyle=t.tree;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(bx-6,by);ctx.quadraticCurveTo(bx-2,by-5,bx,by);ctx.quadraticCurveTo(bx+3,by-5,bx+7,by);ctx.stroke();}
     ctx.fillStyle=t.water;ctx.fillRect(0,536,viewW,Math.max(64,viewH-536));
