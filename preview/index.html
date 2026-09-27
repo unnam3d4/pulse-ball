@@ -2741,7 +2741,7 @@ globalThis.PulseBallEngine = (() => {
   const musicBuffers=new Map(),musicLoads=new Map();
   const MUSIC_TRACKS={
     // Music intentionally sits behind gameplay. SFX must stay readable on phone speakers.
-    menu:{file:'before_the_jump.mp3',loopStart:10.2284,loopEnd:40.2286,volume:.052},
+    menu:{file:'before_the_jump.mp3',loopStart:10.2284,loopEnd:40.2286,volume:.066},
     early:{file:'piston_gardens.mp3',loopStart:40.4724,loopEnd:95.0161,volume:.060},
     mid:{file:'velocity_gate.mp3',loopStart:33.8547,loopEnd:95.9913,volume:.062},
     late:{file:'gravity_at_the_end.mp3',loopStart:40.4259,loopEnd:85.9719,volume:.064}
@@ -4164,6 +4164,18 @@ globalThis.PulseBallEngine = (() => {
       Promise.resolve(resume).then(()=>syncMusic(musicWanted)).catch(()=>{});
     }catch{sound=false;updateSound();}
   }
+  // Mobile browsers block WebAudio until a real user gesture. Unlock once on the
+  // first tap/click/key press so menu music can start without forcing the player
+  // to enter a level first.
+  const audioUnlockEvents=('PointerEvent' in window)?['pointerdown','keydown']:['touchstart','mousedown','keydown'];
+  function armFirstAudioGesture(){
+    const handler=()=>{
+      for(const type of audioUnlockEvents)removeEventListener(type,handler,true);
+      unlockAudio();
+    };
+    for(const type of audioUnlockEvents)addEventListener(type,handler,{capture:true,passive:true});
+  }
+  armFirstAudioGesture();
   function toast(text){$('toast').textContent=text;$('toast').classList.add('visible');toastUntil=visualTime+2.7;}
   const tutorialCues=()=>[
     {key:'move',x:150,label:tr('tutorialMove'),desktop:'← →',touch:'← →'},
