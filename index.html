@@ -3526,62 +3526,82 @@ globalThis.PulseBallEngine = (() => {
     ctx.globalAlpha=o.active?.48:.24;path([[x1+10*o.dir,y1],[x2-18*o.dir,y2]],null,'#b7fff0',1.3);
     ctx.restore();
   }
-  const ballSprites=new Map();
-  function getBallSprite(gaze){
-    if(ballSprites.has(gaze))return ballSprites.get(gaze);
-    const sprite=document.createElement('canvas');sprite.width=sprite.height=192;
-    const ctx=sprite.getContext('2d');ctx.setTransform(3,0,0,3,96,96);
-    const ellipse=(x,y,rx,ry,color)=>{ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();};
-    const halo=ctx.createRadialGradient(0,-2,3,0,0,28);
-    halo.addColorStop(0,'rgba(78,239,255,.18)');halo.addColorStop(.55,'rgba(33,175,255,.12)');halo.addColorStop(1,'rgba(33,175,255,0)');
-    ellipse(0,0,25,25,halo);
-
-    const shell=ctx.createRadialGradient(-8,-13,2,4,4,28);
-    shell.addColorStop(0,'#8ff8ff');
-    shell.addColorStop(.22,'#53dfff');
-    shell.addColorStop(.52,'#249ee8');
-    shell.addColorStop(.8,'#1654b8');
-    shell.addColorStop(1,'#0a2367');
-    ellipse(0,0,22.2,22.2,'#07225f');
-    ellipse(0,-.1,21.2,21.2,shell);
-
-    ctx.lineWidth=1.2;ctx.strokeStyle='#d7ffff88';
-    ctx.beginPath();ctx.arc(0,0,20.6,-2.65,-.72);ctx.stroke();
-    ctx.save();ctx.shadowColor='#42dfff';ctx.shadowBlur=7;ctx.strokeStyle='#73f6ff';ctx.lineWidth=2.2;
-    ctx.beginPath();ctx.arc(0,0,19.2,.2,1.35);ctx.stroke();ctx.restore();
-
-    ellipse(-5.8,-8.8,7.8,5.9,'rgba(255,255,255,.26)');
-    ellipse(4.8,9.8,10.5,7.2,'rgba(0,28,99,.12)');
-
-    const facePlate=ctx.createLinearGradient(0,-9,0,16);
-    facePlate.addColorStop(0,'rgba(6,38,105,.98)');
-    facePlate.addColorStop(.55,'rgba(9,54,130,.95)');
-    facePlate.addColorStop(1,'rgba(8,32,92,.98)');
-    ellipse(0,3.2,15.7,13.8,'rgba(171,240,255,.18)');
-    ellipse(0,2.6,15.2,13.2,facePlate);
-
-
-    for(const side of [-1,1]){
-      const ex=side*6.6;
-      const eye=ctx.createLinearGradient(0,-7,0,8);
-      eye.addColorStop(0,'#dbffff');eye.addColorStop(.55,'#ffffff');eye.addColorStop(1,'#b5efff');
-      ellipse(ex,-.1,5.95,7.9,eye);
-      const iris=ctx.createRadialGradient(ex+gaze*.55,-.5,.5,ex+gaze*.55,1.2,4.6);
-      iris.addColorStop(0,'#9fffff');iris.addColorStop(.45,'#41d9ff');iris.addColorStop(1,'#1372d8');
-      ellipse(ex+gaze*.65,.9,3.55,5.4,iris);
-      ellipse(ex+gaze*.95,1.1,1.95,3.5,'#082056');
-      ellipse(ex+gaze*.15-1,-2.2,1.4,1.8,'rgba(255,255,255,.9)');
+  // The approved menu hero is the art reference. A single shell is shared by
+  // every expression: alternate artwork is composited ONLY inside the face.
+  const playerSpriteCache=new Map(),playerArt=new Map(),playerVisualStates=new WeakMap();
+  const playerArtNames=['confident','happy','scared','hurt','defeat'];
+  const playerExpressionArt={neutral:'confident',focused:'confident',determined:'confident',happy:'happy',victory:'happy',scared:'scared',hurt:'hurt',defeat:'defeat'};
+  let ballContactSprite=null;
+  async function loadPlayerArt(){
+    const prefix=location.pathname.includes('/preview/')?'../':'';
+    await Promise.all(playerArtNames.map(name=>new Promise(resolve=>{
+      const image=new Image();let settled=false;
+      const finish=loaded=>{
+        if(settled)return;settled=true;clearTimeout(timer);
+        image.onload=image.onerror=null;
+        if(loaded)playerArt.set(name,image);resolve();
+      };
+      // Cosmetic downloads must never hold the boot screen indefinitely. Late
+      // arrivals are ignored so a prewarmed fallback cannot change mid-frame.
+      const timer=setTimeout(()=>finish(false),4000);
+      image.onload=()=>finish(true);image.onerror=()=>finish(false);
+      image.src=prefix+'assets/player/hero-'+name+'.webp';
+    })));
+    // If a download fails, retain the existing embedded hero as a safe fallback.
+    if(!playerArt.has('confident')){
+      const original=document.querySelector('.menu-mascot');
+      if(original.complete&&original.naturalWidth)playerArt.set('fallback',original);
     }
-
-    ctx.lineCap='round';
-    ctx.strokeStyle='#0d3c83';ctx.lineWidth=3.2;
-    ctx.beginPath();ctx.moveTo(-5.6,8.9);ctx.quadraticCurveTo(.2,13.6,6.1,8.9);ctx.stroke();
-    ctx.strokeStyle='#bfffff';ctx.lineWidth=1.55;
-    ctx.beginPath();ctx.moveTo(-4.8,8.7);ctx.quadraticCurveTo(.2,12.5,5.1,8.7);ctx.stroke();
-
-    ctx.beginPath();ctx.moveTo(-10.2,-13.8);ctx.quadraticCurveTo(-1.8,-17.9,6.2,-14.1);
-    ctx.lineWidth=2.3;ctx.strokeStyle='#9ef8ff';ctx.stroke();
-    ballSprites.set(gaze,sprite);return sprite;
+    getBallContactSprite();
+    for(const name of playerArtNames)for(const gaze of [-1,1])getPlayerSprite(name,gaze);
+  }
+  function getPlayerSprite(expression,gaze){
+    const name=playerExpressionArt[expression]||expression,key=name+':'+gaze;
+    if(playerSpriteCache.has(key))return playerSpriteCache.get(key);
+    const base=playerArt.get('confident')||playerArt.get('fallback');if(!base)return null;
+    const sprite=document.createElement('canvas');sprite.width=sprite.height=192;
+    const c=sprite.getContext('2d');c.setTransform(3*gaze,0,0,3,96,96);
+    if(playerArt.has('confident')){
+      // Match the 44px spherical core to the unchanged radius-22 collider.
+      // Turbine modules extend beyond the core, as in the approved artwork.
+      c.translate(-34,-31.8);c.scale(61.4/1254,61.4/1254);
+      c.drawImage(base,0,0,1254,1254);
+      const face=playerArt.get(name);
+      if(name!=='confident'&&face){
+        c.save();c.beginPath();
+        c.rect(550,505,335,335);c.rect(925,660,197,239);c.rect(722,827,220,137);c.clip();
+        c.drawImage(face,0,0,1254,1254);c.restore();
+      }
+    }else c.drawImage(base,-37.8,-32.6,66.9,66.9);
+    playerSpriteCache.set(key,sprite);return sprite;
+  }
+  function getBallContactSprite(){
+    if(ballContactSprite)return ballContactSprite;
+    const sprite=document.createElement('canvas');sprite.width=96;sprite.height=24;
+    const c=sprite.getContext('2d');c.scale(1,.25);
+    const shade=c.createRadialGradient(48,48,1,48,48,47);
+    shade.addColorStop(0,'rgba(12,27,39,.38)');shade.addColorStop(.4,'rgba(12,27,39,.2)');shade.addColorStop(1,'rgba(12,27,39,0)');
+    c.fillStyle=shade;c.fillRect(0,0,96,96);ballContactSprite=sprite;return sprite;
+  }
+  function playerExpression(game){
+    if(game.status==='won')return 'victory';if(game.status==='lost')return 'defeat';
+    const mood=playerVisualStates.get(game);if(mood&&visualTime<mood.until)return mood.kind;
+    if(game.superPulseEffect>0)return 'determined';if(game.pulseEffect>0)return 'focused';
+    if(!game.player.grounded&&game.player.vy>570)return 'scared';
+    if(game.player.boosted)return 'determined';
+    return Math.abs(game.player.vx)>90?'focused':'neutral';
+  }
+  function reactPlayerVisual(event){
+    let kind='',duration=0,priority=0;
+    if(event.type==='hurt'){kind='hurt';duration=.7;priority=3;}
+    else if(event.type==='superPulse'){kind='determined';duration=.55;priority=2;}
+    else if(event.type==='shieldBreak'){kind='focused';duration=.4;priority=2;}
+    else if(event.type==='boost'||event.type==='relay'){kind='determined';duration=.45;priority=1;}
+    else if(event.type==='star'||event.type==='checkpoint'||event.type==='heartPickup'){kind='happy';duration=.55;priority=1;}
+    if(!kind)return;
+    const previous=playerVisualStates.get(g);
+    if(previous&&visualTime<previous.until&&previous.priority>priority)return;
+    playerVisualStates.set(g,{kind,until:visualTime+duration,priority});
   }
   function drawPickup(q,i){
     if(q.taken)return;const x=q.x-camera;if(x< -45||x>viewW+45)return;
@@ -3599,30 +3619,50 @@ globalThis.PulseBallEngine = (() => {
     ctx.restore();
   }
   function ball(p){
-    if(p.invincible>0&&Math.floor(p.invincible*12)%2===0)return;
-    const x=p.x-camera,y=p.y;const floor=g.ground.find(s=>p.x>s.x&&p.x<s.x+s.w);
-    if(floor){const shadowScale=Math.max(.25,1-(floor.y-p.y)/260);ellipse(x,floor.y-1,24*shadowScale,5.2*shadowScale,'#30465a30');}
+    const x=p.x-camera,y=p.y;if(x<-70||x>viewW+70)return;
+    // Find the closest receiving surface, including platforms and ramps. No
+    // temporary arrays are built in this per-frame path.
+    let floorY=Infinity,shadowSlope=0;
+    const surface=s=>{if(!s.trapDisabled&&!s.broken&&p.x>=s.x&&p.x<=s.x+s.w&&s.y>=y+p.r-3&&s.y<floorY){floorY=s.y;shadowSlope=0;}};
+    for(const s of g.ground)surface(s);for(const s of g.platforms)surface(s);
+    for(const s of g.crates)surface(s);for(const s of g.breakables)surface(s);
+    for(const s of g.ramps){
+      const dx=s.x2-s.x1;if(!dx||p.x<Math.min(s.x1,s.x2)||p.x>Math.max(s.x1,s.x2))continue;
+      const sy=s.y1+(s.y2-s.y1)*(p.x-s.x1)/dx;
+      if(sy>=y+p.r-3&&sy<floorY){floorY=sy;shadowSlope=(s.y2-s.y1)/dx;}
+    }
+    if(floorY<Infinity&&floorY-y<230){
+      const height=Math.max(0,floorY-y-p.r),scale=1+height/200;
+      ctx.save();ctx.translate(x,floorY-1);ctx.rotate(Math.atan(shadowSlope));ctx.globalAlpha=Math.max(0,1-height/230);
+      ctx.drawImage(getBallContactSprite(),-23*scale,-4.5*scale,46*scale,9*scale);ctx.restore();
+    }
     ctx.save();ctx.translate(x,y);
+    // Keep the existing slight landing compression, with upright facial features.
     const squash=Math.sign(p.squash)*Math.min(.028,Math.max(0,Math.abs(p.squash)-.04)*.18);
     ctx.scale(1+squash,1/(1+squash));
+    if(p.invincible>0&&g.status==='playing')ctx.globalAlpha=Math.floor(p.invincible*12)%2===0?.48:1;
     const speed=Math.min(Math.abs(p.vx)/230,1);
     if(speed>.22){
-      const rear=p.face<0?1:-1;
-      ctx.save();
-      ctx.globalAlpha=.16+.16*speed;
-      ctx.strokeStyle='#67ebff';ctx.lineWidth=7;ctx.lineCap='round';
-      ctx.beginPath();ctx.moveTo(rear*10,-5);ctx.quadraticCurveTo(rear*(22+speed*8),0,rear*(11+speed*10),8);ctx.stroke();
-      ctx.lineWidth=3.5;ctx.strokeStyle='#d8fbff';ctx.beginPath();ctx.moveTo(rear*8,-4);ctx.quadraticCurveTo(rear*(17+speed*7),0,rear*(9+speed*8),6);ctx.stroke();
-      ctx.restore();
+      const rear=p.face<0?1:-1;ctx.save();ctx.globalAlpha*=.18+.12*speed;
+      ctx.strokeStyle='#67e1f7';ctx.lineWidth=3;ctx.lineCap='round';
+      ctx.beginPath();ctx.moveTo(rear*18,-6);ctx.quadraticCurveTo(rear*(26+speed*8),1,rear*(20+speed*9),9);ctx.stroke();ctx.restore();
     }
-    ctx.drawImage(getBallSprite(p.face<0?-1:1),-32,-32,64,64);
+    const sprite=getPlayerSprite(playerExpression(g),p.face<0?-1:1);
+    if(sprite)ctx.drawImage(sprite,-32,-32,64,64);
+    // Peripheral arcs keep the shell and expression visible. No live blur,
+    // screen blend or colored fill across the face, even with both abilities.
     if(g.shield){
-      ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.34+.08*Math.sin(visualTime*5.5);ctx.strokeStyle='#aefcff';ctx.lineWidth=2.2;ctx.shadowColor='#55e7ff';ctx.shadowBlur=coarsePointer?0:12;
-      ctx.beginPath();for(let i=0;i<6;i++){const a=-Math.PI/2+i*Math.PI/3,px=Math.cos(a)*31,py=Math.sin(a)*31;i?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.closePath();ctx.stroke();
-      ctx.globalAlpha=.13;ctx.fillStyle='#55e7ff';ctx.fill();ctx.restore();
+      ctx.save();ctx.globalAlpha*=reduced?.7:.64+.1*Math.sin(visualTime*4);ctx.strokeStyle='#9beef4';ctx.lineWidth=1.15;
+      ctx.beginPath();ctx.arc(0,0,33,-2.8,-.2);ctx.stroke();
+      ctx.beginPath();ctx.arc(0,0,33,.35,2.45);ctx.stroke();
+      ctx.strokeStyle='#e4ffff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,33,-2.45,-1.8);ctx.stroke();ctx.restore();
     }
-    if((g.superCharge||0)>=100){
-      ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.35+.12*Math.sin(visualTime*7);ctx.strokeStyle='#9ff9ff';ctx.lineWidth=2.3;ctx.shadowColor='#6eeaff';ctx.shadowBlur=coarsePointer?0:11;ctx.beginPath();ctx.arc(0,0,27+Math.sin(visualTime*5)*1.8,0,Math.PI*2);ctx.stroke();ctx.restore();
+    if((g.superCharge||0)>=100||g.superPulseEffect>0){
+      ctx.save();ctx.globalAlpha*=reduced?.85:.7+.14*Math.sin(visualTime*6);ctx.lineWidth=1.8;
+      const phase=reduced?0:visualTime*.9,radius=g.shield?38:33;
+      ctx.strokeStyle='#94e9ff';ctx.beginPath();ctx.arc(0,0,radius,phase,phase+1.55);ctx.stroke();
+      ctx.beginPath();ctx.arc(0,0,radius,phase+Math.PI,phase+Math.PI+1.55);ctx.stroke();
+      ctx.strokeStyle='#b5a5ff';ctx.lineWidth=1;ctx.beginPath();ctx.arc(0,0,radius+1,phase+1.65,phase+2.2);ctx.stroke();ctx.restore();
     }
     ctx.restore();
   }
@@ -4046,7 +4086,6 @@ globalThis.PulseBallEngine = (() => {
     if(g.pulseEffect>0){
       const age=1-g.pulseEffect/.24,fade=1-age,px=g.player.x-camera,py=g.player.y,dir=g.player.face<0?Math.PI:0;
       ctx.save();ctx.globalCompositeOperation='screen';
-      ctx.globalAlpha=fade*.18;ellipse(px,py,22,22,'#70eaff');
       ctx.globalAlpha=fade*.55;ctx.beginPath();ctx.arc(px,py,24+age*25,0,Math.PI*2);ctx.lineWidth=1.4;ctx.strokeStyle='#77edff';ctx.stroke();
       ctx.globalAlpha=fade*.9;ctx.shadowColor='#48dfff';ctx.shadowBlur=coarsePointer?0:7;ctx.beginPath();ctx.arc(px,py,27+age*42,dir-.82,dir+.82);ctx.lineWidth=3.4-age*2.4;ctx.strokeStyle='#b0f6ff';ctx.stroke();ctx.shadowBlur=0;
       for(let i=-2;i<=2;i++){const angle=dir+i*.31,radius=32+age*(34+(i%2)*6),sx=px+Math.cos(angle)*radius,sy=py+Math.sin(angle)*radius;ctx.globalAlpha=fade*.75;ellipse(sx,sy,1.4+(1-age)*.7,1.4+(1-age)*.7,'#d7fbff');}
@@ -4055,7 +4094,6 @@ globalThis.PulseBallEngine = (() => {
     if(g.superPulseEffect>0){
       const age=1-g.superPulseEffect/.42,fade=1-age,px=g.player.x-camera,py=g.player.y,dir=g.player.face<0?Math.PI:0;
       ctx.save();ctx.globalCompositeOperation='screen';
-      ctx.globalAlpha=fade*.20;ellipse(px,py,42+age*20,42+age*20,'#776dff');
       const rings=coarsePointer?2:3;ctx.shadowColor='#66eaff';ctx.shadowBlur=coarsePointer?0:9;
       for(let ring=0;ring<rings;ring++){ctx.globalAlpha=fade*(.82-ring*.20);ctx.strokeStyle=ring===0?'#efffff':ring===1?'#77f3ff':'#967cff';ctx.lineWidth=4.5-ring*1.1;ctx.beginPath();ctx.arc(px,py,55+age*(105+ring*24),dir-.72-ring*.10,dir+.72+ring*.10);ctx.stroke();}
       ctx.shadowBlur=0;ctx.globalAlpha=fade*.58;const sparks=coarsePointer?5:9;
@@ -4252,6 +4290,7 @@ globalThis.PulseBallEngine = (() => {
   function handleEvents(){
     const utilityPulse=g.events.some(e=>e.type==='orbLaunch'||e.type==='boost'||e.type==='relay');
     for(const e of g.events){
+      reactPlayerVisual(e);
       if(e.type==='relay'){burst(e.x,e.y,'#b0faff',5);feedback('switch',e.x,e.y,'#b0faff');tone(430,.07,'triangle',0,.022);tone(860,.14,'sine',.035,.026);}
       if(e.type==='orbLaunch'){burst(e.x,e.y,'#8cf7ff',coarsePointer?3:5);feedback('switch',e.x,e.y,'#8cf7ff');if(g.index===9&&!g.orbTargets.some(t=>t.on))toast(tr('orbLaunch'));tone(380,.075,'triangle',0,.020);tone(760,.12,'sine',.035,.020);}
       if(e.type==='orbEnemy'){burst(e.x,e.y,'#a6f7ff',9);feedback('enemy',e.x,e.y-5,'#c8fbff',1);impactSound(.8,210);tone(720,.09,'sine',.035,.016);}
@@ -4571,6 +4610,7 @@ globalThis.PulseBallEngine = (() => {
   async function bootstrap(){
     const assets=[...document.querySelectorAll('.menu-backdrop,.menu-mascot')].map(img=>img.decode?.().catch(()=>{}));
     const [platform]=await Promise.all([globalThis.YandexPlatform.readyPromise,Promise.all(assets)]);
+    await loadPlayerArt();
     setLanguage(manualLang||platform.lang);
     mergeExternalProgress(platform.safeLegacy);mergeExternalProgress(platform.safe);mergeExternalProgress(platform.cloud);
     saveProgress();showMenu();updateRecord();updateHud();

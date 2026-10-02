@@ -26,6 +26,8 @@ function copyDir(from,to){
 
 if(!fs.existsSync(path.join(root,'audio')))throw new Error('audio directory is missing');
 copyDir(path.join(root,'audio'),path.join(dist,'audio'));
+if(!fs.existsSync(path.join(root,'assets','player')))throw new Error('player artwork is missing');
+copyDir(path.join(root,'assets','player'),path.join(dist,'assets','player'));
 
 const coreJs=path.join(root,'node_modules','core-js-bundle','minified.js');
 const regenerator=path.join(root,'node_modules','regenerator-runtime','runtime.js');
