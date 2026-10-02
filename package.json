@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "build:yandex": "node scripts/build-yandex.mjs",
-    "test:player": "node scripts/test-player-visuals.mjs"
+    "test:player": "node scripts/test-player-visuals.mjs",
+    "test:runtime": "node scripts/test-runtime.mjs"
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",

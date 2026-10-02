@@ -37,18 +37,41 @@ core matches the original 44-pixel diameter; turbine modules extend beyond it.
 The physical radius remains 22.
 
 The player uses one sprite draw per frame and a cached contact shadow. Shield
-and charged Super Pulse use peripheral arcs; the original opaque effect fills
-over the face are removed. There are no new runtime dependencies, per-frame
+uses a closed cyan outline; charged Super Pulse uses a separate violet lightning
+marker above the hero. The original opaque effect fills over the face are
+removed. There are no new runtime dependencies, per-frame
 canvas allocations, image filters, or real-time 3D rendering.
 
 Expression state is separate from the engine in a WeakMap. Loading is bounded
 to four seconds per parallel image request; unavailable expressions use the
 confident art, and unavailable base art uses the original embedded mascot.
 
-Physics, controls, levels, collision, lives, ability mechanics, advertising,
-and the Yandex SDK are unchanged. The SDK and engine inline scripts were
-compared byte for byte with main at
-`5cc0ef64b8b1c75c8662ce2db1e1a5b56e8b854d`.
+The original visual update retained physics, controls, levels, collision, lives,
+ability mechanics, advertising and the SDK byte for byte. The runtime follow-up
+below changes short-input capture and shield handling for falls. Movement
+constants, hitboxes, levels, advertising and SDK remain unchanged.
+
+## Runtime follow-up
+
+Desktop had no rendering pixel budget: at 1920 × 1080 CSS pixels with DPR 2,
+the game rasterized 3840 × 2160 pixels every frame. In software-rendered Chrome,
+JavaScript draw submission was fast while actual frame intervals were slow.
+Desktop now starts with a 2,073,600-pixel budget (mobile keeps 1,650,000). After
+16 sustained slow frame intervals averaging over 25 ms, only the backing bitmap
+scale decreases, down to 50% of the initial size. World coordinates, physics,
+CSS layout and DOM HUD resolution do not change. Paused/hidden frames are
+excluded. The scale stays stable after adapting, avoiding repeated resizing.
+
+A short jump press/release between simulation frames is now queued, matching
+Pulse input handling. Both keyboard and touch presses are preserved until the
+next simulation step; pause/restart clears the queue. Jump forces are unchanged.
+
+The existing shield correctly blocked enemies, spikes and projectiles, but
+`damage(g, true)` bypassed it on falls. A shield now absorbs one fall as well,
+returning the player to the safe spawn without losing health or Super charge.
+Ordinary impact protection remains one hit plus its existing grace interval.
+The closed shield outline and separate Super marker avoid confusing attack
+readiness with protection.
 
 ## Validation
 
@@ -58,6 +81,7 @@ Install development dependencies and a Playwright Chromium browser, then run:
 npm install
 npx playwright install chromium
 npm run test:player
+npm run test:runtime
 npm run build:yandex
 ```
 
@@ -65,6 +89,10 @@ The browser test checks event expressions, isolated player pixels, clear faces
 under shield/Super overlays, gameplay state isolation, bounded sprite caches,
 restart, level transition, stalled image requests, and JavaScript errors.
 The release builder copies the player assets and validates ES5 output.
+Runtime tests exercise shielded/unshielded enemy, spike, projectile, wave, web
+and fall impacts; repeated contact during grace; short keyboard/touch jumps;
+queued input reset; desktop pixel budgeting; and resolution adaptation while
+preserving world coordinates.
 
 Additional local visual QA covered desktop, mobile landscape at 844 × 390 with
 DPR 2, portrait pause, all 18 level renderings, keyboard/touch input, real engine

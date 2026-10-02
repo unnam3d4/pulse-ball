@@ -2628,7 +2628,13 @@ globalThis.PulseBallEngine = (() => {
       const regularSafe=g.checkpoint&&Math.abs(p.x-g.checkpoint.x)<78&&Math.abs(p.y-440)<82;
       const bossSafe=g.bossCheckpoint&&g.bossCheckpoint.active&&Math.abs(p.x-g.bossCheckpoint.x)<78&&Math.abs(p.y-440)<82;
       if(regularSafe||bossSafe||p.invincible>0)return;
-      if(g.shield>0){g.shield=0;p.invincible=.85;g.events.push({type:'shieldBreak',x:p.x,y:p.y});return;}
+    }
+    // One shield absorbs one damaging incident, including a fall. A fall still
+    // returns the player to safe ground, without losing health or Super charge.
+    if(g.shield>0){
+      g.shield=0;g.events.push({type:'shieldBreak',x:p.x,y:p.y});
+      if(fall)Object.assign(p,{x:g.spawn.x,y:g.spawn.y,vx:0,vy:0,grounded:false,coyote:0,jumpBuffer:0,boosted:false,boostGlow:0,slopeMomentum:0});
+      p.invincible=fall?1.8:.85;return;
     }
     g.health=Math.max(0,g.health-1);g.events.push({type:'hurt',x:p.x,y:p.y});
     if(g.health<=0){g.status='lost';return;}
@@ -2781,7 +2787,7 @@ globalThis.PulseBallEngine = (() => {
     {sky:'#3d245f',horizon:'#d96f9a',sun:'#ffe3ba',far:'#724184',mid:'#55326e',near:'#382751',tree:'#34233f',dark:'#1d172c',grass:'#d8d05f',edge:'#8a7650',dirt:'#8e5966',deep:'#442c45',stone:'#6d5278',water:'#3f4b79'}
   ];
   const readLocal=key=>{try{return localStorage.getItem(key);}catch{return null;}};
-  let g=E.createGame(0),mode='menu',input={left:false,right:false,jump:false,pulse:false},pulseQueued=false,heldCodes=new Set(),touchPointers=new Map(),camera=0,viewW=1200,viewH=600,last=0,accumulator=0,visualTime=0,particles=[],feedbackFx=[],toastUntil=0,shake=0,finishCelebration=0,audio=null,audioMaster=null,masterLimiter=null,sfxGain=null,musicGain=null,noiseBuffer=null,musicSource=null,musicKey='',musicWanted='menu',musicLoadToken=0,sound=readLocal('pulse-ball-sound')!=='off',dialogKind='',helpPrevious='menu',best=[],unlocked=0,tutorialSeen=new Set(),tutorialActive='',tutorialUntil=0,tutorialActed=false,tutorialActionAt=0,tutorialHideTimer=0;
+  let g=E.createGame(0),mode='menu',input={left:false,right:false,jump:false,pulse:false},pulseQueued=false,jumpQueued=false,heldCodes=new Set(),touchPointers=new Map(),camera=0,viewW=1200,viewH=600,last=0,accumulator=0,visualTime=0,particles=[],feedbackFx=[],toastUntil=0,shake=0,finishCelebration=0,audio=null,audioMaster=null,masterLimiter=null,sfxGain=null,musicGain=null,noiseBuffer=null,musicSource=null,musicKey='',musicWanted='menu',musicLoadToken=0,sound=readLocal('pulse-ball-sound')!=='off',dialogKind='',helpPrevious='menu',best=[],unlocked=0,tutorialSeen=new Set(),tutorialActive='',tutorialUntil=0,tutorialActed=false,tutorialActionAt=0,tutorialHideTimer=0;
   const musicBuffers=new Map(),musicLoads=new Map();
   const MUSIC_TRACKS={
     // Music intentionally sits behind gameplay. SFX must stay readable on phone speakers.
@@ -2816,7 +2822,18 @@ globalThis.PulseBallEngine = (() => {
   function continueLevel(){for(let i=0;i<=unlocked;i++)if(!recordFor(i))return i;return Math.min(unlocked,E.levels.length-1);}
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const coarsePointer=matchMedia('(pointer:coarse)').matches||('ontouchstart' in window)||(navigator.maxTouchPoints||0)>0;
-  const MOBILE_RENDER_PIXEL_BUDGET=1650000;
+  const MOBILE_RENDER_PIXEL_BUDGET=1650000,DESKTOP_RENDER_PIXEL_BUDGET=2073600;
+  let renderScale=1,renderFrameCount=0,renderFrameMs=0;
+  function trackRenderLoad(elapsed){
+    if(mode!=='playing'||document.hidden){renderFrameCount=0;renderFrameMs=0;return;}
+    if(!(elapsed>0))return;
+    renderFrameMs+=Math.min(elapsed,250);renderFrameCount++;
+    if(renderFrameCount<16)return;
+    // Use presented frame intervals, not just JS draw submission timings:
+    // software rasterization can be slow while draw() itself returns quickly.
+    if(renderFrameMs/renderFrameCount>25&&renderScale>.5){renderScale=Math.max(.5,renderScale*.75);fit();}
+    renderFrameCount=0;renderFrameMs=0;
+  }
   if(coarsePointer)document.documentElement.classList.add('touch-capable');
   let lang='ru',manualLang=readLocal('pulse-ball-lang')||'';
   const LEVEL_NAMES_EN=['First Pulse','Echo Valley','Energy Rift','Pulse Ascent','Sky Terraces','Heart of the Rift','Resonance Canyon','Above the Clouds','Energy Cascade','Light Frontier','Sky Circuit','Radiant Core','Sunlit Gardens','Turquoise Flow','Pulse Garden','High Voltage','Rainbow Cascade','Energy Peak'];
@@ -2930,13 +2947,11 @@ globalThis.PulseBallEngine = (() => {
     viewH=coarsePointer?Math.max(600,480*box.height/groundRoom):600;
     viewW=viewH*box.width/box.height;
     let ratio=Math.min(devicePixelRatio||1,2);
-    if(coarsePointer){
-      const budgetRatio=Math.sqrt(MOBILE_RENDER_PIXEL_BUDGET/Math.max(1,box.width*box.height));
-      ratio=Math.max(1,Math.min(ratio,budgetRatio));
-    }
+    const pixelBudget=coarsePointer?MOBILE_RENDER_PIXEL_BUDGET:DESKTOP_RENDER_PIXEL_BUDGET;
+    ratio=Math.min(ratio,Math.sqrt(pixelBudget/Math.max(1,box.width*box.height)))*renderScale;
     const nextWidth=Math.max(1,Math.round(box.width*ratio)),nextHeight=Math.max(1,Math.round(box.height*ratio));
     if(canvas.width!==nextWidth||canvas.height!==nextHeight){canvas.width=nextWidth;canvas.height=nextHeight;skyGradientCache=new WeakMap();}
-    ctx.imageSmoothingEnabled=true;if('imageSmoothingQuality' in ctx)ctx.imageSmoothingQuality=ratio>=1.75?'high':'medium';
+    ctx.imageSmoothingEnabled=true;if('imageSmoothingQuality' in ctx)ctx.imageSmoothingQuality='medium';
     ctx.setTransform(canvas.width/viewW,0,0,canvas.height/viewH,0,0);
   }
   if(typeof ResizeObserver==='function')new ResizeObserver(fit).observe(stage);addEventListener('resize',fit,{passive:true});addEventListener('orientationchange',()=>requestAnimationFrame(fit),{passive:true});if(window.visualViewport)visualViewport.addEventListener('resize',fit,{passive:true});fit();
@@ -3649,20 +3664,17 @@ globalThis.PulseBallEngine = (() => {
     }
     const sprite=getPlayerSprite(playerExpression(g),p.face<0?-1:1);
     if(sprite)ctx.drawImage(sprite,-32,-32,64,64);
-    // Peripheral arcs keep the shell and expression visible. No live blur,
-    // screen blend or colored fill across the face, even with both abilities.
+    // A closed cyan boundary means protection. Super readiness is a separate
+    // violet lightning marker, so charged offense cannot look like a shield.
     if(g.shield){
-      ctx.save();ctx.globalAlpha*=reduced?.7:.64+.1*Math.sin(visualTime*4);ctx.strokeStyle='#9beef4';ctx.lineWidth=1.15;
-      ctx.beginPath();ctx.arc(0,0,33,-2.8,-.2);ctx.stroke();
-      ctx.beginPath();ctx.arc(0,0,33,.35,2.45);ctx.stroke();
-      ctx.strokeStyle='#e4ffff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,33,-2.45,-1.8);ctx.stroke();ctx.restore();
+      ctx.save();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(0,0,33,0,Math.PI*2);
+      ctx.strokeStyle='#18557b';ctx.lineWidth=4;ctx.stroke();
+      ctx.strokeStyle='#a9ffff';ctx.lineWidth=2.2;ctx.stroke();ctx.restore();
     }
     if((g.superCharge||0)>=100||g.superPulseEffect>0){
-      ctx.save();ctx.globalAlpha*=reduced?.85:.7+.14*Math.sin(visualTime*6);ctx.lineWidth=1.8;
-      const phase=reduced?0:visualTime*.9,radius=g.shield?38:33;
-      ctx.strokeStyle='#94e9ff';ctx.beginPath();ctx.arc(0,0,radius,phase,phase+1.55);ctx.stroke();
-      ctx.beginPath();ctx.arc(0,0,radius,phase+Math.PI,phase+Math.PI+1.55);ctx.stroke();
-      ctx.strokeStyle='#b5a5ff';ctx.lineWidth=1;ctx.beginPath();ctx.arc(0,0,radius+1,phase+1.65,phase+2.2);ctx.stroke();ctx.restore();
+      ctx.save();ctx.globalAlpha=1;ctx.translate(0,g.shield?-43:-37);
+      ctx.beginPath();ctx.moveTo(2,-8);ctx.lineTo(-6,1);ctx.lineTo(-1,1);ctx.lineTo(-3,8);ctx.lineTo(6,-2);ctx.lineTo(1,-2);ctx.closePath();
+      ctx.strokeStyle='#533184';ctx.lineWidth=2.5;ctx.stroke();ctx.fillStyle='#e4bdff';ctx.fill();ctx.restore();
     }
     ctx.restore();
   }
@@ -4411,7 +4423,7 @@ globalThis.PulseBallEngine = (() => {
     const progress=Math.round(Math.max(0,Math.min(1,(g.player.x-150)/(g.finish.x-150)))*100);if(hudCache.progress!==progress){hudCache.progress=progress;$('progressBar').style.width=progress+'%';$('progressText').textContent=progress+'%';}
   }
   function updateRecord(){const r=best[g.index];$('levelRecord').textContent=r&&r.level===g.level.name&&Number.isFinite(r.stars)?tr('record')+': '+r.stars+' / '+g.stars.length+' ★':tr('adventure');}
-  function clearInput(){heldCodes.clear();touchPointers.clear();pulseQueued=false;input={left:false,right:false,jump:false,pulse:false};g.pulseHeld=false;document.querySelectorAll('.touch-btn').forEach(b=>b.classList.remove('pressed'));}
+  function clearInput(){heldCodes.clear();touchPointers.clear();pulseQueued=false;jumpQueued=false;input={left:false,right:false,jump:false,pulse:false};g.pulseHeld=false;g.jumpHeld=false;document.querySelectorAll('.touch-btn').forEach(b=>b.classList.remove('pressed'));}
   function start(){if(pauseReasons.size||document.hidden)return;setGameplayFocusEnabled(true);globalThis.YandexPlatform?.hideBanner?.();mode='playing';$('menuScreen').hidden=true;$('readyHint').hidden=true;$('overlay').hidden=true;unlockAudio();globalThis.YandexPlatform?.gameplayStart?.();canvas.focus({preventScroll:true});}
   function loadLevel(index,autostart=false,carrySuper=0,carryShield=0){
     if(adPending||pauseReasons.size||document.hidden)return;
@@ -4560,14 +4572,14 @@ globalThis.PulseBallEngine = (() => {
     if(e.code==='Escape'||e.code==='KeyP'){if(!e.repeat){if(mode==='help')$('dialogPrimary').click();else if(mode==='menu'&&(!$('levelPicker').hidden||!$('settingsPanel').hidden))showMenu();else if(mode!=='menu')pause();}e.preventDefault();return;}
     if(codeMap[e.code]&&(mode==='playing'||mode==='ready')){
       if(e.code==='Space'&&e.target.tagName==='BUTTON'&&e.target!==$('startButton'))return;
-      e.preventDefault();if(mode==='ready')start();if(codeMap[e.code]==='pulse'&&!heldCodes.has(e.code))pulseQueued=true;heldCodes.add(e.code);syncInput();unlockAudio();
+      e.preventDefault();if(mode==='ready')start();if(codeMap[e.code]==='pulse'&&!heldCodes.has(e.code))pulseQueued=true;if(codeMap[e.code]==='jump'&&!heldCodes.has(e.code))jumpQueued=true;heldCodes.add(e.code);syncInput();unlockAudio();
     }
   });
   addEventListener('keyup',e=>{if(codeMap[e.code]){heldCodes.delete(e.code);syncInput();if(mode==='playing')e.preventDefault();}});
   document.querySelectorAll('.touch-btn').forEach(b=>{
     function press(id){
       if(mode==='ready')start();if(mode!=='playing')return;
-      touchPointers.set(id,b.dataset.key);if(b.dataset.key==='pulse')pulseQueued=true;syncInput();b.classList.add('pressed');unlockAudio();
+      touchPointers.set(id,b.dataset.key);if(b.dataset.key==='pulse')pulseQueued=true;if(b.dataset.key==='jump')jumpQueued=true;syncInput();b.classList.add('pressed');unlockAudio();
     }
     function releaseId(id){touchPointers.delete(id);syncInput();if(![...touchPointers.values()].includes(b.dataset.key))b.classList.remove('pressed');}
     if('PointerEvent' in window){
@@ -4593,9 +4605,10 @@ globalThis.PulseBallEngine = (() => {
     else globalThis.PulseGame.platformResume('visibility');
   });
   function frame(now){
-    const dt=Math.min(.05,Math.max(0,(now-last)/1000||0));last=now;visualTime+=dt;
+    const elapsed=Math.max(0,now-last||0);trackRenderLoad(elapsed);
+    const dt=Math.min(.05,elapsed/1000);last=now;visualTime+=dt;
     if(mode==='playing'){
-      accumulator+=dt;while(accumulator>=1/120){E.step(g,pulseQueued?{...input,pulse:true}:input,1/120);pulseQueued=false;handleEvents();accumulator-=1/120;if(g.status!=='playing'){openDialog(g.status);accumulator=0;break;}}
+      accumulator+=dt;while(accumulator>=1/120){if(jumpQueued)g.jumpHeld=false;E.step(g,(pulseQueued||jumpQueued)?{...input,pulse:pulseQueued||input.pulse,jump:jumpQueued||input.jump}:input,1/120);pulseQueued=false;jumpQueued=false;handleEvents();accumulator-=1/120;if(g.status!=='playing'){openDialog(g.status);accumulator=0;break;}}
     }else accumulator=0;
     const cameraAnchor=coarsePointer?.27:.32;
     const target=Math.max(0,Math.min(g.level.width-viewW,g.player.x-viewW*cameraAnchor));
