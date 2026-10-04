@@ -6,7 +6,7 @@ This repository is prepared for Yandex Games upload.
 
 The production game is `index.html` in the repository root.
 
-GitHub Actions workflow **Yandex Games Release** validates the build and creates:
+GitHub Actions workflow **Yandex Games Release** runs the runtime and player-visual regression suites, validates the Yandex build, and creates:
 
 - `pulse-ball-yandex.zip`
 - the ZIP contains `index.html` at archive root
@@ -25,9 +25,10 @@ Download the artifact from the latest successful workflow run and upload it to t
 - Russian and English UI
 - cloud progress through Player `getData/setData`
 - Safe Storage fallback when available
-- fullscreen interstitial calls only at natural breaks: level transitions and repeated retry flow; Yandex controls actual fullscreen-ad frequency
-- rewarded video continue after a loss: clearly labeled as an ad, reward is 3 lives and continuation from the current checkpoint/start
-- sticky banner API hooks: banner is requested in menus and normal gameplay, then hidden/restored around fullscreen or rewarded ads
+- fullscreen interstitial calls only at natural breaks: level restart/retry and post-win transitions; Yandex controls whether an ad is actually shown and its frequency
+- rewarded video after a loss: clearly labeled as an ad, reward is 2 hearts + shield and continuation from the current checkpoint/start
+- rewarded video after a completed non-final level: clearly labeled as an ad, reward is a shield carried into the next level
+- sticky banner API hooks: banner is requested in menus and result/pause dialogs, hidden during active gameplay, and hidden while fullscreen or rewarded ads are open
 - local fallback outside Yandex Games, so GitHub Pages stays usable
 
 ## Draft settings
@@ -101,16 +102,17 @@ On the **Advertising** tab:
 - Keep fullscreen and rewarded units enabled.
 - For Sticky banners, enable **Use the API to display a sticky-banner**.
 - **Mobile landscape sticky banner: choose “On the right”.** This matches the intended Yandex Games layout: platform chrome/banner stays outside the game field while the game adapts to the remaining viewport.
-- The game now keeps the sticky banner enabled during normal gameplay for monetization, and hides/restores it around fullscreen/rewarded ads.
+- The game requests the sticky banner in menus and result/pause dialogs, and hides it during active gameplay and fullscreen/rewarded ads.
 - Do not draw or reserve a fake ad slot inside the game: Yandex owns the banner area and may resize the game viewport when it is shown.
 - Do not add custom or third-party banners.
 
 Current in-game monetization flow:
 
-- fullscreen ad request after every second completed level transition; the Yandex platform controls whether an ad is actually shown and its frequency;
-- fullscreen ad request after every third manual retry following a loss;
-- voluntary rewarded video on the loss screen: **continue with 3 lives from the checkpoint/start**;
-- no fullscreen or rewarded ad calls during active gameplay.
+- fullscreen ad request on manual level restart/retry and on post-win level transitions; the Yandex platform controls whether an ad is actually shown and its frequency;
+- voluntary rewarded video on the loss screen: **continue from the checkpoint/start with 2 hearts + shield**;
+- voluntary rewarded video on the completed-level screen (except the final level): **start the next level with a shield**;
+- no fullscreen or rewarded ad calls during active gameplay;
+- sticky banner is kept out of active gameplay and is used only on non-gameplay screens.
 
 ## Draft-mode verification before moderation
 
@@ -123,8 +125,9 @@ Open the game with the Yandex debug panel and check:
 5. Language mock switches the UI between Russian and English before gameplay.
 6. Cloud progress survives reload and a second device/account session.
 7. Startup/fullscreen ads pause gameplay and audio, then resume cleanly.
-8. Desktop and mobile landscape layouts have no browser scroll, swipe-to-refresh, clipping or overlapping UI. Test mobile landscape both with and without a right-side sticky banner, including live viewport resize when the banner appears/disappears.
-9. Every level can be completed from a clean save.
-10. Console stays free of gameplay-breaking JavaScript errors.
+8. Desktop and mobile landscape layouts have no browser scroll, swipe-to-refresh, clipping or overlapping UI. Verify the right-side sticky banner in menus/result dialogs and confirm it disappears during active gameplay and fullscreen/rewarded ads.
+9. Loss rewarded flow grants exactly 2 hearts + shield and resumes from the current checkpoint/start; win rewarded flow carries exactly one shield into the next level.
+10. Every level can be completed from a clean save.
+11. Console stays free of gameplay-breaking JavaScript errors.
 
 Only after these checks should the draft be submitted for moderation.
